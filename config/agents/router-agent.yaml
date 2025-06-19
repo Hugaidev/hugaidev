@@ -1,0 +1,271 @@
+metadata:
+  name: router-agent
+  version: 1.0.0
+  description: "Central dispatcher for HUGAI agent network orchestration"
+  category: core-orchestration
+  dependencies:
+    - agent-registry
+    - task-queue
+    - audit-logger
+  tags:
+    - orchestration
+    - routing
+    - central-dispatcher
+
+configuration:
+  # Core Routing Settings
+  strategy: priority_first  # Options: priority_first, round_robin, load_based, capability_match
+  fallbacks_enabled: true
+  parallel_dispatch: false
+  max_concurrent_routes: 10
+  
+  # Input Sources
+  input_sources:
+    tasks: "tasks/*.yaml"
+    agents: "agents/*.yaml" 
+    routing_rules: "config/routing_rules.yaml"
+    capability_registry: "config/agent_capabilities.yaml"
+  
+  # Processing Pipeline
+  processing_steps:
+    - load_capabilities
+    - parse_task_metadata
+    - evaluate_routing_rules
+    - validate_agent_availability
+    - dispatch_task
+    - handle_failures
+    - update_audit_log
+  
+  # Retry Policy
+  retry_policy:
+    enabled: true
+    max_attempts: 3
+    delay_seconds: 5
+    backoff_strategy: exponential  # Options: fixed, linear, exponential
+    retry_on_errors:
+      - agent_unavailable
+      - capability_mismatch
+      - timeout_error
+  
+  # Fallback Configuration
+  fallback_policy:
+    enabled: true
+    fallback_chain:
+      - prompt_refiner_agent
+      - domain_expert_agent
+      - human_review_queue
+    escalation_timeout: 300  # seconds
+  
+  # Routing Rules
+  routing_rules:
+    requirement_analysis:
+      primary: requirements_analyzer_agent
+      fallbacks: [domain_expert_agent, prompt_refiner_agent]
+    
+    architecture_design:
+      primary: architecture_agent
+      fallbacks: [domain_expert_agent]
+    
+    code_implementation:
+      primary: implementation_agent
+      fallbacks: [architecture_agent]
+    
+    code_review:
+      primary: internal_reviewer_agent
+      fallbacks: [security_agent, test_agent]
+    
+    testing:
+      primary: test_agent
+      fallbacks: [implementation_agent]
+    
+    deployment:
+      primary: deployment_agent
+      fallbacks: [devops_agent]
+    
+    security_scan:
+      primary: security_agent
+      fallbacks: [compliance_legal_agent]
+    
+    documentation:
+      primary: documentation_writer_agent
+      fallbacks: [domain_expert_agent]
+
+integration:
+  # API Endpoints
+  api:
+    route_task: "/api/v1/route"
+    health_check: "/api/v1/health"
+    metrics: "/api/v1/metrics"
+  
+  # Message Queue Integration
+  messaging:
+    input_queue: "hugai.tasks.incoming"
+    output_queue: "hugai.tasks.routed"
+    dead_letter_queue: "hugai.tasks.failed"
+    
+  # Agent Communication
+  agent_communication:
+    protocol: "http"
+    timeout: 30  # seconds
+    headers:
+      content_type: "application/yaml"
+      authorization: "Bearer ${HUGAI_API_TOKEN}"
+  
+  # External Systems
+  external_systems:
+    audit_system: "hugai-audit-service"
+    metrics_system: "prometheus"
+    notification_system: "slack-webhook"
+
+validation:
+  # Input Validation
+  task_validation:
+    required_fields:
+      - task_id
+      - task_type
+      - payload
+    optional_fields:
+      - priority
+      - deadline
+      - metadata
+  
+  # Agent Capability Validation
+  capability_checks:
+    - verify_agent_exists
+    - check_agent_availability
+    - validate_required_capabilities
+    - confirm_resource_availability
+  
+  # Routing Decision Validation
+  routing_validation:
+    - validate_target_agent
+    - check_fallback_chain
+    - verify_retry_parameters
+    - confirm_audit_logging
+
+monitoring:
+  # Key Performance Indicators
+  metrics:
+    routing_accuracy:
+      description: "Percentage of tasks routed correctly on first attempt"
+      target: ">95%"
+      alert_threshold: "<90%"
+    
+    routing_latency:
+      description: "Average time to evaluate and dispatch tasks"
+      target: "<100ms"
+      alert_threshold: ">500ms"
+    
+    routing_throughput:
+      description: "Number of routing decisions per minute"
+      target: ">100"
+      alert_threshold: "<50"
+    
+    fallback_rate:
+      description: "Percentage of tasks requiring fallback routing"
+      target: "<10%"
+      alert_threshold: ">25%"
+    
+    retry_rate:
+      description: "Percentage of tasks requiring retry"
+      target: "<5%"
+      alert_threshold: ">15%"
+    
+    error_rate:
+      description: "Percentage of routing operations with errors"
+      target: "<1%"
+      alert_threshold: ">5%"
+  
+  # Alerting Configuration
+  alerts:
+    channels:
+      - slack: "#hugai-alerts"
+      - email: "hugai-ops@company.com"
+      - pagerduty: "hugai-critical"
+    
+    severity_levels:
+      critical: "System unavailable or >50% error rate"
+      warning: "Performance degraded or approaching thresholds"
+      info: "Routing patterns or unusual activity"
+  
+  # Health Checks
+  health_checks:
+    agent_registry_connectivity: 30s
+    task_queue_connectivity: 30s
+    audit_logger_connectivity: 60s
+    routing_rule_validation: 300s
+
+examples:
+  # Basic Task Routing
+  basic_routing:
+    input:
+      task_id: "task-001"
+      task_type: "requirement_analysis"
+      payload:
+        requirements: "User authentication system"
+      priority: "high"
+    
+    output:
+      routed_to: "requirements_analyzer_agent"
+      fallback_chain: ["domain_expert_agent", "prompt_refiner_agent"]
+      retry_attempts: 0
+      routing_metadata:
+        strategy_used: "priority_first"
+        decision_time: "50ms"
+  
+  # Complex Multi-Agent Workflow
+  complex_workflow:
+    input:
+      task_id: "task-002" 
+      task_type: "full_implementation"
+      payload:
+        feature: "Payment processing module"
+      requires_agents:
+        - requirements_analyzer_agent
+        - architecture_agent
+        - security_agent
+        - implementation_agent
+        - test_agent
+    
+    output:
+      routing_plan:
+        - agent: "requirements_analyzer_agent"
+          depends_on: []
+        - agent: "architecture_agent"
+          depends_on: ["requirements_analyzer_agent"]
+        - agent: "security_agent"
+          depends_on: ["architecture_agent"]
+        - agent: "implementation_agent"
+          depends_on: ["architecture_agent", "security_agent"]
+        - agent: "test_agent"
+          depends_on: ["implementation_agent"]
+  
+  # Fallback Scenario
+  fallback_scenario:
+    input:
+      task_id: "task-003"
+      task_type: "code_review"
+      primary_agent_error: "internal_reviewer_agent unavailable"
+    
+    output:
+      routed_to: "security_agent"
+      reason: "Fallback due to primary agent unavailability"
+      original_target: "internal_reviewer_agent"
+      fallback_level: 1
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize router agent
+  hugai agent init router-agent --config config/agents/router-agent.yaml
+  
+  # Route a single task
+  hugai route --task tasks/requirement-analysis.yaml --strategy priority_first
+  
+  # Monitor routing performance
+  hugai agent status router-agent --metrics routing_latency,routing_accuracy
+  
+  # Update routing rules
+  hugai config update router-agent.routing_rules --add-rule "new_task_type:target_agent"
+  
+  # Test routing configuration
+  hugai agent test router-agent --dry-run --input test/sample-tasks.yaml

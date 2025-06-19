@@ -1,0 +1,302 @@
+metadata:
+  name: requirements-analyzer-agent
+  version: 1.0.0
+  description: "Transforms stakeholder needs into structured, traceable software requirements"
+  category: domain-specific
+  dependencies:
+    - prompt-refiner-agent
+    - context-store
+    - document-parser
+  tags:
+    - requirements
+    - analysis
+    - validation
+    - traceability
+
+configuration:
+  # Core Analysis Settings
+  analysis_depth: comprehensive  # Options: basic, standard, comprehensive, deep
+  smart_validation: true
+  ambiguity_detection: true
+  dependency_mapping: true
+  
+  # Input Sources Configuration
+  input_sources:
+    requirements_docs: "docs/requirements/*.md"
+    business_docs: "docs/business/*.{md,docx,pdf}"
+    transcripts: "transcripts/*.txt" 
+    user_stories: "stories/*.yaml"
+    project_metadata: "metadata/project_info.yaml"
+    stakeholder_inputs: "inputs/stakeholders/*.{md,txt}"
+  
+  # Processing Pipeline
+  processing_steps:
+    - load_input_sources
+    - parse_documents
+    - extract_requirements
+    - normalize_format
+    - detect_ambiguities
+    - map_dependencies  
+    - validate_smart_criteria
+    - generate_traceability_matrix
+    - create_analysis_report
+    - validate_completeness
+  
+  # Output Configuration
+  output_format: yaml  # Options: yaml, json, markdown
+  output_structure:
+    functional_requirements: true
+    non_functional_requirements: true
+    business_rules: true
+    user_stories: true
+    acceptance_criteria: true
+    edge_cases: true
+    traceability_matrix: true
+  
+  # Quality Validation Settings
+  validation_rules:
+    smart_criteria:
+      specific: true
+      measurable: true  
+      achievable: true
+      relevant: true
+      time_bound: true
+    
+    completeness_checks:
+      min_acceptance_criteria: 2
+      max_acceptance_criteria: 10
+      edge_case_coverage: true
+      stakeholder_mapping: required
+    
+    ambiguity_detection:
+      sensitivity: medium  # Options: low, medium, high, strict
+      keywords: ["maybe", "probably", "might", "could", "should probably"]
+      vague_terms: ["user-friendly", "fast", "secure", "scalable"]
+  
+  # Requirement Classification
+  requirement_types:
+    functional:
+      prefix: "FR"
+      priority_levels: [critical, high, medium, low]
+      
+    non_functional:
+      prefix: "NFR"
+      categories: [performance, security, usability, reliability, scalability]
+      
+    business_rules:
+      prefix: "BR"
+      validation: mandatory
+      
+    constraints:
+      prefix: "CON"
+      types: [technical, regulatory, resource, timeline]
+
+integration:
+  # Upstream Agents
+  input_agents:
+    - prompt_refiner_agent
+    - domain_expert_agent
+    - knowledge_base_manager_agent
+  
+  # Downstream Agents  
+  output_agents:
+    - architecture_agent
+    - security_agent
+    - test_agent
+    - documentation_writer_agent
+  
+  # External Systems
+  external_integrations:
+    requirements_management:
+      tool: "jira"
+      api_endpoint: "${JIRA_API_URL}"
+      authentication: "api_key"
+      sync_enabled: true
+    
+    document_management:
+      tool: "confluence"
+      space_key: "REQ"
+      auto_publish: false
+    
+    version_control:
+      repository: "requirements-repo"
+      branch_strategy: "feature-requirements"
+      auto_commit: false
+  
+  # Communication Protocols
+  messaging:
+    input_format: "hugai-standard"
+    output_format: "requirements-spec-v1"
+    error_handling: "detailed"
+
+validation:
+  # Input Validation
+  input_validation:
+    required_files:
+      - project_info.yaml
+      - at_least_one_requirement_doc
+    
+    document_formats:
+      supported: [".md", ".txt", ".docx", ".pdf", ".yaml", ".json"]
+      max_size: "10MB"
+      encoding: "utf-8"
+  
+  # Processing Validation
+  processing_validation:
+    min_requirements: 1
+    max_requirements: 1000
+    duplicate_detection: true
+    circular_dependency_check: true
+  
+  # Output Validation
+  output_validation:
+    schema_compliance: true
+    traceability_completeness: ">90%"
+    ambiguity_threshold: "<5%"
+    smart_criteria_compliance: ">85%"
+
+monitoring:
+  # Performance Metrics
+  metrics:
+    requirements_completeness_rate:
+      description: "Percentage of stakeholder inputs captured as requirements"
+      target: ">95%"
+      alert_threshold: "<85%"
+      calculation: "captured_requirements / total_inputs * 100"
+    
+    ambiguity_detection_rate:
+      description: "Number of ambiguous requirements identified per input set"
+      target: "5-15"
+      alert_threshold: ">25"
+      calculation: "ambiguous_requirements / total_requirements"
+    
+    traceability_coverage:
+      description: "Percentage of requirements linked to stakeholders/tests"
+      target: ">90%"
+      alert_threshold: "<75%"
+      calculation: "traced_requirements / total_requirements * 100"
+    
+    consistency_score:
+      description: "Proportion of requirements free from conflicts"
+      target: ">98%"
+      alert_threshold: "<90%"
+      calculation: "conflict_free_requirements / total_requirements * 100"
+    
+    processing_throughput:
+      description: "Requirements processed per hour"
+      target: ">50"
+      alert_threshold: "<20"
+      calculation: "requirements_processed / processing_time_hours"
+    
+    delivery_time:
+      description: "Time from input to final specification"
+      target: "<30min"
+      alert_threshold: ">60min"
+      calculation: "completion_time - start_time"
+  
+  # Quality Metrics
+  quality_metrics:
+    smart_compliance_rate:
+      description: "Percentage of requirements meeting SMART criteria"
+      target: ">90%"
+      
+    stakeholder_satisfaction:
+      description: "Average rating from requirement reviews"
+      target: ">4.0"
+      scale: "1-5"
+  
+  # Health Checks
+  health_checks:
+    document_parser_status: 30s
+    context_store_connectivity: 60s
+    external_integrations: 300s
+    validation_engine: 120s
+
+examples:
+  # Basic Requirements Analysis
+  basic_analysis:
+    input:
+      project: "E-commerce Platform"
+      source_document: "docs/requirements/user-auth.md"
+      stakeholders: ["product_manager", "tech_lead", "ux_designer"]
+    
+    output:
+      requirements:
+        - id: "FR-001"
+          type: "functional"
+          title: "User Registration"
+          description: "Users must be able to create accounts with email and password"
+          priority: "high"
+          acceptance_criteria:
+            - "Email validation is performed"
+            - "Password meets complexity requirements"
+            - "Confirmation email is sent"
+          edge_cases:
+            - "Email already exists"
+            - "Invalid email format"
+            - "Weak password provided"
+          stakeholders: ["product_manager", "ux_designer"]
+          
+        - id: "NFR-001"
+          type: "non_functional"
+          title: "Registration Performance"
+          description: "User registration must complete within 3 seconds"
+          category: "performance"
+          measurable_criteria: "95% of registrations < 3 seconds"
+  
+  # Complex Business Rules
+  business_rules_example:
+    input:
+      domain: "Financial Services"
+      regulations: ["PCI-DSS", "SOX", "GDPR"]
+      
+    output:
+      business_rules:
+        - id: "BR-001"
+          title: "Payment Card Data Protection"
+          description: "All credit card data must be encrypted at rest and in transit"
+          regulation_source: "PCI-DSS"
+          validation_method: "automated_scan"
+          
+        - id: "BR-002"
+          title: "Data Retention Policy"
+          description: "Personal data must be deleted after 7 years unless legally required"
+          regulation_source: "GDPR"
+          automation_possible: true
+  
+  # Traceability Matrix
+  traceability_example:
+    requirements_to_stakeholders:
+      FR-001: ["product_manager", "ux_designer"]
+      NFR-001: ["tech_lead", "performance_engineer"]
+      BR-001: ["compliance_officer", "security_engineer"]
+    
+    requirements_to_tests:
+      FR-001: ["TC-001", "TC-002", "TC-003"]
+      NFR-001: ["PTC-001"]  # Performance Test Case
+      BR-001: ["SEC-001", "COMP-001"]
+    
+    dependencies:
+      FR-002: 
+        depends_on: ["FR-001"]
+        reason: "Login requires registration"
+
+# CLI Usage Examples
+cli_usage: |
+  # Analyze requirements from documents
+  hugai analyze requirements --input docs/requirements/ --output specs/requirements.yaml
+  
+  # Validate existing requirements
+  hugai validate requirements --spec specs/requirements.yaml --check ambiguity,completeness
+  
+  # Generate traceability matrix
+  hugai trace requirements --requirements specs/requirements.yaml --tests tests/ --stakeholders team.yaml
+  
+  # Interactive requirements refinement
+  hugai refine requirements --interactive --input rough-requirements.md
+  
+  # Export to external tools
+  hugai export requirements --format jira --destination ${JIRA_PROJECT_KEY}
+  
+  # Analyze requirement changes
+  hugai diff requirements --old v1.0/requirements.yaml --new v2.0/requirements.yaml

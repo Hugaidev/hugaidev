@@ -1,0 +1,411 @@
+metadata:
+  name: implementation-agent
+  version: 1.0.0
+  description: "Transforms validated designs and requirements into executable code modules"
+  category: domain-specific
+  dependencies:
+    - architecture-agent
+    - requirements-analyzer-agent
+    - security-agent
+    - static-analysis-tools
+  tags:
+    - code-generation
+    - implementation
+    - scaffolding
+    - standards-compliance
+
+configuration:
+  # Core Implementation Settings
+  generation_approach: specification_driven  # Options: specification_driven, template_based, ai_guided
+  code_quality_level: production  # Options: prototype, development, production
+  documentation_level: comprehensive  # Options: minimal, standard, comprehensive
+  
+  # Supported Languages and Frameworks
+  supported_languages:
+    python:
+      versions: ["3.9", "3.10", "3.11", "3.12"]
+      frameworks: [django, flask, fastapi, pytest]
+      style_guide: pep8
+      linters: [pylint, flake8, black]
+      
+    typescript:
+      versions: ["4.9", "5.0", "5.1", "5.2"]
+      frameworks: [express, nest, react, vue]
+      style_guide: airbnb
+      linters: [eslint, prettier, tsc]
+      
+    java:
+      versions: ["11", "17", "21"]
+      frameworks: [spring_boot, junit, mockito]
+      style_guide: google
+      linters: [checkstyle, spotbugs, pmd]
+      
+    go:
+      versions: ["1.19", "1.20", "1.21"]
+      frameworks: [gin, echo, testify]
+      style_guide: effective_go
+      linters: [golangci_lint, gofmt]
+  
+  # Input Sources Configuration
+  input_sources:
+    component_specs: "specs/components/*.yaml"
+    architecture_designs: "designs/*.{yaml,json}"
+    coding_standards: "guidelines/coding_standards.md"
+    style_guides: "guidelines/style_guides/*.md"
+    existing_codebase: "src/**/*"
+    dependency_configs: "{package.json,requirements.txt,go.mod,pom.xml}"
+    test_frameworks: "test_configs/*.yaml"
+  
+  # Processing Pipeline
+  processing_steps:
+    - load_specifications
+    - analyze_existing_codebase
+    - validate_architecture_constraints
+    - generate_project_structure
+    - implement_core_components
+    - generate_interfaces_contracts
+    - embed_documentation
+    - create_test_scaffolding
+    - apply_coding_standards
+    - validate_generated_code
+    - create_build_configurations
+  
+  # Code Generation Strategy
+  generation_strategy:
+    scaffolding:
+      project_structure: true
+      configuration_files: true
+      build_scripts: true
+      ci_cd_configs: true
+      
+    component_generation:
+      classes_interfaces: true
+      business_logic: true
+      data_access_layer: true
+      api_endpoints: true
+      
+    documentation_generation:
+      inline_comments: true
+      api_documentation: true
+      readme_files: true
+      usage_examples: true
+  
+  # Quality Standards
+  quality_standards:
+    code_coverage:
+      minimum_threshold: 80
+      target_threshold: 90
+      critical_paths: 95
+      
+    complexity_limits:
+      cyclomatic_complexity: 10
+      function_length: 50
+      class_length: 500
+      
+    documentation_requirements:
+      public_methods: required
+      complex_algorithms: required
+      api_endpoints: required
+      configuration_options: required
+  
+  # Testing Configuration
+  testing_framework:
+    unit_tests:
+      auto_generate: true
+      test_patterns: ["test_*.py", "*_test.go", "*.test.ts"]
+      mock_frameworks: [pytest_mock, jest, mockito]
+      
+    integration_tests:
+      auto_generate: true
+      test_containers: true
+      database_fixtures: true
+      
+    performance_tests:
+      load_testing: conditional
+      benchmark_tests: true
+      profiling_hooks: true
+
+integration:
+  # Upstream Agents
+  input_agents:
+    - architecture_agent
+    - requirements_analyzer_agent
+    - security_agent
+    - domain_expert_agent
+  
+  # Downstream Agents
+  output_agents:
+    - test_agent
+    - internal_reviewer_agent
+    - security_agent
+    - documentation_writer_agent
+  
+  # Development Environment Integration
+  ide_integration:
+    vscode:
+      extensions_config: ".vscode/extensions.json"
+      settings_config: ".vscode/settings.json"
+      launch_configs: ".vscode/launch.json"
+      
+    jetbrains:
+      code_style_configs: ".idea/codeStyles/"
+      inspection_profiles: ".idea/inspectionProfiles/"
+      
+    vim_neovim:
+      lsp_configs: "lsp-config.lua"
+      plugin_configs: "plugins.vim"
+  
+  # Build System Integration
+  build_systems:
+    maven:
+      pom_generation: true
+      profile_configs: [dev, test, prod]
+      
+    gradle:
+      build_script_generation: true
+      multi_project_support: true
+      
+    npm_yarn:
+      package_json_management: true
+      script_generation: true
+      
+    go_modules:
+      go_mod_management: true
+      vendor_management: true
+  
+  # Version Control Integration
+  vcs_integration:
+    git_hooks:
+      pre_commit: "lint, format, test"
+      pre_push: "full_test_suite"
+      
+    commit_templates:
+      conventional_commits: true
+      auto_changelog: true
+
+validation:
+  # Input Validation
+  input_validation:
+    specification_completeness:
+      component_definitions: required
+      interface_specifications: required
+      business_logic_rules: required
+      data_models: required
+      
+    architecture_alignment:
+      pattern_compliance: validated
+      dependency_management: validated
+      security_requirements: validated
+  
+  # Code Generation Validation
+  generation_validation:
+    syntax_validation:
+      compile_check: true
+      lint_check: true
+      format_check: true
+      
+    semantic_validation:
+      interface_compliance: true
+      business_rule_implementation: true
+      error_handling: validated
+      
+    security_validation:
+      vulnerability_scan: true
+      secure_coding_practices: true
+      dependency_security: validated
+  
+  # Output Validation
+  output_validation:
+    build_validation:
+      successful_compilation: required
+      dependency_resolution: required
+      test_execution: required
+      
+    documentation_validation:
+      api_docs_completeness: ">90%"
+      code_coverage_documentation: required
+      usage_examples: required
+
+monitoring:
+  # Implementation Metrics
+  metrics:
+    implementation_completion_time:
+      description: "Time to generate code modules from specifications"
+      target: "<2 hours"
+      alert_threshold: ">8 hours"
+      
+    code_generation_accuracy:
+      description: "Percentage of generated code passing static analysis"
+      target: ">95%"
+      alert_threshold: "<85%"
+      
+    build_success_rate:
+      description: "Percentage of generated code that builds without errors"
+      target: ">98%"
+      alert_threshold: "<90%"
+      
+    test_stub_coverage:
+      description: "Percentage of generated code covered by auto-created tests"
+      target: ">80%"
+      alert_threshold: "<60%"
+      
+    specification_coverage:
+      description: "Percentage of specs implemented in generated code"
+      target: ">95%"
+      alert_threshold: "<85%"
+      
+    lint_compliance_rate:
+      description: "Percentage of code lines adhering to style guidelines"
+      target: ">98%"
+      alert_threshold: "<90%"
+  
+  # Quality Metrics
+  quality_metrics:
+    cyclomatic_complexity:
+      description: "Average complexity of generated functions"
+      target: "<8"
+      alert_threshold: ">15"
+      
+    technical_debt_ratio:
+      description: "Estimated technical debt in generated code"
+      target: "<10%"
+      alert_threshold: ">25%"
+      
+    maintainability_index:
+      description: "Calculated maintainability score"
+      target: ">70"
+      alert_threshold: "<50"
+  
+  # Performance Monitoring
+  performance_monitoring:
+    code_generation_throughput: ">1000 lines/hour"
+    specification_processing_time: "<30min"
+    validation_execution_time: "<15min"
+
+examples:
+  # REST API Implementation
+  rest_api_example:
+    input:
+      specification:
+        component: "UserService"
+        endpoints:
+          - path: "/users"
+            method: "GET"
+            description: "List all users"
+          - path: "/users/{id}"
+            method: "GET"
+            description: "Get user by ID"
+          - path: "/users"
+            method: "POST"
+            description: "Create new user"
+        data_model:
+          User:
+            fields:
+              id: "UUID"
+              email: "string"
+              name: "string"
+              created_at: "datetime"
+    
+    output:
+      files_generated:
+        - "src/services/user_service.py"
+        - "src/models/user.py"
+        - "src/api/user_endpoints.py"
+        - "tests/test_user_service.py"
+        - "tests/test_user_endpoints.py"
+      
+      code_sample: |
+        # Generated user_service.py
+        from typing import List, Optional
+        from models.user import User
+        from repositories.user_repository import UserRepository
+        
+        class UserService:
+            def __init__(self, user_repository: UserRepository):
+                self.user_repository = user_repository
+            
+            async def get_all_users(self) -> List[User]:
+                """Retrieve all users from the system."""
+                return await self.user_repository.find_all()
+            
+            async def get_user_by_id(self, user_id: str) -> Optional[User]:
+                """Get a specific user by their ID."""
+                return await self.user_repository.find_by_id(user_id)
+  
+  # Database Model Implementation
+  database_model_example:
+    input:
+      specification:
+        entity: "Product"
+        attributes:
+          id: {type: "UUID", primary_key: true}
+          name: {type: "string", max_length: 255, required: true}
+          price: {type: "decimal", precision: 10, scale: 2}
+          category_id: {type: "UUID", foreign_key: "Category.id"}
+        relationships:
+          category: {type: "many_to_one", target: "Category"}
+          reviews: {type: "one_to_many", target: "ProductReview"}
+    
+    output:
+      sqlalchemy_model: |
+        from sqlalchemy import Column, String, Numeric, ForeignKey
+        from sqlalchemy.dialects.postgresql import UUID
+        from sqlalchemy.orm import relationship
+        from database import Base
+        
+        class Product(Base):
+            __tablename__ = 'products'
+            
+            id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+            name = Column(String(255), nullable=False)
+            price = Column(Numeric(10, 2), nullable=True)
+            category_id = Column(UUID(as_uuid=True), ForeignKey('categories.id'))
+            
+            category = relationship("Category", back_populates="products")
+            reviews = relationship("ProductReview", back_populates="product")
+  
+  # Microservice Scaffolding
+  microservice_example:
+    input:
+      specification:
+        service_name: "order-service"
+        architecture: "hexagonal"
+        language: "go"
+        framework: "gin"
+        database: "postgresql"
+        messaging: "kafka"
+    
+    output:
+      project_structure:
+        - "cmd/server/main.go"
+        - "internal/domain/order.go"
+        - "internal/ports/order_service.go"
+        - "internal/adapters/postgres/order_repository.go"
+        - "internal/adapters/http/order_handler.go"
+        - "internal/adapters/kafka/order_publisher.go"
+        - "pkg/config/config.go"
+        - "deployments/docker/Dockerfile"
+        - "deployments/k8s/deployment.yaml"
+
+# CLI Usage Examples
+cli_usage: |
+  # Generate code from specifications
+  hugai implement --specs specs/components/ --language python --framework django
+  
+  # Scaffold new microservice
+  hugai scaffold microservice --name user-service --language go --pattern hexagonal
+  
+  # Generate API endpoints
+  hugai generate api --openapi api/user-api.yaml --output src/api/
+  
+  # Create database models
+  hugai generate models --schema database/schema.sql --orm sqlalchemy
+  
+  # Implement business logic
+  hugai implement business-logic --requirements requirements.yaml --tests-included
+  
+  # Update existing code
+  hugai update implementation --component user-service --add-feature authentication
+  
+  # Validate generated code
+  hugai validate code --path src/ --checks lint,security,tests

@@ -1,0 +1,511 @@
+metadata:
+  name: branch-pr-manager-agent-configuration
+  version: 1.0.0
+  description: "AI agent specialized in Git branch management, pull request automation, and code collaboration workflows for HUGAI development"
+  category: specialized-agents
+  dependencies:
+    - llm-models
+    - version-control-systems
+    - code-review-tools
+    - ci-cd-pipelines
+  tags:
+    - git-management
+    - pull-requests
+    - code-review
+    - branch-strategy
+    - collaboration
+
+configuration:
+  # Branch PR Manager Agent Philosophy
+  agent_philosophy:
+    purpose: "Streamline and optimize Git branch management and pull request workflows to enhance code collaboration and maintain high-quality development practices"
+    principles:
+      automated_workflow_optimization: "Automate repetitive Git operations while maintaining human oversight for critical decisions"
+      quality_gate_enforcement: "Enforce code quality standards through automated checks and intelligent review routing"
+      collaboration_enhancement: "Facilitate effective code collaboration through smart PR management and reviewer assignment"
+      branch_strategy_compliance: "Ensure adherence to established branching strategies and naming conventions"
+      knowledge_sharing: "Promote knowledge transfer through intelligent code review suggestions and documentation"
+
+  # Core Capabilities
+  core_capabilities:
+    branch_management:
+      branch_operations:
+        - "intelligent_branch_creation"
+        - "automated_branch_naming"
+        - "branch_lifecycle_management"
+        - "merge_conflict_detection"
+        - "branch_cleanup_automation"
+        - "stale_branch_identification"
+        - "branch_protection_management"
+      
+      branching_strategies:
+        git_flow:
+          main_branches:
+            - "main": "production_ready_code"
+            - "develop": "integration_branch"
+          
+          supporting_branches:
+            - "feature/*": "new_feature_development"
+            - "release/*": "release_preparation"
+            - "hotfix/*": "critical_production_fixes"
+          
+          workflow_automation:
+            - "automatic_feature_branch_creation"
+            - "release_branch_management"
+            - "hotfix_workflow_acceleration"
+        
+        github_flow:
+          branch_structure:
+            - "main": "always_deployable"
+            - "feature/*": "all_development_work"
+          
+          workflow_principles:
+            - "continuous_deployment_ready"
+            - "pull_request_driven_development"
+            - "short_lived_feature_branches"
+        
+        gitlab_flow:
+          environment_branches:
+            - "main": "development_environment"
+            - "staging": "staging_environment"
+            - "production": "production_environment"
+          
+          release_management:
+            - "environment_promotion_workflow"
+            - "cherry_pick_automation"
+            - "release_tag_management"
+    
+    pull_request_automation:
+      pr_lifecycle_management:
+        creation:
+          - "template_based_pr_creation"
+          - "automatic_description_generation"
+          - "intelligent_reviewer_assignment"
+          - "label_automation"
+          - "milestone_association"
+        
+        review_process:
+          - "review_request_automation"
+          - "review_reminder_scheduling"
+          - "review_load_balancing"
+          - "expertise_based_routing"
+          - "escalation_management"
+        
+        validation:
+          - "automated_checks_orchestration"
+          - "conflict_detection_prevention"
+          - "quality_gate_validation"
+          - "security_scan_integration"
+          - "test_coverage_verification"
+        
+        merge_management:
+          - "merge_strategy_selection"
+          - "automatic_merge_execution"
+          - "post_merge_cleanup"
+          - "deployment_trigger_coordination"
+      
+      pr_quality_enhancement:
+        description_optimization:
+          - "ai_powered_description_generation"
+          - "change_impact_analysis"
+          - "related_issue_linking"
+          - "testing_recommendation_generation"
+        
+        code_analysis:
+          - "automated_code_review"
+          - "security_vulnerability_detection"
+          - "performance_impact_assessment"
+          - "documentation_completeness_check"
+          - "breaking_change_identification"
+
+  # Agent Configuration
+  agent_configuration:
+    model_selection:
+      primary_model: "claude-3-5-sonnet"
+      fallback_models: ["gpt-4-turbo", "gpt-3.5-turbo"]
+      
+      task_specific_models:
+        code_analysis: "claude-3-5-sonnet"
+        pr_description_generation: "gpt-4-turbo"
+        reviewer_assignment: "gpt-3.5-turbo"
+        conflict_resolution: "claude-3-5-sonnet"
+    
+    operational_parameters:
+      pr_processing_timeout: "5m"
+      review_assignment_delay: "immediate"
+      stale_branch_threshold: "30_days"
+      
+      human_escalation_triggers:
+        - "complex_merge_conflicts_detected"
+        - "security_vulnerability_found"
+        - "breaking_change_impact_high"
+        - "review_consensus_not_reached"
+        - "critical_hotfix_required"
+    
+    integration_points:
+      version_control_platforms:
+        - "github"
+        - "gitlab"
+        - "bitbucket"
+        - "azure_devops"
+      
+      code_quality_tools:
+        - "sonarqube"
+        - "codeclimate"
+        - "codeacy"
+        - "deepsource"
+      
+      ci_cd_systems:
+        - "github_actions"
+        - "gitlab_ci"
+        - "jenkins"
+        - "circleci"
+        - "azure_pipelines"
+
+  # Branch Management Workflows
+  branch_workflows:
+    feature_development:
+      workflow_name: "feature_branch_lifecycle"
+      
+      steps:
+        branch_creation:
+          description: "Create feature branch with proper naming and setup"
+          actions:
+            - "validate_feature_requirements"
+            - "generate_branch_name"
+            - "create_branch_from_latest_main"
+            - "setup_branch_protection_rules"
+          
+          naming_conventions:
+            feature_pattern: "feature/TICKET-{id}-{short-description}"
+            validation_rules:
+              - "ticket_id_required"
+              - "description_length_limit_50"
+              - "kebab_case_enforcement"
+              - "no_special_characters"
+        
+        development_tracking:
+          description: "Monitor development progress and provide assistance"
+          continuous_actions:
+            - "track_commit_frequency"
+            - "monitor_code_quality_metrics"
+            - "detect_potential_conflicts"
+            - "suggest_intermediate_commits"
+          
+          automated_checks:
+            - "commit_message_validation"
+            - "code_style_compliance"
+            - "test_coverage_tracking"
+            - "security_scan_execution"
+        
+        pr_preparation:
+          description: "Prepare feature for pull request submission"
+          actions:
+            - "rebase_against_latest_main"
+            - "resolve_merge_conflicts"
+            - "run_comprehensive_tests"
+            - "generate_pr_description"
+          
+          quality_gates:
+            - "all_tests_passing"
+            - "code_coverage_threshold_met"
+            - "no_merge_conflicts"
+            - "commit_history_clean"
+    
+    hotfix_workflow:
+      workflow_name: "emergency_hotfix_process"
+      
+      priority: "critical"
+      sla: "2_hours"
+      
+      steps:
+        rapid_branch_creation:
+          description: "Quickly create hotfix branch from production"
+          actions:
+            - "create_hotfix_branch_from_main"
+            - "notify_stakeholders"
+            - "expedite_review_assignment"
+            - "bypass_non_critical_checks"
+        
+        accelerated_review:
+          description: "Fast-track review process for hotfix"
+          process_modifications:
+            - "reduced_reviewer_requirements"
+            - "shortened_review_timeline"
+            - "emergency_approval_workflow"
+            - "post_deployment_validation"
+
+  # Pull Request Management
+  pr_management:
+    automated_pr_creation:
+      pr_template_selection:
+        feature_template:
+          sections:
+            - "summary"
+            - "changes_made"
+            - "testing_performed"
+            - "screenshots_demos"
+            - "checklist"
+            - "related_issues"
+        
+        bugfix_template:
+          sections:
+            - "bug_description"
+            - "root_cause_analysis"
+            - "solution_approach"
+            - "testing_verification"
+            - "regression_prevention"
+        
+        hotfix_template:
+          sections:
+            - "critical_issue_description"
+            - "immediate_impact"
+            - "fix_implementation"
+            - "risk_assessment"
+            - "rollback_plan"
+      
+      description_generation:
+        ai_analysis_inputs:
+          - "commit_messages_analysis"
+          - "code_diff_examination"
+          - "related_issue_context"
+          - "testing_file_changes"
+        
+        generated_content:
+          - "change_summary"
+          - "impact_assessment"
+          - "testing_recommendations"
+          - "deployment_considerations"
+    
+    reviewer_assignment:
+      assignment_strategies:
+        expertise_based:
+          file_expertise_mapping:
+            - "frontend/*": ["frontend_team", "ui_experts"]
+            - "backend/api/*": ["backend_team", "api_experts"]
+            - "infrastructure/*": ["devops_team", "infra_experts"]
+            - "security/*": ["security_team"]
+          
+          code_area_analysis:
+            - "identify_modified_components"
+            - "map_components_to_experts"
+            - "consider_reviewer_availability"
+            - "balance_review_workload"
+        
+        round_robin:
+          balancing_factors:
+            - "current_review_load"
+            - "recent_review_history"
+            - "team_member_availability"
+            - "expertise_requirements"
+        
+        ai_recommended:
+          recommendation_factors:
+            - "past_review_quality"
+            - "domain_expertise"
+            - "collaboration_history"
+            - "learning_opportunities"
+
+  # Code Review Enhancement
+  review_enhancement:
+    automated_code_analysis:
+      static_analysis_integration:
+        - "security_vulnerability_scanning"
+        - "code_quality_assessment"
+        - "performance_impact_analysis"
+        - "maintainability_evaluation"
+        - "test_coverage_analysis"
+      
+      ai_powered_insights:
+        code_quality_feedback:
+          - "naming_convention_suggestions"
+          - "code_structure_improvements"
+          - "potential_bug_identification"
+          - "performance_optimization_opportunities"
+        
+        documentation_assistance:
+          - "missing_documentation_identification"
+          - "api_documentation_generation"
+          - "code_comment_suggestions"
+          - "readme_update_recommendations"
+    
+    review_process_optimization:
+      intelligent_scheduling:
+        - "reviewer_availability_consideration"
+        - "time_zone_optimization"
+        - "workload_distribution"
+        - "urgency_based_prioritization"
+      
+      review_quality_enhancement:
+        - "context_aware_review_suggestions"
+        - "historical_issue_pattern_analysis"
+        - "best_practice_enforcement"
+        - "knowledge_transfer_facilitation"
+
+  # Merge Management
+  merge_management:
+    merge_strategy_optimization:
+      strategy_selection_criteria:
+        merge_commit:
+          use_cases:
+            - "feature_branch_completion"
+            - "release_integration"
+            - "audit_trail_preservation"
+          
+          conditions:
+            - "multiple_commits_with_logical_grouping"
+            - "branch_history_preservation_required"
+            - "collaborative_development_context"
+        
+        squash_merge:
+          use_cases:
+            - "small_feature_implementation"
+            - "bug_fix_commits"
+            - "cleanup_and_refactoring"
+          
+          conditions:
+            - "commit_history_noise_reduction"
+            - "linear_history_preference"
+            - "single_logical_change"
+        
+        rebase_merge:
+          use_cases:
+            - "linear_history_maintenance"
+            - "clean_commit_preservation"
+            - "advanced_development_workflows"
+          
+          conditions:
+            - "clean_commit_history_available"
+            - "linear_progression_suitable"
+            - "team_rebase_proficiency"
+    
+    post_merge_automation:
+      cleanup_operations:
+        - "feature_branch_deletion"
+        - "related_branch_cleanup"
+        - "stale_reference_removal"
+        - "workspace_synchronization"
+      
+      notification_management:
+        - "merge_completion_notification"
+        - "deployment_pipeline_trigger"
+        - "issue_closure_automation"
+        - "changelog_update_trigger"
+
+integration:
+  # Development Tool Integration
+  development_integration:
+    ide_integration:
+      vscode_extension:
+        features:
+          - "branch_management_commands"
+          - "pr_creation_assistance"
+          - "review_request_notifications"
+          - "merge_conflict_resolution_help"
+      
+      jetbrains_plugin:
+        features:
+          - "intelligent_branch_suggestions"
+          - "automated_pr_description_generation"
+          - "code_review_integration"
+          - "git_workflow_optimization"
+    
+    project_management_integration:
+      jira_integration:
+        - "automatic_branch_creation_from_tickets"
+        - "pr_linking_to_issues"
+        - "status_synchronization"
+        - "time_tracking_integration"
+      
+      linear_integration:
+        - "issue_to_branch_mapping"
+        - "pr_status_updates"
+        - "cycle_time_tracking"
+        - "team_velocity_metrics"
+
+  # Quality Assurance Integration
+  qa_integration:
+    automated_testing:
+      test_execution_coordination:
+        - "pr_triggered_test_suites"
+        - "regression_test_selection"
+        - "performance_test_integration"
+        - "security_test_automation"
+    
+    quality_metrics:
+      code_quality_tracking:
+        - "technical_debt_measurement"
+        - "code_complexity_analysis"
+        - "maintainability_index_calculation"
+        - "test_coverage_evolution"
+
+validation:
+  # Branch PR Manager Agent Validation
+  agent_effectiveness:
+    workflow_automation_success_rate: ">95%"
+    pr_quality_improvement: "measurable"
+    review_cycle_time_reduction: ">30%"
+    merge_conflict_prevention_rate: ">80%"
+  
+  # Development Workflow Validation
+  workflow_validation:
+    branch_management_efficiency: "optimized"
+    code_review_quality: "enhanced"
+    collaboration_satisfaction: ">4.5/5"
+    development_velocity: "maintained_or_improved"
+
+examples:
+  # Automated PR Creation Example
+  pr_automation_example:
+    pr_creation_workflow: |
+      # Automated PR Creation Process
+      
+      ## Branch Analysis
+      - **Branch**: feature/HUGAI-123-implement-new-agent
+      - **Base Branch**: main
+      - **Commits**: 8 commits
+      - **Files Changed**: 15 files
+      - **Lines Added**: +420
+      - **Lines Removed**: -85
+      
+      ## Generated PR Description
+      ### Summary
+      Implements new AI agent for requirements analysis with enhanced 
+      natural language processing capabilities and human validation checkpoints.
+      
+      ### Changes Made
+      - Added RequirementsAnalyzerAgent class with NLP integration
+      - Implemented human validation workflow for critical decisions
+      - Added comprehensive test suite with 95% coverage
+      - Updated documentation with usage examples
+      
+      ### Testing Performed
+      - Unit tests: 42 new tests added
+      - Integration tests: 8 end-to-end scenarios
+      - Performance tests: Response time < 2s validated
+      - Security scan: No vulnerabilities detected
+      
+      ## Recommended Reviewers
+      - @alice (AI/ML expertise, requirements domain)
+      - @bob (Senior developer, architecture review)
+      - @charlie (Security specialist, validation logic)
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize branch PR manager agent
+  hugai agent init branch-pr-manager --platform github --strategy git-flow --automation full
+  
+  # Create feature branch with AI assistance
+  hugai agent branch create --ticket HUGAI-123 --type feature --auto-setup
+  
+  # Generate PR with AI-powered description
+  hugai agent pr create --auto-description --smart-reviewers --template feature
+  
+  # Manage PR review process
+  hugai agent pr review-manage --balance-load --expertise-routing --reminders
+  
+  # Execute intelligent merge
+  hugai agent pr merge --strategy auto --cleanup --notifications
+  
+  # Branch cleanup automation
+  hugai agent branch cleanup --stale-threshold 30d --safe-delete --notify-owners

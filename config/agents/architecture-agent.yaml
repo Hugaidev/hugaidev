@@ -1,0 +1,372 @@
+metadata:
+  name: architecture-agent
+  version: 1.0.0
+  description: "Designs scalable, secure, and maintainable system architectures from validated requirements"
+  category: domain-specific
+  dependencies:
+    - requirements-analyzer-agent
+    - security-agent
+    - domain-expert-agent
+    - context-store
+  tags:
+    - architecture
+    - design
+    - patterns
+    - scalability
+    - security
+
+configuration:
+  # Core Architecture Settings
+  design_approach: pattern_driven  # Options: pattern_driven, domain_driven, event_driven, microservices_first
+  architecture_styles:
+    - microservices
+    - hexagonal
+    - event_driven
+    - layered
+    - clean_architecture
+    - serverless
+  
+  # Input Sources Configuration
+  input_sources:
+    requirements_specs: "specs/requirements.yaml"
+    business_context: "metadata/context.json"
+    existing_systems: "docs/systems/*.{md,yaml}"
+    constraints: "constraints/*.yaml"
+    patterns_library: "patterns/*.yaml"
+    compliance_requirements: "compliance/*.yaml"
+  
+  # Processing Pipeline
+  processing_steps:
+    - load_requirements
+    - analyze_constraints
+    - select_architectural_patterns
+    - define_system_boundaries
+    - compose_components
+    - design_interfaces
+    - plan_data_flows
+    - address_cross_cutting_concerns
+    - generate_deployment_strategy
+    - create_architecture_artifacts
+    - validate_design_decisions
+  
+  # Pattern Selection Criteria
+  pattern_selection:
+    scalability_requirements:
+      horizontal_scaling: microservices
+      vertical_scaling: modular_monolith
+      elastic_scaling: serverless
+    
+    complexity_thresholds:
+      low: layered_architecture
+      medium: hexagonal_architecture
+      high: event_driven_architecture
+      
+    team_size_considerations:
+      small: monolithic
+      medium: modular_monolith
+      large: microservices
+  
+  # Technology Stack Recommendations
+  technology_stacks:
+    backend:
+      languages: [java, python, nodejs, go, csharp]
+      frameworks: [spring_boot, django, express, gin, dotnet]
+      databases: [postgresql, mongodb, redis, elasticsearch]
+      
+    frontend:
+      frameworks: [react, vue, angular, svelte]
+      mobile: [react_native, flutter, native]
+      
+    infrastructure:
+      cloud_providers: [aws, azure, gcp]
+      containers: [docker, kubernetes]
+      messaging: [kafka, rabbitmq, redis_streams]
+      monitoring: [prometheus, grafana, elk_stack]
+  
+  # Architecture Documentation
+  documentation_standards:
+    formats:
+      architecture_specs: yaml
+      diagrams: mermaid
+      decisions: markdown
+      apis: openapi
+    
+    required_artifacts:
+      - system_overview
+      - component_diagram
+      - deployment_diagram
+      - data_flow_diagram
+      - architecture_decision_records
+      - api_specifications
+      - security_architecture
+  
+  # Quality Attributes
+  quality_attributes:
+    performance:
+      response_time_targets: ["<100ms", "<500ms", "<2s"]
+      throughput_targets: ["1k rps", "10k rps", "100k rps"]
+      
+    scalability:
+      user_load_targets: [1000, 10000, 100000, 1000000]
+      data_volume_targets: ["1GB", "100GB", "1TB", "100TB"]
+      
+    availability:
+      uptime_targets: ["99%", "99.9%", "99.99%", "99.999%"]
+      disaster_recovery: ["RTO<4h", "RTO<1h", "RTO<15min"]
+      
+    security:
+      authentication: [oauth2, jwt, saml, ldap]
+      authorization: [rbac, abac, acl]
+      encryption: [tls, aes, rsa]
+
+integration:
+  # Upstream Agents
+  input_agents:
+    - requirements_analyzer_agent
+    - domain_expert_agent
+    - security_agent
+    - performance_agent
+  
+  # Downstream Agents
+  output_agents:
+    - implementation_agent
+    - security_agent
+    - test_agent
+    - deployment_agent
+    - documentation_writer_agent
+  
+  # External Systems
+  external_integrations:
+    architecture_tools:
+      lucidchart:
+        api_endpoint: "${LUCIDCHART_API_URL}"
+        auto_export: true
+        
+      drawio:
+        export_format: "xml"
+        auto_sync: false
+        
+      miro:
+        workspace_id: "${MIRO_WORKSPACE_ID}"
+        collaboration_enabled: true
+    
+    documentation_platforms:
+      confluence:
+        space_key: "ARCH"
+        auto_publish: true
+        
+      notion:
+        database_id: "${NOTION_ARCH_DB_ID}"
+        sync_enabled: true
+  
+  # Design Validation
+  validation_framework:
+    design_principles:
+      - single_responsibility
+      - open_closed
+      - dependency_inversion
+      - separation_of_concerns
+      - fail_fast
+      - graceful_degradation
+    
+    architecture_reviews:
+      automated_checks:
+        - component_coupling_analysis
+        - circular_dependency_detection
+        - interface_consistency_validation
+        - security_architecture_scan
+      
+      human_review_triggers:
+        - high_complexity_components
+        - new_architectural_patterns
+        - security_critical_changes
+        - performance_sensitive_areas
+
+validation:
+  # Input Validation
+  input_validation:
+    requirements_completeness:
+      functional_requirements: required
+      non_functional_requirements: required
+      constraints: required
+      quality_attributes: required
+    
+    format_validation:
+      requirements_format: yaml_or_json
+      context_format: json
+      max_file_size: "50MB"
+  
+  # Design Validation
+  design_validation:
+    architecture_consistency:
+      component_interfaces: validated
+      data_flow_integrity: validated
+      pattern_compliance: validated
+      
+    quality_validation:
+      performance_requirements: mapped
+      security_requirements: addressed
+      scalability_requirements: designed
+      maintainability_score: ">7/10"
+  
+  # Output Validation
+  output_validation:
+    documentation_completeness:
+      system_overview: required
+      component_specifications: required
+      deployment_instructions: required
+      adr_documentation: required
+    
+    diagram_validation:
+      syntax_validation: mermaid_or_plantuml
+      completeness_check: all_components_covered
+      consistency_check: interfaces_match
+
+monitoring:
+  # Architecture Metrics
+  metrics:
+    development_speed:
+      description: "Time from requirements to architecture delivery"
+      target: "<2 days"
+      alert_threshold: ">5 days"
+      
+    design_completeness:
+      description: "Percentage of requirements covered by architecture"
+      target: ">98%"
+      alert_threshold: "<90%"
+      
+    pattern_reuse_index:
+      description: "Ratio of reused vs custom architectural patterns"
+      target: ">70%"
+      alert_threshold: "<50%"
+      
+    security_risk_score:
+      description: "Quantified security risk assessment"
+      target: "<3/10"
+      alert_threshold: ">6/10"
+      
+    architecture_approval_rate:
+      description: "Percentage of designs approved on first review"
+      target: ">85%"
+      alert_threshold: "<70%"
+      
+    technical_debt_ratio:
+      description: "Estimate of architectural technical debt"
+      target: "<15%"
+      alert_threshold: ">30%"
+  
+  # Quality Metrics
+  quality_metrics:
+    component_coupling:
+      description: "Average coupling between components"
+      target: "loose"
+      measurement: "automated_analysis"
+      
+    interface_stability:
+      description: "Rate of interface changes over time"
+      target: "<5% per month"
+      measurement: "version_tracking"
+  
+  # Performance Monitoring
+  performance_monitoring:
+    architecture_generation_time: "<30min"
+    diagram_rendering_time: "<5min"
+    validation_execution_time: "<10min"
+
+examples:
+  # Microservices Architecture
+  microservices_example:
+    input:
+      requirements:
+        - user_management
+        - product_catalog
+        - order_processing
+        - payment_handling
+      constraints:
+        - high_scalability_needed
+        - team_size_large
+        - cloud_native_preferred
+    
+    output:
+      architecture_style: "microservices"
+      services:
+        - name: "user-service"
+          responsibilities: ["authentication", "user_profiles", "preferences"]
+          technology_stack: "java_spring_boot"
+          database: "postgresql"
+          
+        - name: "catalog-service"
+          responsibilities: ["product_management", "inventory", "search"]
+          technology_stack: "python_django"
+          database: "elasticsearch"
+          
+        - name: "order-service"
+          responsibilities: ["order_creation", "order_tracking", "fulfillment"]
+          technology_stack: "nodejs_express"
+          database: "mongodb"
+      
+      integration_patterns:
+        - api_gateway
+        - event_driven_communication
+        - saga_pattern_for_transactions
+  
+  # Monolithic Architecture
+  monolithic_example:
+    input:
+      requirements:
+        - simple_crud_operations
+        - basic_reporting
+        - user_authentication
+      constraints:
+        - small_team
+        - quick_deployment_needed
+        - limited_infrastructure
+    
+    output:
+      architecture_style: "layered_monolith"
+      layers:
+        - presentation: "react_frontend"
+        - business_logic: "spring_boot_backend"
+        - data_access: "jpa_repositories"
+        - database: "postgresql"
+      
+      deployment_strategy: "single_deployable_unit"
+      
+  # Event-Driven Architecture
+  event_driven_example:
+    input:
+      requirements:
+        - real_time_data_processing
+        - high_throughput_needed
+        - loose_coupling_preferred
+      
+    output:
+      architecture_style: "event_driven"
+      components:
+        - event_producers: ["user_actions", "system_events"]
+        - event_bus: "apache_kafka"
+        - event_consumers: ["analytics_service", "notification_service"]
+        - event_store: "event_sourcing_database"
+
+# CLI Usage Examples
+cli_usage: |
+  # Generate architecture from requirements
+  hugai design architecture --requirements specs/requirements.yaml --output architecture/
+  
+  # Apply specific architectural pattern
+  hugai design --pattern microservices --requirements specs/requirements.yaml
+  
+  # Validate existing architecture
+  hugai validate architecture --design architecture/system.yaml --check consistency,security
+  
+  # Generate architecture diagrams
+  hugai diagram architecture --input architecture/system.yaml --format mermaid,plantuml
+  
+  # Compare architectural alternatives
+  hugai compare architectures --option1 monolith.yaml --option2 microservices.yaml
+  
+  # Export to external tools
+  hugai export architecture --format lucidchart --destination ${LUCIDCHART_WORKSPACE}
+  
+  # Architecture decision record generation
+  hugai adr create --decision "Use microservices pattern" --rationale architecture/analysis.md

@@ -1,0 +1,549 @@
+metadata:
+  name: risk-management-agent-configuration
+  version: 1.0.0
+  description: "AI agent specialized in risk assessment, mitigation, and management for HUGAI systems and development processes"
+  category: specialized-agents
+  dependencies:
+    - llm-models
+    - risk-assessment-frameworks
+    - compliance-tools
+    - monitoring-systems
+  tags:
+    - risk-assessment
+    - risk-mitigation
+    - threat-analysis
+    - compliance-risk
+    - operational-risk
+
+configuration:
+  # Risk Management Agent Philosophy
+  agent_philosophy:
+    purpose: "Identify, assess, and manage risks across all aspects of HUGAI systems to ensure business continuity, compliance, and stakeholder protection"
+    principles:
+      proactive_risk_identification: "Continuously scan for emerging risks before they materialize"
+      comprehensive_risk_assessment: "Evaluate risks across technical, operational, regulatory, and business dimensions"
+      risk_based_decision_making: "Support informed decision-making through quantitative and qualitative risk analysis"
+      continuous_risk_monitoring: "Maintain ongoing surveillance of risk indicators and trends"
+      adaptive_risk_management: "Evolve risk strategies based on changing threat landscapes and business contexts"
+
+  # Core Capabilities
+  core_capabilities:
+    risk_identification:
+      risk_categories:
+        technical_risks:
+          infrastructure_risks:
+            - "system_availability_failures"
+            - "data_loss_corruption"
+            - "performance_degradation"
+            - "scalability_limitations"
+            - "technology_obsolescence"
+          
+          security_risks:
+            - "data_breaches"
+            - "unauthorized_access"
+            - "malware_attacks"
+            - "api_vulnerabilities"
+            - "insider_threats"
+          
+          ai_specific_risks:
+            - "model_bias_discrimination"
+            - "adversarial_attacks"
+            - "model_drift_degradation"
+            - "training_data_poisoning"
+            - "explainability_limitations"
+        
+        operational_risks:
+          process_risks:
+            - "human_error_incidents"
+            - "process_breakdown_failures"
+            - "communication_gaps"
+            - "resource_shortage"
+            - "skill_gaps"
+          
+          vendor_risks:
+            - "supplier_dependency"
+            - "third_party_service_failures"
+            - "vendor_data_breaches"
+            - "contract_disputes"
+            - "geopolitical_impacts"
+          
+          business_continuity_risks:
+            - "disaster_recovery_failures"
+            - "key_personnel_unavailability"
+            - "critical_system_downtime"
+            - "supply_chain_disruptions"
+        
+        regulatory_risks:
+          compliance_risks:
+            - "regulatory_non_compliance"
+            - "data_protection_violations"
+            - "audit_failures"
+            - "licensing_issues"
+            - "industry_standard_deviations"
+          
+          legal_risks:
+            - "intellectual_property_disputes"
+            - "contractual_liabilities"
+            - "litigation_exposure"
+            - "regulatory_penalties"
+            - "reputation_damage"
+        
+        financial_risks:
+          direct_financial_risks:
+            - "cost_overruns"
+            - "revenue_impact"
+            - "investment_losses"
+            - "currency_fluctuations"
+            - "credit_risks"
+          
+          opportunity_risks:
+            - "market_timing_misses"
+            - "competitive_disadvantage"
+            - "innovation_delays"
+            - "resource_misallocation"
+    
+    risk_assessment:
+      quantitative_assessment:
+        probability_estimation:
+          - "historical_data_analysis"
+          - "statistical_modeling"
+          - "monte_carlo_simulation"
+          - "bayesian_inference"
+          - "expert_judgment_aggregation"
+        
+        impact_quantification:
+          - "financial_impact_modeling"
+          - "operational_impact_measurement"
+          - "reputation_impact_scoring"
+          - "customer_impact_assessment"
+          - "regulatory_penalty_estimation"
+        
+        risk_metrics:
+          - "value_at_risk_var"
+          - "expected_shortfall"
+          - "risk_adjusted_return"
+          - "sharpe_ratio"
+          - "maximum_drawdown"
+      
+      qualitative_assessment:
+        risk_matrix_analysis:
+          probability_levels:
+            very_low: "< 5%"
+            low: "5% - 25%"
+            medium: "25% - 50%"
+            high: "50% - 75%"
+            very_high: "> 75%"
+          
+          impact_levels:
+            negligible: "minimal_business_impact"
+            minor: "limited_business_impact"
+            moderate: "significant_business_impact"
+            major: "severe_business_impact"
+            catastrophic: "existential_threat"
+        
+        risk_prioritization:
+          - "risk_heat_mapping"
+          - "risk_ranking_algorithms"
+          - "multi_criteria_decision_analysis"
+          - "stakeholder_impact_weighting"
+    
+    risk_mitigation:
+      mitigation_strategies:
+        risk_avoidance:
+          - "eliminate_risky_activities"
+          - "alternative_approach_adoption"
+          - "technology_substitution"
+          - "market_exit_strategies"
+        
+        risk_reduction:
+          - "control_implementation"
+          - "process_improvement"
+          - "redundancy_introduction"
+          - "training_enhancement"
+          - "technology_upgrades"
+        
+        risk_transfer:
+          - "insurance_coverage"
+          - "outsourcing_arrangements"
+          - "contractual_risk_transfer"
+          - "hedging_strategies"
+        
+        risk_acceptance:
+          - "self_insurance"
+          - "contingency_planning"
+          - "monitoring_protocols"
+          - "rapid_response_capabilities"
+
+  # Agent Configuration
+  agent_configuration:
+    model_selection:
+      primary_model: "gpt-4"
+      fallback_models: ["claude-3-5-sonnet", "gpt-4-turbo"]
+      
+      task_specific_models:
+        risk_analysis: "gpt-4"
+        quantitative_modeling: "claude-3-5-sonnet"
+        regulatory_assessment: "gpt-4"
+        scenario_planning: "gpt-4-turbo"
+    
+    operational_parameters:
+      risk_assessment_frequency: "weekly"
+      threat_monitoring_interval: "real_time"
+      risk_tolerance_threshold: "medium"
+      
+      human_escalation_triggers:
+        - "high_severity_risk_identified"
+        - "regulatory_compliance_risk_detected"
+        - "business_critical_threat_emergence"
+        - "risk_mitigation_strategy_failure"
+        - "stakeholder_risk_tolerance_exceeded"
+    
+    risk_frameworks:
+      risk_management_standards:
+        - "iso_31000"
+        - "coso_enterprise_risk_management"
+        - "nist_risk_management_framework"
+        - "fair_factor_analysis"
+      
+      industry_frameworks:
+        - "basel_iii_operational_risk"
+        - "solvency_ii_risk_management"
+        - "gdpr_privacy_impact_assessment"
+        - "nist_cybersecurity_framework"
+
+  # Risk Assessment Workflows
+  risk_workflows:
+    comprehensive_risk_assessment:
+      workflow_name: "enterprise_risk_assessment"
+      
+      steps:
+        risk_universe_definition:
+          description: "Define comprehensive scope of potential risks"
+          actions:
+            - "identify_risk_categories"
+            - "map_risk_sources"
+            - "define_risk_appetite"
+            - "establish_risk_tolerance_levels"
+          
+          deliverables:
+            - "risk_taxonomy"
+            - "risk_appetite_statement"
+            - "risk_tolerance_matrix"
+            - "risk_assessment_scope"
+        
+        threat_landscape_analysis:
+          description: "Analyze current and emerging threat landscape"
+          depends_on: ["risk_universe_definition"]
+          
+          actions:
+            - "scan_threat_intelligence_sources"
+            - "analyze_industry_specific_threats"
+            - "assess_geopolitical_risks"
+            - "evaluate_technology_risks"
+          
+          analysis_methods:
+            - "threat_modeling"
+            - "attack_tree_analysis"
+            - "scenario_based_analysis"
+            - "expert_consultation"
+        
+        vulnerability_assessment:
+          description: "Assess organizational vulnerabilities"
+          depends_on: ["threat_landscape_analysis"]
+          
+          actions:
+            - "conduct_technical_vulnerability_scans"
+            - "assess_process_vulnerabilities"
+            - "evaluate_human_factor_risks"
+            - "analyze_third_party_dependencies"
+          
+          assessment_areas:
+            - "system_architecture_weaknesses"
+            - "process_control_gaps"
+            - "skill_and_knowledge_deficits"
+            - "vendor_security_postures"
+        
+        risk_evaluation_prioritization:
+          description: "Evaluate and prioritize identified risks"
+          depends_on: ["vulnerability_assessment"]
+          
+          actions:
+            - "calculate_risk_scores"
+            - "perform_sensitivity_analysis"
+            - "conduct_stress_testing"
+            - "prioritize_risk_treatment"
+          
+          deliverables:
+            - "risk_register"
+            - "risk_heat_map"
+            - "risk_prioritization_matrix"
+            - "risk_treatment_recommendations"
+    
+    incident_risk_analysis:
+      workflow_name: "post_incident_risk_analysis"
+      
+      analysis_scope:
+        - "incident_root_cause_analysis"
+        - "control_failure_assessment"
+        - "impact_quantification"
+        - "lessons_learned_integration"
+      
+      risk_adjustment_actions:
+        - "risk_rating_updates"
+        - "control_effectiveness_reassessment"
+        - "mitigation_strategy_refinement"
+        - "monitoring_enhancement"
+
+  # Risk Monitoring and Reporting
+  monitoring_reporting:
+    continuous_monitoring:
+      risk_indicators:
+        leading_indicators:
+          - "threat_intelligence_alerts"
+          - "vulnerability_discovery_rates"
+          - "control_performance_metrics"
+          - "external_risk_factor_changes"
+        
+        lagging_indicators:
+          - "incident_occurrence_rates"
+          - "loss_event_frequencies"
+          - "control_failure_instances"
+          - "compliance_violation_counts"
+      
+      automated_monitoring:
+        - "real_time_threat_detection"
+        - "anomaly_detection_algorithms"
+        - "compliance_drift_monitoring"
+        - "performance_threshold_monitoring"
+    
+    risk_reporting:
+      stakeholder_reporting:
+        executive_dashboard:
+          - "risk_heat_map_visualization"
+          - "key_risk_indicator_trends"
+          - "risk_appetite_vs_exposure"
+          - "mitigation_progress_tracking"
+        
+        board_reporting:
+          - "enterprise_risk_summary"
+          - "strategic_risk_assessment"
+          - "regulatory_compliance_status"
+          - "crisis_preparedness_overview"
+        
+        operational_reporting:
+          - "departmental_risk_profiles"
+          - "project_risk_assessments"
+          - "vendor_risk_evaluations"
+          - "incident_trend_analysis"
+      
+      regulatory_reporting:
+        - "risk_based_capital_requirements"
+        - "operational_risk_disclosures"
+        - "cyber_incident_notifications"
+        - "data_breach_impact_assessments"
+
+  # Scenario Planning and Stress Testing
+  scenario_analysis:
+    scenario_development:
+      scenario_types:
+        baseline_scenarios:
+          - "business_as_usual"
+          - "expected_growth_trajectory"
+          - "normal_market_conditions"
+        
+        stress_scenarios:
+          - "economic_recession_impact"
+          - "major_cyber_attack"
+          - "key_vendor_failure"
+          - "regulatory_change_shock"
+        
+        extreme_scenarios:
+          - "black_swan_events"
+          - "multiple_simultaneous_failures"
+          - "systemic_industry_disruption"
+          - "natural_disaster_impact"
+    
+    stress_testing:
+      testing_methodologies:
+        - "sensitivity_analysis"
+        - "scenario_stress_testing"
+        - "reverse_stress_testing"
+        - "monte_carlo_simulation"
+      
+      testing_scope:
+        - "financial_resilience_testing"
+        - "operational_continuity_testing"
+        - "cybersecurity_resilience_testing"
+        - "regulatory_compliance_testing"
+
+  # AI-Specific Risk Management
+  ai_risk_management:
+    model_risk_assessment:
+      model_development_risks:
+        - "data_quality_bias_risks"
+        - "model_selection_risks"
+        - "validation_inadequacy_risks"
+        - "overfitting_generalization_risks"
+      
+      model_deployment_risks:
+        - "production_performance_drift"
+        - "adversarial_attack_vulnerability"
+        - "model_explainability_limitations"
+        - "ethical_algorithmic_bias"
+    
+    ai_governance_risks:
+      governance_framework_gaps:
+        - "ai_ethics_policy_absence"
+        - "model_validation_inadequacy"
+        - "human_oversight_deficiency"
+        - "transparency_accountability_gaps"
+      
+      regulatory_compliance_risks:
+        - "ai_regulation_non_compliance"
+        - "algorithmic_fairness_violations"
+        - "privacy_protection_breaches"
+        - "data_governance_failures"
+
+  # Crisis Management and Business Continuity
+  crisis_management:
+    crisis_response_planning:
+      crisis_categories:
+        - "cybersecurity_incidents"
+        - "operational_disruptions"
+        - "regulatory_investigations"
+        - "reputation_crises"
+        - "natural_disasters"
+      
+      response_frameworks:
+        - "incident_command_system"
+        - "crisis_communication_protocols"
+        - "stakeholder_notification_procedures"
+        - "decision_escalation_matrices"
+    
+    business_continuity:
+      continuity_planning:
+        - "critical_business_function_identification"
+        - "recovery_time_objective_definition"
+        - "recovery_point_objective_establishment"
+        - "alternative_process_development"
+      
+      disaster_recovery:
+        - "data_backup_restoration_procedures"
+        - "system_recovery_protocols"
+        - "alternative_site_activation"
+        - "vendor_contingency_arrangements"
+
+integration:
+  # Enterprise Risk Management Integration
+  erm_integration:
+    governance_structure:
+      risk_committees:
+        - "board_risk_committee"
+        - "executive_risk_committee"
+        - "operational_risk_committee"
+        - "audit_committee_coordination"
+      
+      risk_roles_responsibilities:
+        - "chief_risk_officer_function"
+        - "risk_champion_network"
+        - "business_unit_risk_managers"
+        - "independent_risk_assurance"
+    
+    policy_framework:
+      risk_policies:
+        - "enterprise_risk_management_policy"
+        - "operational_risk_policy"
+        - "cybersecurity_risk_policy"
+        - "vendor_risk_management_policy"
+
+  # Technology Integration
+  technology_integration:
+    risk_management_platforms:
+      grc_platforms:
+        - "servicenow_grc"
+        - "metricstream"
+        - "riskonnect"
+        - "lockpath"
+      
+      risk_analytics_tools:
+        - "sas_risk_management"
+        - "matlab_risk_management"
+        - "r_quantmod"
+        - "python_risk_libraries"
+
+validation:
+  # Risk Management Agent Validation
+  agent_effectiveness:
+    risk_identification_accuracy: ">90%"
+    risk_assessment_precision: ">85%"
+    mitigation_strategy_effectiveness: "measurable"
+    regulatory_compliance_maintenance: ">99%"
+  
+  # Risk Management System Validation
+  system_validation:
+    risk_coverage_completeness: ">95%"
+    early_warning_system_effectiveness: "validated"
+    crisis_response_capability: "tested"
+    business_continuity_assurance: "verified"
+
+examples:
+  # Comprehensive Risk Assessment Example
+  risk_assessment_example:
+    ai_model_deployment_risk: |
+      ## AI Model Deployment Risk Assessment
+      
+      ### Risk Identification
+      **Primary Risk**: Algorithmic bias in customer credit scoring model
+      
+      ### Risk Analysis
+      - **Probability**: Medium (30-40%)
+      - **Impact**: High (regulatory penalties + reputation damage)
+      - **Risk Score**: 15 (High Priority)
+      
+      ### Risk Factors
+      1. **Training Data Bias**: Historical lending data reflects past discriminatory practices
+      2. **Protected Attributes**: Indirect correlation with protected characteristics
+      3. **Model Interpretability**: Limited explainability for credit decisions
+      4. **Regulatory Environment**: Increasing scrutiny on algorithmic fairness
+      
+      ### Impact Assessment
+      - **Financial Impact**: $2M - $10M in regulatory fines
+      - **Reputation Impact**: Significant brand damage in target markets
+      - **Operational Impact**: Model retraining and validation costs
+      - **Regulatory Impact**: Potential consent order and oversight
+      
+      ### Mitigation Strategies
+      1. **Immediate Actions**:
+         - Implement bias detection algorithms
+         - Conduct fairness impact assessment
+         - Establish human oversight protocols
+      
+      2. **Medium-term Actions**:
+         - Retrain model with bias-corrected data
+         - Implement explainable AI features
+         - Establish ongoing monitoring
+      
+      3. **Long-term Actions**:
+         - Develop comprehensive AI ethics framework
+         - Implement model governance lifecycle
+         - Regular third-party bias audits
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize risk management agent
+  hugai agent init risk-management --frameworks iso31000,nist --domains tech,operational,regulatory
+  
+  # Conduct comprehensive risk assessment
+  hugai agent risk assess --scope enterprise --methodology quantitative --output risk-register.xlsx
+  
+  # Monitor real-time risk indicators
+  hugai agent risk monitor --indicators all --alerts critical --dashboard executive
+  
+  # Perform scenario analysis
+  hugai agent risk scenario --type stress-test --scenarios recession,cyber-attack --impact-analysis
+  
+  # Generate risk reports
+  hugai agent risk report --audience board --period quarterly --format executive-summary
+  
+  # Assess AI model risks
+  hugai agent risk ai-assessment --model credit-scoring --bias-analysis --regulatory-compliance

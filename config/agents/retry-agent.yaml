@@ -1,0 +1,576 @@
+metadata:
+  name: retry-agent-configuration
+  version: 1.0.0
+  description: "AI agent specialized in intelligent retry mechanisms, failure recovery, and resilience patterns for HUGAI systems"
+  category: specialized-agents
+  dependencies:
+    - llm-models
+    - monitoring-systems
+    - circuit-breakers
+    - chaos-engineering-tools
+  tags:
+    - retry-mechanisms
+    - failure-recovery
+    - resilience
+    - fault-tolerance
+    - reliability
+
+configuration:
+  # Retry Agent Philosophy
+  agent_philosophy:
+    purpose: "Design and implement intelligent retry mechanisms and failure recovery strategies to ensure HUGAI systems are resilient and maintain high availability"
+    principles:
+      intelligent_retry_strategies: "Apply context-aware retry logic based on failure types and system conditions"
+      graceful_degradation: "Implement fallback mechanisms that maintain partial functionality during failures"
+      adaptive_resilience: "Continuously learn from failures to improve retry strategies"
+      resource_awareness: "Consider system resources and load when implementing retry mechanisms"
+      observable_recovery: "Provide comprehensive visibility into retry attempts and recovery processes"
+
+  # Core Capabilities
+  core_capabilities:
+    retry_strategy_design:
+      retry_patterns:
+        exponential_backoff:
+          description: "Progressively increase delay between retry attempts"
+          use_cases:
+            - "rate_limited_apis"
+            - "database_connection_failures"
+            - "network_timeout_errors"
+            - "service_overload_conditions"
+          
+          configuration_parameters:
+            base_delay: "1s"
+            max_delay: "300s"
+            backoff_multiplier: 2.0
+            jitter_factor: 0.1
+            max_retries: 5
+          
+          implementation_considerations:
+            - "add_jitter_to_prevent_thundering_herd"
+            - "implement_maximum_delay_cap"
+            - "consider_circuit_breaker_integration"
+            - "log_retry_attempts_for_monitoring"
+        
+        linear_backoff:
+          description: "Constant interval increase between retry attempts"
+          use_cases:
+            - "predictable_service_recovery_times"
+            - "batch_processing_failures"
+            - "scheduled_maintenance_windows"
+          
+          configuration_parameters:
+            initial_delay: "5s"
+            increment: "5s"
+            max_delay: "60s"
+            max_retries: 10
+        
+        fixed_interval:
+          description: "Constant delay between retry attempts"
+          use_cases:
+            - "health_check_failures"
+            - "simple_connection_retries"
+            - "quick_recovery_scenarios"
+          
+          configuration_parameters:
+            retry_interval: "30s"
+            max_retries: 3
+        
+        adaptive_retry:
+          description: "Dynamic retry strategy based on system conditions"
+          use_cases:
+            - "machine_learning_model_failures"
+            - "variable_load_conditions"
+            - "multi_tenant_environments"
+          
+          adaptation_factors:
+            - "current_system_load"
+            - "error_rate_trends"
+            - "historical_success_patterns"
+            - "resource_availability"
+    
+    failure_classification:
+      transient_failures:
+        network_failures:
+          - "connection_timeout"
+          - "network_unreachable"
+          - "dns_resolution_failure"
+          - "packet_loss"
+        
+        service_failures:
+          - "service_temporarily_unavailable"
+          - "rate_limit_exceeded"
+          - "service_overloaded"
+          - "dependency_timeout"
+        
+        infrastructure_failures:
+          - "database_connection_pool_exhausted"
+          - "memory_pressure"
+          - "cpu_throttling"
+          - "disk_space_issues"
+      
+      permanent_failures:
+        authentication_failures:
+          - "invalid_credentials"
+          - "expired_tokens"
+          - "insufficient_permissions"
+          - "blocked_user_account"
+        
+        validation_failures:
+          - "malformed_request"
+          - "invalid_parameters"
+          - "schema_validation_errors"
+          - "business_rule_violations"
+        
+        system_failures:
+          - "service_not_found"
+          - "method_not_supported"
+          - "resource_not_found"
+          - "configuration_errors"
+    
+    recovery_mechanisms:
+      fallback_strategies:
+        graceful_degradation:
+          - "default_response_provision"
+          - "cached_data_utilization"
+          - "simplified_functionality"
+          - "alternative_service_routing"
+        
+        circuit_breaker_integration:
+          - "failure_threshold_monitoring"
+          - "automatic_circuit_opening"
+          - "recovery_attempt_scheduling"
+          - "gradual_traffic_restoration"
+        
+        bulkhead_isolation:
+          - "resource_pool_separation"
+          - "service_isolation"
+          - "tenant_isolation"
+          - "critical_path_protection"
+      
+      data_consistency:
+        idempotency_handling:
+          - "request_deduplication"
+          - "operation_idempotency_keys"
+          - "state_consistency_validation"
+          - "duplicate_detection"
+        
+        compensation_actions:
+          - "rollback_mechanisms"
+          - "compensating_transactions"
+          - "state_restoration"
+          - "cleanup_operations"
+
+  # Agent Configuration
+  agent_configuration:
+    model_selection:
+      primary_model: "claude-3-5-sonnet"
+      fallback_models: ["gpt-4-turbo", "gpt-4"]
+      
+      task_specific_models:
+        failure_analysis: "claude-3-5-sonnet"
+        strategy_optimization: "gpt-4-turbo"
+        pattern_recognition: "gpt-4"
+        configuration_generation: "claude-3-5-sonnet"
+    
+    operational_parameters:
+      failure_analysis_window: "24h"
+      retry_optimization_interval: "1h"
+      pattern_learning_threshold: 10
+      
+      human_escalation_triggers:
+        - "persistent_failure_patterns_detected"
+        - "retry_strategy_ineffectiveness"
+        - "cascading_failure_risks_identified"
+        - "resource_exhaustion_patterns"
+        - "business_impact_threshold_exceeded"
+    
+    monitoring_integration:
+      observability_platforms:
+        - "prometheus"
+        - "grafana"
+        - "datadog"
+        - "new_relic"
+        - "elastic_apm"
+      
+      alerting_systems:
+        - "pagerduty"
+        - "opsgenie"
+        - "slack"
+        - "microsoft_teams"
+
+  # Retry Implementation Workflows
+  retry_workflows:
+    failure_analysis_workflow:
+      workflow_name: "intelligent_failure_analysis"
+      
+      steps:
+        failure_detection:
+          description: "Detect and categorize system failures"
+          actions:
+            - "monitor_error_rates_and_patterns"
+            - "classify_failure_types"
+            - "assess_failure_impact"
+            - "identify_affected_components"
+          
+          detection_methods:
+            - "real_time_error_monitoring"
+            - "anomaly_detection_algorithms"
+            - "threshold_based_alerting"
+            - "pattern_recognition_analysis"
+        
+        root_cause_analysis:
+          description: "Identify underlying causes of failures"
+          depends_on: ["failure_detection"]
+          
+          actions:
+            - "correlate_failure_events"
+            - "analyze_system_metrics"
+            - "examine_dependency_chains"
+            - "review_recent_changes"
+          
+          analysis_techniques:
+            - "causal_chain_analysis"
+            - "correlation_analysis"
+            - "timeline_reconstruction"
+            - "dependency_impact_assessment"
+        
+        retry_strategy_optimization:
+          description: "Optimize retry strategies based on analysis"
+          depends_on: ["root_cause_analysis"]
+          
+          actions:
+            - "evaluate_current_retry_effectiveness"
+            - "recommend_strategy_adjustments"
+            - "implement_adaptive_parameters"
+            - "validate_strategy_improvements"
+          
+          optimization_factors:
+            - "failure_type_specific_tuning"
+            - "load_condition_adaptation"
+            - "resource_constraint_consideration"
+            - "business_impact_prioritization"
+    
+    resilience_implementation:
+      workflow_name: "comprehensive_resilience_implementation"
+      
+      implementation_phases:
+        design_phase:
+          activities:
+            - "identify_critical_failure_points"
+            - "design_retry_strategies"
+            - "plan_fallback_mechanisms"
+            - "define_circuit_breaker_policies"
+          
+          deliverables:
+            - "resilience_architecture_blueprint"
+            - "retry_strategy_specifications"
+            - "fallback_implementation_plan"
+            - "monitoring_requirements_document"
+        
+        implementation_phase:
+          activities:
+            - "implement_retry_mechanisms"
+            - "configure_circuit_breakers"
+            - "setup_monitoring_alerting"
+            - "implement_fallback_logic"
+          
+          validation_steps:
+            - "unit_test_retry_logic"
+            - "integration_test_failure_scenarios"
+            - "chaos_engineering_validation"
+            - "performance_impact_assessment"
+        
+        optimization_phase:
+          activities:
+            - "monitor_retry_effectiveness"
+            - "analyze_failure_patterns"
+            - "optimize_retry_parameters"
+            - "improve_fallback_strategies"
+
+  # Adaptive Retry Strategies
+  adaptive_strategies:
+    machine_learning_based:
+      pattern_recognition:
+        failure_pattern_analysis:
+          - "temporal_failure_patterns"
+          - "service_dependency_failures"
+          - "load_related_failure_correlations"
+          - "environmental_factor_impacts"
+        
+        success_prediction:
+          - "retry_success_probability_modeling"
+          - "optimal_retry_timing_prediction"
+          - "resource_availability_forecasting"
+          - "service_recovery_time_estimation"
+      
+      dynamic_parameter_adjustment:
+        real_time_optimization:
+          - "backoff_multiplier_adjustment"
+          - "max_retry_count_optimization"
+          - "timeout_duration_tuning"
+          - "jitter_factor_calibration"
+        
+        feedback_loop_integration:
+          - "success_rate_feedback"
+          - "resource_utilization_feedback"
+          - "user_experience_impact_feedback"
+          - "business_metric_feedback"
+    
+    context_aware_retry:
+      service_type_adaptation:
+        api_services:
+          - "http_status_code_based_retry"
+          - "rate_limit_header_analysis"
+          - "service_health_check_integration"
+          - "api_versioning_consideration"
+        
+        database_operations:
+          - "transaction_isolation_level_consideration"
+          - "connection_pool_status_awareness"
+          - "query_complexity_factor"
+          - "deadlock_detection_handling"
+        
+        message_queue_operations:
+          - "queue_depth_monitoring"
+          - "consumer_availability_checking"
+          - "message_priority_consideration"
+          - "poison_message_detection"
+
+  # Circuit Breaker Integration
+  circuit_breaker_management:
+    circuit_breaker_patterns:
+      simple_circuit_breaker:
+        states: ["closed", "open", "half_open"]
+        configuration:
+          failure_threshold: 5
+          timeout_duration: "60s"
+          success_threshold: 3
+        
+        state_transitions:
+          closed_to_open: "failure_count >= failure_threshold"
+          open_to_half_open: "timeout_duration_elapsed"
+          half_open_to_closed: "success_count >= success_threshold"
+          half_open_to_open: "any_failure_detected"
+      
+      sliding_window_circuit_breaker:
+        window_types: ["count_based", "time_based"]
+        configuration:
+          window_size: 100
+          minimum_throughput: 10
+          failure_rate_threshold: "50%"
+          slow_call_rate_threshold: "60%"
+        
+        advantages:
+          - "more_accurate_failure_rate_calculation"
+          - "better_handling_of_varying_loads"
+          - "reduced_false_positives"
+    
+    circuit_breaker_monitoring:
+      metrics_collection:
+        - "circuit_state_duration"
+        - "failure_rate_trends"
+        - "recovery_success_rate"
+        - "prevented_failure_count"
+      
+      alerting_configuration:
+        - "circuit_opened_alert"
+        - "high_failure_rate_warning"
+        - "slow_recovery_notification"
+        - "circuit_flapping_detection"
+
+  # Chaos Engineering Integration
+  chaos_engineering:
+    failure_injection:
+      network_failures:
+        - "latency_injection"
+        - "packet_loss_simulation"
+        - "network_partition_creation"
+        - "bandwidth_throttling"
+      
+      service_failures:
+        - "service_unavailability_simulation"
+        - "dependency_failure_injection"
+        - "resource_exhaustion_creation"
+        - "configuration_corruption"
+    
+    resilience_validation:
+      chaos_experiments:
+        - "service_dependency_failure_tests"
+        - "network_partition_tolerance_tests"
+        - "resource_constraint_handling_tests"
+        - "cascading_failure_prevention_tests"
+      
+      recovery_validation:
+        - "automatic_recovery_time_measurement"
+        - "data_consistency_verification"
+        - "user_experience_impact_assessment"
+        - "business_continuity_validation"
+
+  # Performance and Resource Management
+  performance_optimization:
+    resource_efficiency:
+      retry_cost_analysis:
+        - "computational_resource_usage"
+        - "network_bandwidth_consumption"
+        - "storage_io_impact"
+        - "monetary_cost_calculation"
+      
+      optimization_strategies:
+        - "retry_budget_management"
+        - "priority_based_retry_allocation"
+        - "resource_pooling_optimization"
+        - "load_shedding_integration"
+    
+    scalability_considerations:
+      horizontal_scaling:
+        - "distributed_retry_coordination"
+        - "retry_state_sharing"
+        - "load_balancing_retry_logic"
+        - "cluster_wide_circuit_breakers"
+      
+      vertical_scaling:
+        - "memory_efficient_retry_tracking"
+        - "cpu_optimized_backoff_calculations"
+        - "storage_efficient_failure_logging"
+
+integration:
+  # Development Framework Integration
+  framework_integration:
+    spring_boot:
+      retry_annotations:
+        - "@Retryable"
+        - "@CircuitBreaker"
+        - "@Recover"
+        - "@Backoff"
+      
+      configuration_properties:
+        - "retry.max-attempts"
+        - "retry.backoff.delay"
+        - "retry.backoff.multiplier"
+        - "circuit-breaker.failure-rate-threshold"
+    
+    nodejs_frameworks:
+      retry_libraries:
+        - "async-retry"
+        - "retry"
+        - "p-retry"
+        - "cockatiel"
+      
+      middleware_integration:
+        - "express_retry_middleware"
+        - "axios_retry_interceptors"
+        - "fetch_retry_wrappers"
+    
+    python_frameworks:
+      retry_decorators:
+        - "tenacity"
+        - "retrying"
+        - "backoff"
+        - "circuit-breaker"
+
+  # Monitoring and Observability Integration
+  observability_integration:
+    metrics_instrumentation:
+      retry_metrics:
+        - "retry_attempts_total"
+        - "retry_success_rate"
+        - "retry_duration_histogram"
+        - "circuit_breaker_state_duration"
+      
+      business_impact_metrics:
+        - "user_experience_degradation"
+        - "transaction_completion_rate"
+        - "service_availability_percentage"
+        - "error_rate_reduction"
+    
+    distributed_tracing:
+      trace_enrichment:
+        - "retry_attempt_annotations"
+        - "circuit_breaker_state_tags"
+        - "fallback_execution_markers"
+        - "recovery_time_measurements"
+
+validation:
+  # Retry Agent Validation
+  agent_effectiveness:
+    failure_recovery_success_rate: ">95%"
+    retry_optimization_impact: "measurable"
+    resource_efficiency_improvement: ">20%"
+    system_availability_enhancement: ">99.9%"
+  
+  # Resilience System Validation
+  system_validation:
+    chaos_experiment_success: "validated"
+    recovery_time_optimization: "demonstrated"
+    business_continuity_assurance: "verified"
+    cost_efficiency_improvement: "quantified"
+
+examples:
+  # Adaptive Retry Configuration Example
+  adaptive_retry_example:
+    configuration: |
+      ```yaml
+      retry_strategies:
+        api_service:
+          type: "adaptive_exponential_backoff"
+          base_delay: "1s"
+          max_delay: "300s"
+          max_retries: 5
+          jitter_factor: 0.1
+          
+          adaptive_parameters:
+            load_factor_consideration: true
+            error_rate_threshold: 0.1
+            success_rate_target: 0.95
+          
+          circuit_breaker:
+            failure_threshold: 10
+            timeout_duration: "60s"
+            success_threshold: 3
+          
+          fallback_strategy:
+            type: "cached_response"
+            cache_duration: "5m"
+            default_response: "service_unavailable"
+      ```
+    
+    implementation_example: |
+      ```python
+      @adaptive_retry(
+          strategy="exponential_backoff",
+          max_retries=5,
+          circuit_breaker=True,
+          fallback="cached_response"
+      )
+      async def call_external_service(request):
+          try:
+              response = await http_client.post(
+                  url=service_url,
+                  json=request,
+                  timeout=30
+              )
+              return response.json()
+          except Exception as e:
+              # Retry logic handled by decorator
+              raise RetryableException(f"Service call failed: {e}")
+      ```
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize retry agent
+  hugai agent init retry --patterns exponential-backoff,circuit-breaker --monitoring prometheus
+  
+  # Analyze failure patterns
+  hugai agent retry analyze --period 24h --services all --pattern-detection
+  
+  # Optimize retry strategies
+  hugai agent retry optimize --service user-api --strategy adaptive --validate
+  
+  # Configure circuit breakers
+  hugai agent retry circuit-breaker configure --service payment-service --threshold 10 --timeout 60s
+  
+  # Run chaos experiments
+  hugai agent retry chaos-test --experiment network-partition --duration 5m --validate-recovery
+  
+  # Generate resilience report
+  hugai agent retry report --type effectiveness --period weekly --recommendations

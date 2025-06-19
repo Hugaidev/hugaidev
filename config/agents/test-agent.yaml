@@ -1,0 +1,444 @@
+metadata:
+  name: test-agent
+  version: 1.0.0
+  description: "Automates generation, execution, and validation of comprehensive test suites"
+  category: domain-specific
+  dependencies:
+    - implementation-agent
+    - requirements-analyzer-agent
+    - static-analysis-tools
+    - test-frameworks
+  tags:
+    - testing
+    - quality-assurance
+    - test-automation
+    - coverage-analysis
+
+configuration:
+  # Core Testing Settings
+  testing_approach: comprehensive  # Options: basic, standard, comprehensive, exhaustive
+  test_pyramid_strategy: true  # Emphasize unit tests, fewer integration/e2e tests
+  mutation_testing: false  # Enable mutation testing for higher quality validation
+  
+  # Test Types Configuration
+  test_types:
+    unit_tests:
+      enabled: true
+      target_coverage: 90
+      framework_preferences: [pytest, jest, junit, go_test]
+      
+    integration_tests:
+      enabled: true
+      target_coverage: 80
+      database_testing: true
+      api_testing: true
+      
+    end_to_end_tests:
+      enabled: true
+      target_coverage: 60
+      browser_testing: true
+      mobile_testing: conditional
+      
+    performance_tests:
+      enabled: conditional
+      load_testing: true
+      stress_testing: true
+      benchmark_testing: true
+      
+    security_tests:
+      enabled: true
+      vulnerability_scanning: true
+      penetration_testing: conditional
+  
+  # Framework Support
+  supported_frameworks:
+    python:
+      unit: [pytest, unittest, nose2]
+      integration: [pytest, testcontainers]
+      coverage: [coverage.py, pytest-cov]
+      
+    javascript_typescript:
+      unit: [jest, mocha, vitest]
+      integration: [supertest, cypress]
+      coverage: [istanbul, c8]
+      
+    java:
+      unit: [junit5, testng, spock]
+      integration: [spring-boot-test, testcontainers]
+      coverage: [jacoco, cobertura]
+      
+    go:
+      unit: [go_test, testify]
+      integration: [testcontainers-go]
+      coverage: [go_cover]
+      
+    csharp:
+      unit: [xunit, nunit, mstest]
+      integration: [aspnet-core-test]
+      coverage: [coverlet, dotcover]
+  
+  # Input Sources Configuration
+  input_sources:
+    source_code: "src/**/*.{py,ts,js,java,go,cs}"
+    component_specs: "specs/components/*.yaml"
+    requirements: "requirements/**/*.yaml"
+    api_specs: "api/**/*.{yaml,json}"
+    existing_tests: "tests/**/*"
+    test_configs: "config/test_*.{yaml,json}"
+    test_data: "test_data/**/*.{json,yaml,csv}"
+  
+  # Processing Pipeline
+  processing_steps:
+    - analyze_source_code
+    - parse_requirements_specifications
+    - identify_test_scenarios
+    - generate_test_skeletons
+    - create_test_fixtures
+    - implement_test_assertions
+    - setup_test_environment
+    - execute_test_suites
+    - collect_coverage_metrics
+    - analyze_test_results
+    - generate_test_reports
+    - identify_improvement_areas
+  
+  # Test Generation Strategy
+  generation_strategy:
+    unit_tests:
+      method_coverage: all_public_methods
+      branch_coverage: true
+      edge_case_generation: true
+      mock_dependencies: true
+      
+    integration_tests:
+      api_endpoint_coverage: all_endpoints
+      database_operations: full_crud
+      external_service_integration: mocked
+      
+    test_data_generation:
+      realistic_data: true
+      edge_cases: true
+      invalid_inputs: true
+      boundary_conditions: true
+  
+  # Coverage Requirements
+  coverage_requirements:
+    minimum_thresholds:
+      line_coverage: 80
+      branch_coverage: 75
+      function_coverage: 85
+      statement_coverage: 80
+      
+    target_thresholds:
+      line_coverage: 90
+      branch_coverage: 85
+      function_coverage: 95
+      statement_coverage: 90
+    
+    critical_path_coverage: 100
+    
+    exclusions:
+      - "test_*"
+      - "*_test.py"
+      - "migrations/*"
+      - "vendor/*"
+      - "__pycache__/*"
+
+integration:
+  # Upstream Agents
+  input_agents:
+    - implementation_agent
+    - requirements_analyzer_agent
+    - architecture_agent
+    - security_agent
+  
+  # Downstream Agents
+  output_agents:
+    - internal_reviewer_agent
+    - deployment_agent
+    - performance_agent
+    - documentation_writer_agent
+  
+  # CI/CD Integration
+  cicd_integration:
+    jenkins:
+      pipeline_hooks: ["post-build", "pre-deploy"]
+      result_publishing: true
+      
+    github_actions:
+      workflow_triggers: ["push", "pull_request"]
+      artifact_uploads: true
+      
+    gitlab_ci:
+      stage_integration: "test"
+      coverage_reports: true
+      
+    azure_devops:
+      test_results_publishing: true
+      coverage_publishing: true
+  
+  # Test Environment Management
+  environment_management:
+    docker_containers:
+      database_containers: true
+      service_containers: true
+      cleanup_after_tests: true
+      
+    kubernetes_testing:
+      namespace_isolation: true
+      resource_cleanup: true
+      
+    cloud_testing:
+      aws_testing: conditional
+      azure_testing: conditional
+      gcp_testing: conditional
+  
+  # External Tool Integration
+  external_tools:
+    test_management:
+      testray: optional
+      testrail: optional
+      qtest: optional
+      
+    monitoring:
+      test_insights: true
+      flaky_test_detection: true
+      performance_tracking: true
+      
+    reporting:
+      slack_notifications: true
+      email_reports: conditional
+      dashboard_integration: true
+
+validation:
+  # Input Validation
+  input_validation:
+    source_code_quality:
+      syntax_validation: true
+      compilation_check: true
+      dependency_resolution: true
+      
+    specification_completeness:
+      requirements_coverage: ">80%"
+      api_specification_completeness: required
+      
+    test_environment_readiness:
+      framework_availability: validated
+      dependency_installation: validated
+      configuration_validity: validated
+  
+  # Test Quality Validation
+  test_quality_validation:
+    test_naming_conventions: enforced
+    assertion_quality: validated
+    test_isolation: enforced
+    test_determinism: validated
+    
+    anti_patterns_detection:
+      - test_dependencies
+      - hardcoded_values
+      - insufficient_assertions
+      - overly_complex_tests
+  
+  # Output Validation
+  output_validation:
+    test_execution_success:
+      build_success: required
+      test_runner_execution: successful
+      coverage_report_generation: required
+      
+    quality_metrics:
+      coverage_threshold_compliance: enforced
+      test_pass_rate: ">95%"
+      execution_time_reasonable: "<30min"
+
+monitoring:
+  # Test Execution Metrics
+  metrics:
+    total_tests_executed:
+      description: "Number of test cases generated and executed"
+      target: ">1000"
+      alert_threshold: "<100"
+      
+    test_pass_rate:
+      description: "Percentage of executed tests that pass"
+      target: ">98%"
+      alert_threshold: "<90%"
+      
+    test_coverage:
+      description: "Percentage of code paths covered by tests"
+      target: ">90%"
+      alert_threshold: "<80%"
+      
+    flaky_test_rate:
+      description: "Percentage of tests marked as flaky or unstable"
+      target: "<2%"
+      alert_threshold: ">5%"
+      
+    test_execution_time:
+      description: "Average duration to complete full test suite"
+      target: "<15min"
+      alert_threshold: ">30min"
+      
+    defect_detection_rate:
+      description: "Number of defects detected per test run"
+      target: "early_detection"
+      measurement: "defects_found / total_defects"
+      
+    test_generation_throughput:
+      description: "Number of test cases scaffolded per hour"
+      target: ">50"
+      alert_threshold: "<20"
+  
+  # Quality Metrics
+  quality_metrics:
+    test_maintainability:
+      description: "Test code quality and maintainability score"
+      target: ">8/10"
+      
+    test_effectiveness:
+      description: "Ratio of bugs caught by tests vs production bugs"
+      target: ">80%"
+      
+    regression_detection:
+      description: "Percentage of regressions caught by test suite"
+      target: ">95%"
+  
+  # Performance Monitoring
+  performance_monitoring:
+    test_suite_performance:
+      parallel_execution: true
+      resource_utilization: monitored
+      bottleneck_identification: automated
+
+examples:
+  # Unit Test Generation
+  unit_test_example:
+    input:
+      source_code: |
+        def calculate_tax(amount: float, rate: float) -> float:
+            """Calculate tax amount based on rate."""
+            if amount < 0:
+                raise ValueError("Amount cannot be negative")
+            if rate < 0 or rate > 1:
+                raise ValueError("Rate must be between 0 and 1")
+            return amount * rate
+    
+    generated_test: |
+      import pytest
+      from tax_calculator import calculate_tax
+      
+      class TestCalculateTax:
+          def test_calculate_tax_valid_inputs(self):
+              # Test normal case
+              result = calculate_tax(100.0, 0.15)
+              assert result == 15.0
+          
+          def test_calculate_tax_zero_amount(self):
+              # Test edge case: zero amount
+              result = calculate_tax(0.0, 0.15)
+              assert result == 0.0
+          
+          def test_calculate_tax_negative_amount_raises_error(self):
+              # Test negative amount
+              with pytest.raises(ValueError, match="Amount cannot be negative"):
+                  calculate_tax(-100.0, 0.15)
+          
+          def test_calculate_tax_invalid_rate_raises_error(self):
+              # Test invalid rate
+              with pytest.raises(ValueError, match="Rate must be between 0 and 1"):
+                  calculate_tax(100.0, 1.5)
+  
+  # Integration Test Example
+  integration_test_example:
+    input:
+      api_specification:
+        endpoint: "/users"
+        method: "POST"
+        request_body:
+          email: "string"
+          password: "string"
+        responses:
+          201: "User created successfully"
+          400: "Invalid input"
+    
+    generated_test: |
+      import pytest
+      from fastapi.testclient import TestClient
+      from app import app
+      
+      client = TestClient(app)
+      
+      class TestUserAPI:
+          def test_create_user_success(self):
+              response = client.post("/users", json={
+                  "email": "test@example.com",
+                  "password": "securepassword123"
+              })
+              assert response.status_code == 201
+              assert "id" in response.json()
+          
+          def test_create_user_invalid_email(self):
+              response = client.post("/users", json={
+                  "email": "invalid-email",
+                  "password": "securepassword123"
+              })
+              assert response.status_code == 400
+              assert "email" in response.json()["errors"]
+  
+  # Performance Test Example  
+  performance_test_example:
+    input:
+      performance_requirements:
+        endpoint: "/api/search"
+        max_response_time: "200ms"
+        concurrent_users: 100
+        duration: "5min"
+    
+    generated_test: |
+      import asyncio
+      import aiohttp
+      import time
+      from statistics import mean, percentile
+      
+      async def performance_test_search_endpoint():
+          async with aiohttp.ClientSession() as session:
+              response_times = []
+              
+              async def make_request():
+                  start_time = time.time()
+                  async with session.get('/api/search?q=test') as response:
+                      await response.text()
+                      return time.time() - start_time
+              
+              # Run 100 concurrent requests
+              tasks = [make_request() for _ in range(100)]
+              response_times = await asyncio.gather(*tasks)
+              
+              # Assert performance requirements
+              assert mean(response_times) < 0.2  # 200ms average
+              assert max(response_times) < 0.5   # 500ms max
+              assert percentile(response_times, 95) < 0.3  # 95th percentile
+
+# CLI Usage Examples
+cli_usage: |
+  # Generate tests for specific module
+  hugai test generate --source src/user_service.py --framework pytest
+  
+  # Run complete test suite
+  hugai test run --all --coverage --report-format html
+  
+  # Generate integration tests for API
+  hugai test generate integration --api-spec api/openapi.yaml
+  
+  # Run performance tests
+  hugai test performance --endpoint /api/users --concurrent 50 --duration 5m
+  
+  # Analyze test coverage
+  hugai test coverage --source src/ --min-threshold 85 --report coverage.html
+  
+  # Generate test data
+  hugai test data generate --schema database/schema.sql --format json
+  
+  # Run security tests
+  hugai test security --target https://api.example.com --auth-token $API_TOKEN

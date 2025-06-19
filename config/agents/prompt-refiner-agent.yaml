@@ -1,0 +1,538 @@
+metadata:
+  name: prompt-refiner-agent
+  version: 1.0.0
+  description: "Refines raw prompts by clarifying intent, enriching context, and ensuring HUGAI methodology compliance"
+  category: core-orchestration
+  dependencies:
+    - context-store
+    - knowledge-base-manager-agent
+    - template-engine
+  tags:
+    - prompt-optimization
+    - context-enrichment
+    - quality-assurance
+    - standardization
+
+configuration:
+  # Core Refinement Settings
+  refinement_approach: comprehensive  # Options: basic, standard, comprehensive, adaptive
+  context_enrichment: automatic  # Options: manual, guided, automatic
+  quality_threshold: high  # Options: basic, standard, high, strict
+  
+  # Prompt Analysis Configuration
+  analysis_dimensions:
+    clarity_assessment:
+      enabled: true
+      readability_scoring: flesch_kincaid
+      ambiguity_detection: nlp_based
+      intent_classification: automated
+      
+    completeness_validation:
+      enabled: true
+      required_elements: [objective, context, constraints, output_format]
+      missing_information_detection: true
+      dependency_identification: true
+      
+    consistency_checking:
+      enabled: true
+      style_guide_compliance: enforced
+      terminology_standardization: true
+      format_normalization: automatic
+      
+    context_analysis:
+      enabled: true
+      domain_identification: automatic
+      audience_analysis: inferred
+      complexity_assessment: automated
+  
+  # Context Enrichment Strategy
+  context_enrichment_strategy:
+    project_context:
+      auto_inject: true
+      sources: [project_metadata, requirements_docs, architecture_specs]
+      relevance_filtering: ml_based
+      
+    domain_context:
+      knowledge_base_integration: true
+      industry_standards: included
+      best_practices: referenced
+      
+    technical_context:
+      framework_specifics: auto_detected
+      language_conventions: applied
+      platform_constraints: considered
+      
+    historical_context:
+      previous_prompts: analyzed
+      successful_patterns: applied
+      failure_patterns: avoided
+  
+  # Template and Style Management
+  template_management:
+    hugai_templates:
+      requirements_analysis: "templates/requirements.yaml"
+      architecture_design: "templates/architecture.yaml"
+      implementation: "templates/implementation.yaml"
+      testing: "templates/testing.yaml"
+      deployment: "templates/deployment.yaml"
+      
+    custom_templates:
+      organization_specific: "templates/custom/*.yaml"
+      project_specific: "templates/project/*.yaml"
+      
+    style_guides:
+      prompt_style: "guides/prompt-style.md"
+      terminology: "guides/terminology.yaml"
+      formatting_rules: "guides/formatting.yaml"
+  
+  # Input Sources Configuration
+  input_sources:
+    raw_prompts: "prompts/raw/*.{txt,md}"
+    user_inputs: "inputs/user/*.{txt,md}"
+    agent_requests: "requests/agents/*.yaml"
+    task_metadata: "metadata/tasks/*.yaml"
+    project_context: "context/project/*.{yaml,json}"
+    domain_knowledge: "knowledge/**/*.{md,yaml}"
+    templates: "templates/**/*.{yaml,jinja2}"
+    style_guides: "guides/**/*.{md,yaml}"
+  
+  # Processing Pipeline
+  processing_steps:
+    - parse_input_prompt
+    - extract_intent_objectives
+    - analyze_completeness_gaps
+    - identify_ambiguities
+    - classify_domain_context
+    - load_relevant_templates
+    - enrich_with_project_context
+    - apply_style_guidelines
+    - structure_output_format
+    - validate_refined_prompt
+    - generate_metadata
+    - create_audit_trail
+  
+  # Quality Validation Framework
+  quality_validation:
+    automated_checks:
+      clarity_score: ">70"
+      completeness_percentage: ">90%"
+      ambiguity_count: "<3"
+      template_compliance: "100%"
+      
+    linguistic_quality:
+      grammar_check: automated
+      spelling_validation: enforced
+      readability_assessment: flesch_kincaid
+      tone_consistency: validated
+      
+    structural_validation:
+      required_sections: present
+      metadata_completeness: verified
+      format_compliance: enforced
+      
+    content_validation:
+      factual_accuracy: checked
+      context_relevance: verified
+      constraint_completeness: validated
+  
+  # Refinement Rules and Patterns
+  refinement_rules:
+    clarity_improvements:
+      - replace_vague_terms: true
+      - add_specific_examples: true
+      - define_technical_terms: true
+      - clarify_objectives: true
+      
+    context_additions:
+      - inject_project_constraints: true
+      - add_success_criteria: true
+      - include_failure_scenarios: true
+      - reference_related_artifacts: true
+      
+    structure_standardization:
+      - apply_hugai_format: true
+      - normalize_section_headers: true
+      - standardize_metadata: true
+      - consistent_terminology: true
+  
+  # Adaptive Learning Configuration
+  adaptive_learning:
+    feedback_integration:
+      downstream_success_tracking: enabled
+      user_satisfaction_monitoring: enabled
+      pattern_recognition: ml_based
+      
+    continuous_improvement:
+      template_optimization: automated
+      rule_refinement: data_driven
+      context_enrichment_tuning: feedback_based
+      
+    personalization:
+      user_preference_learning: enabled
+      project_pattern_adaptation: automated
+      domain_specialization: progressive
+
+integration:
+  # Upstream Sources
+  input_sources_integration:
+    user_interfaces:
+      cli_interface: "hugai prompt refine"
+      web_interface: "prompt_editor"
+      api_endpoint: "/api/v1/prompts/refine"
+      
+    agent_requests:
+      router_agent: "routing_refinement"
+      domain_expert_agent: "context_enhancement"
+      
+    external_systems:
+      knowledge_management: "confluence_integration"
+      documentation_systems: "wiki_integration"
+  
+  # Downstream Agents
+  output_agents:
+    - router_agent
+    - requirements_analyzer_agent
+    - architecture_agent
+    - implementation_agent
+    - test_agent
+  
+  # Template Engine Integration
+  template_engines:
+    jinja2:
+      enabled: true
+      custom_filters: prompt_specific
+      
+    handlebars:
+      enabled: true
+      helper_functions: context_enrichment
+      
+    mustache:
+      enabled: true
+      partials: reusable_components
+  
+  # Knowledge Base Integration
+  knowledge_integration:
+    vector_databases:
+      chromadb: "similarity_search"
+      pinecone: "context_retrieval"
+      
+    search_engines:
+      elasticsearch: "full_text_search"
+      solr: "faceted_search"
+      
+    documentation_sources:
+      confluence: "organizational_knowledge"
+      notion: "project_documentation"
+      sharepoint: "enterprise_documents"
+
+validation:
+  # Input Validation
+  input_validation:
+    prompt_format:
+      supported_formats: [plain_text, markdown, yaml]
+      max_length: "10000_characters"
+      encoding: "utf-8"
+      
+    metadata_validation:
+      required_fields: [task_id, domain, priority]
+      optional_fields: [deadline, stakeholders, constraints]
+      format_compliance: yaml_schema
+      
+    content_validation:
+      language_detection: automated
+      profanity_filtering: enabled
+      sensitive_information_detection: true
+  
+  # Processing Validation
+  processing_validation:
+    template_application:
+      template_existence: verified
+      variable_substitution: complete
+      syntax_validation: automated
+      
+    context_enrichment:
+      relevance_scoring: ">0.7"
+      source_credibility: verified
+      information_freshness: checked
+      
+    quality_assurance:
+      improvement_measurement: quantified
+      consistency_verification: automated
+      standard_compliance: enforced
+  
+  # Output Validation
+  output_validation:
+    refined_prompt_quality:
+      clarity_improvement: measurable
+      completeness_achievement: ">90%"
+      ambiguity_reduction: significant
+      
+    metadata_completeness:
+      all_required_fields: present
+      audit_trail: complete
+      versioning_information: accurate
+      
+    downstream_compatibility:
+      agent_consumption_format: validated
+      routing_compatibility: verified
+      processing_readiness: confirmed
+
+monitoring:
+  # Refinement Quality Metrics
+  metrics:
+    prompt_clarity_score:
+      description: "Automated readability and clarity score for refined prompts"
+      target: ">80"
+      alert_threshold: "<60"
+      calculation: "flesch_kincaid_score"
+      
+    completeness_rate:
+      description: "Percentage of prompts containing all necessary context"
+      target: ">95%"
+      alert_threshold: "<85%"
+      calculation: "complete_prompts / total_prompts * 100"
+      
+    ambiguity_reduction:
+      description: "Number of ambiguities detected and resolved per prompt"
+      target: ">90%"
+      measurement: "resolved_ambiguities / detected_ambiguities"
+      
+    refinement_turnaround_time:
+      description: "Average time from submission to refined prompt delivery"
+      target: "<30 seconds"
+      alert_threshold: ">60 seconds"
+      
+    user_satisfaction:
+      description: "Average user feedback rating for prompt quality"
+      target: ">4.0/5.0"
+      alert_threshold: "<3.5/5.0"
+      measurement: "user_feedback_surveys"
+      
+    downstream_success_rate:
+      description: "Percentage of downstream tasks succeeding on first attempt"
+      target: ">85%"
+      alert_threshold: "<70%"
+      calculation: "successful_first_attempts / total_attempts * 100"
+  
+  # Operational Metrics
+  operational_metrics:
+    processing_throughput: ">100 prompts/hour"
+    template_utilization: "tracked"
+    context_enrichment_effectiveness: "measured"
+    
+  # Learning Metrics
+  learning_metrics:
+    pattern_recognition_accuracy: ">80%"
+    adaptation_effectiveness: "improving"
+    personalization_success: "tracked"
+
+examples:
+  # Basic Prompt Refinement
+  basic_refinement_example:
+    input:
+      raw_prompt: "Create a user authentication system"
+      metadata:
+        task_id: "AUTH-001"
+        domain: "web_development"
+        priority: "high"
+    
+    output:
+      refined_prompt: |
+        # User Authentication System Implementation
+        
+        ## Objective
+        Design and implement a secure user authentication system for a web application.
+        
+        ## Context
+        - Target Platform: Web application (React frontend, Node.js backend)
+        - Security Requirements: OWASP compliance, password hashing, session management
+        - Integration: Must integrate with existing user database schema
+        - Performance: Support 1000+ concurrent users
+        
+        ## Specific Requirements
+        1. User registration with email verification
+        2. Login/logout functionality with session management
+        3. Password reset mechanism via email
+        4. Multi-factor authentication (optional)
+        5. Rate limiting for login attempts
+        
+        ## Constraints
+        - Must use bcrypt for password hashing
+        - JWT tokens for session management
+        - GDPR compliance for user data
+        - Mobile-responsive design
+        
+        ## Success Criteria
+        - All security tests pass
+        - Performance benchmarks met
+        - Code coverage >85%
+        - Documentation complete
+        
+        ## Output Format
+        - Complete source code with tests
+        - API documentation
+        - Security review checklist
+        - Deployment guide
+      
+      metadata:
+        agent: "prompt_refiner_agent"
+        version: "1.0.0"
+        refined_at: "2025-06-16T22:00:00Z"
+        template_used: "implementation_template"
+        clarity_score: 85
+        completeness_rate: 95
+  
+  # Complex Domain-Specific Refinement
+  complex_refinement_example:
+    input:
+      raw_prompt: "Build ML model for predictions"
+      context:
+        domain: "financial_services"
+        project: "risk_assessment"
+        stakeholders: ["data_scientists", "risk_managers", "compliance"]
+    
+    output:
+      refined_prompt: |
+        # Machine Learning Model for Financial Risk Prediction
+        
+        ## Business Objective
+        Develop a machine learning model to predict credit risk for loan applications,
+        supporting risk management decisions while ensuring regulatory compliance.
+        
+        ## Domain Context
+        - Industry: Financial Services / Consumer Lending
+        - Regulatory Framework: Basel III, GDPR, Fair Credit Reporting Act
+        - Risk Tolerance: Conservative (false positive acceptable, false negative critical)
+        - Stakeholders: Risk Management, Data Science, Compliance, Business Development
+        
+        ## Technical Requirements
+        ### Data Requirements
+        - Training Data: Historical loan performance (5+ years)
+        - Features: Credit score, income, debt-to-income ratio, employment history
+        - Target Variable: Default probability (binary classification)
+        - Data Volume: 100k+ samples for training
+        
+        ### Model Requirements
+        - Algorithm: Interpretable models preferred (Random Forest, Logistic Regression)
+        - Performance: AUC-ROC >0.75, Precision >0.60 for default class
+        - Interpretability: SHAP values for feature importance
+        - Bias Detection: Fairness metrics across demographic groups
+        
+        ### Infrastructure Requirements
+        - Platform: AWS SageMaker or similar MLOps platform
+        - Real-time Inference: <100ms response time
+        - Batch Processing: Daily model retraining capability
+        - Monitoring: Model drift detection and performance tracking
+        
+        ## Compliance Constraints
+        - Model Explainability: Must provide reasoning for decisions
+        - Audit Trail: Complete lineage tracking for model versions
+        - Data Privacy: No PII in model features
+        - Bias Prevention: Regular fairness audits across protected classes
+        
+        ## Success Criteria
+        1. Model Performance: Achieve target AUC-ROC and precision metrics
+        2. Regulatory Approval: Pass compliance review process
+        3. Business Integration: Successfully deployed to production
+        4. Monitoring: Alerting system for model degradation
+        
+        ## Deliverables
+        - Trained and validated ML model
+        - Model documentation and interpretation report
+        - Deployment pipeline and monitoring setup
+        - Compliance and bias assessment report
+        - Production deployment and rollback procedures
+      
+      enrichment_sources:
+        - financial_regulations_knowledge_base
+        - ml_best_practices_guide
+        - company_risk_policies
+        - previous_ml_projects
+  
+  # Technical Specification Refinement
+  technical_refinement_example:
+    input:
+      raw_prompt: "API for mobile app"
+      project_context:
+        application: "e-commerce_mobile"
+        technology_stack: "microservices"
+        team_size: "large"
+    
+    output:
+      refined_prompt: |
+        # Mobile E-commerce API Development
+        
+        ## System Architecture Context
+        - Architecture Pattern: Microservices with API Gateway
+        - Technology Stack: Node.js, Express, MongoDB, Redis
+        - Authentication: OAuth 2.0 with JWT tokens
+        - Deployment: Kubernetes on AWS EKS
+        
+        ## API Specifications
+        ### Core Endpoints
+        1. Product Catalog API
+           - GET /api/v1/products (with pagination, filtering, search)
+           - GET /api/v1/products/{id} (detailed product information)
+           - GET /api/v1/categories (product categories hierarchy)
+        
+        2. User Management API
+           - POST /api/v1/auth/login (authentication)
+           - POST /api/v1/auth/refresh (token refresh)
+           - GET /api/v1/users/profile (user profile)
+           - PUT /api/v1/users/profile (profile updates)
+        
+        3. Shopping Cart API
+           - GET /api/v1/cart (current cart contents)
+           - POST /api/v1/cart/items (add item to cart)
+           - PUT /api/v1/cart/items/{id} (update item quantity)
+           - DELETE /api/v1/cart/items/{id} (remove item)
+        
+        4. Order Management API
+           - POST /api/v1/orders (create order from cart)
+           - GET /api/v1/orders (order history)
+           - GET /api/v1/orders/{id} (order details)
+           - GET /api/v1/orders/{id}/tracking (shipment tracking)
+        
+        ## Non-Functional Requirements
+        - Performance: 95th percentile response time <200ms
+        - Availability: 99.9% uptime SLA
+        - Scalability: Handle 10k+ concurrent users
+        - Security: OWASP API Security Top 10 compliance
+        
+        ## Mobile-Specific Considerations
+        - Offline Capability: Cart persistence, browsing cache
+        - Network Optimization: Response compression, pagination
+        - Battery Efficiency: Minimized polling, push notifications
+        - Cross-Platform: iOS and Android compatibility
+        
+        ## Integration Requirements
+        - Payment Gateway: Stripe, PayPal integration
+        - Inventory System: Real-time stock level synchronization
+        - Analytics: User behavior tracking, conversion metrics
+        - Push Notifications: Order updates, promotional messages
+        
+        ## Quality Assurance
+        - Test Coverage: >90% for all endpoints
+        - Performance Testing: Load testing with realistic scenarios
+        - Security Testing: Penetration testing, dependency scanning
+        - Mobile Testing: Device compatibility, network condition simulation
+
+# CLI Usage Examples
+cli_usage: |
+  # Refine a single prompt
+  hugai prompt refine --input "Build user auth" --domain web_development --output refined.yaml
+  
+  # Batch refine prompts
+  hugai prompt refine batch --input-dir prompts/raw/ --output-dir prompts/refined/
+  
+  # Interactive refinement with feedback
+  hugai prompt refine interactive --input prompt.txt --template implementation
+  
+  # Validate refined prompt quality
+  hugai prompt validate --input refined_prompt.yaml --check clarity,completeness,ambiguity
+  
+  # Generate refinement report
+  hugai prompt analyze --input refined_prompts/ --report quality_report.html
+  
+  # Export to different formats
+  hugai prompt export --input refined.yaml --format markdown,json --output exports/

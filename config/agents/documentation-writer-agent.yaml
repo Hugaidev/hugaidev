@@ -1,0 +1,542 @@
+metadata:
+  name: documentation-writer-agent
+  version: 1.0.0
+  description: "Automates creation of clear, structured documentation from code and specifications"
+  category: domain-specific
+  dependencies:
+    - implementation-agent
+    - architecture-agent
+    - requirements-analyzer-agent
+    - static-analysis-tools
+  tags:
+    - documentation
+    - technical-writing
+    - api-reference
+    - user-guides
+    - knowledge-management
+
+configuration:
+  # Core Documentation Settings
+  documentation_approach: comprehensive  # Options: minimal, standard, comprehensive, exhaustive
+  style_consistency: strict  # Options: loose, standard, strict
+  auto_update: true  # Automatically update docs when code changes
+  
+  # Documentation Types
+  documentation_types:
+    api_reference:
+      enabled: true
+      format: openapi_3
+      include_examples: true
+      auto_generate: true
+      
+    user_guides:
+      enabled: true
+      format: markdown
+      include_tutorials: true
+      step_by_step: true
+      
+    technical_documentation:
+      enabled: true
+      architecture_docs: true
+      deployment_guides: true
+      troubleshooting: true
+      
+    onboarding_materials:
+      enabled: true
+      quick_start: true
+      development_setup: true
+      contribution_guide: true
+      
+    code_documentation:
+      enabled: true
+      inline_comments: comprehensive
+      docstrings: required
+      examples_in_code: true
+  
+  # Supported Formats and Tools
+  supported_formats:
+    input_formats: [markdown, yaml, json, openapi, swagger, code_files]
+    output_formats: [markdown, html, pdf, confluence, notion]
+    documentation_frameworks: [mkdocs, docusaurus, gitbook, sphinx]
+    
+  template_engines:
+    primary: jinja2
+    secondary: [handlebars, mustache]
+    custom_templates: true
+  
+  # Input Sources Configuration
+  input_sources:
+    source_code: "src/**/*.{py,js,ts,java,go,cs,php,rb}"
+    api_specifications: "api/**/*.{yaml,json}"
+    architecture_docs: "docs/architecture/*.md"
+    requirements_specs: "specs/**/*.yaml"
+    configuration_files: "config/**/*.{yaml,json}"
+    templates: "templates/docs/*.{md,html,jinja2}"
+    style_guides: "docs/style-guide.md"
+    existing_documentation: "docs/**/*.md"
+    changelog: "CHANGELOG.md"
+    readme_files: "{README.md,*/README.md}"
+  
+  # Processing Pipeline
+  processing_steps:
+    - analyze_input_sources
+    - extract_code_documentation
+    - parse_api_specifications
+    - load_documentation_templates
+    - generate_content_outline
+    - create_documentation_sections
+    - apply_style_guidelines
+    - generate_code_examples
+    - validate_documentation_completeness
+    - check_grammar_and_spelling
+    - validate_links_and_references
+    - render_final_documentation
+    - update_navigation_structure
+  
+  # Content Generation Strategy
+  content_generation:
+    api_documentation:
+      auto_extract_endpoints: true
+      generate_request_examples: true
+      include_response_schemas: true
+      add_authentication_docs: true
+      
+    code_documentation:
+      extract_docstrings: true
+      generate_class_diagrams: true
+      include_usage_examples: true
+      document_configuration: true
+      
+    user_documentation:
+      step_by_step_tutorials: true
+      troubleshooting_sections: true
+      faq_generation: true
+      best_practices: true
+      
+    onboarding_documentation:
+      quick_start_guide: true
+      development_environment_setup: true
+      coding_standards: true
+      contribution_workflow: true
+  
+  # Style and Quality Standards
+  style_standards:
+    writing_style:
+      tone: "professional"  # Options: casual, professional, technical, friendly
+      voice: "active"       # Options: active, passive
+      person: "second"      # Options: first, second, third
+      
+    formatting_rules:
+      heading_style: "sentence_case"
+      code_block_language: "always_specified"
+      link_format: "descriptive"
+      image_alt_text: "required"
+      
+    content_structure:
+      max_section_length: 500  # words
+      min_examples_per_section: 1
+      table_of_contents: "auto_generated"
+      cross_references: "automatic"
+  
+  # Quality Validation
+  quality_validation:
+    completeness_checks:
+      all_public_apis_documented: true
+      configuration_options_covered: true
+      error_codes_explained: true
+      
+    accuracy_validation:
+      code_examples_tested: true
+      links_verified: true
+      version_compatibility_checked: true
+      
+    readability_metrics:
+      flesch_reading_ease: ">60"
+      average_sentence_length: "<20"
+      paragraph_length: "<150"
+
+integration:
+  # Upstream Agents
+  input_agents:
+    - implementation_agent
+    - architecture_agent
+    - requirements_analyzer_agent
+    - test_agent
+    - deployment_agent
+  
+  # Downstream Agents
+  output_agents:
+    - knowledge_base_manager_agent
+    - internal_reviewer_agent
+  
+  # Documentation Platforms
+  documentation_platforms:
+    mkdocs_material:
+      config_file: "mkdocs.yml"
+      theme_customization: true
+      plugin_integration: [search, git_revision_date]
+      
+    confluence:
+      space_key: "${CONFLUENCE_SPACE}"
+      auto_publish: true
+      template_management: true
+      
+    notion:
+      database_id: "${NOTION_DOCS_DB}"
+      page_templates: true
+      collaborative_editing: true
+      
+    gitbook:
+      organization: "${GITBOOK_ORG}"
+      auto_sync: true
+      version_management: true
+  
+  # Development Tools Integration
+  ide_integration:
+    vscode:
+      extensions: [docs_preview, markdown_lint, spell_checker]
+      snippets: documentation_templates
+      
+    jetbrains:
+      live_templates: documentation_patterns
+      documentation_generation: automated
+  
+  # Version Control Integration
+  vcs_integration:
+    git_hooks:
+      pre_commit: [spell_check, link_validation]
+      post_commit: [doc_generation, site_update]
+      
+    documentation_workflow:
+      docs_branch: "docs/updates"
+      review_process: "pull_request"
+      auto_merge: conditional
+  
+  # Translation and Localization
+  localization:
+    supported_languages: [en, es, fr, de, ja, zh]
+    translation_workflow: "manual"  # Options: manual, automated, hybrid
+    translation_memory: enabled
+    glossary_management: true
+
+validation:
+  # Input Validation
+  input_validation:
+    source_code_quality:
+      syntax_validation: true
+      docstring_presence: ">80%"
+      code_comments: adequate
+      
+    specification_validation:
+      api_spec_completeness: validated
+      schema_validation: enforced
+      example_accuracy: verified
+      
+    template_validation:
+      template_syntax: valid
+      variable_mapping: complete
+      styling_consistency: enforced
+  
+  # Content Quality Validation
+  content_validation:
+    linguistic_quality:
+      grammar_check: automated
+      spell_check: enforced
+      readability_score: ">60"
+      
+    technical_accuracy:
+      code_examples: executable
+      api_endpoints: reachable
+      configuration_examples: valid
+      
+    structural_validation:
+      heading_hierarchy: correct
+      navigation_structure: logical
+      cross_references: valid
+  
+  # Output Validation
+  output_validation:
+    documentation_completeness:
+      required_sections: present
+      coverage_threshold: ">90%"
+      link_validation: passed
+      
+    format_compliance:
+      markdown_syntax: valid
+      html_validation: passed
+      accessibility_standards: met
+
+monitoring:
+  # Documentation Metrics
+  metrics:
+    documentation_coverage:
+      description: "Percentage of code modules covered by documentation"
+      target: ">90%"
+      alert_threshold: "<75%"
+      calculation: "documented_modules / total_modules * 100"
+      
+    documentation_accuracy_score:
+      description: "Quality rating based on reviews and feedback"
+      target: ">4.0/5.0"
+      alert_threshold: "<3.0/5.0"
+      measurement: "user_feedback_average"
+      
+    documentation_delivery_time:
+      description: "Time from code completion to documentation publication"
+      target: "<24 hours"
+      alert_threshold: ">72 hours"
+      
+    review_cycle_time:
+      description: "Average time for documentation review and approval"
+      target: "<48 hours"
+      alert_threshold: ">120 hours"
+      
+    link_validation_pass_rate:
+      description: "Percentage of documentation links validated successfully"
+      target: ">98%"
+      alert_threshold: "<90%"
+      
+    documentation_drift_rate:
+      description: "Percentage of outdated documentation detected"
+      target: "<5%"
+      alert_threshold: ">15%"
+  
+  # Quality Metrics
+  quality_metrics:
+    user_satisfaction:
+      description: "User satisfaction with documentation quality"
+      target: ">4.2/5.0"
+      measurement: "surveys_and_feedback"
+      
+    documentation_usage:
+      description: "Documentation page views and engagement"
+      tracking: "analytics_integration"
+      
+    maintenance_efficiency:
+      description: "Time spent maintaining vs creating documentation"
+      target: "<30%"
+      
+  # Performance Monitoring
+  performance_monitoring:
+    generation_throughput: ">100 pages/hour"
+    template_rendering_time: "<30s"
+    validation_execution_time: "<2min"
+
+examples:
+  # API Documentation Generation
+  api_documentation_example:
+    input:
+      openapi_spec: |
+        openapi: 3.0.0
+        info:
+          title: User Management API
+          version: 1.0.0
+        paths:
+          /users:
+            get:
+              summary: List users
+              responses:
+                '200':
+                  description: List of users
+                  content:
+                    application/json:
+                      schema:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+        components:
+          schemas:
+            User:
+              type: object
+              properties:
+                id:
+                  type: string
+                email:
+                  type: string
+                name:
+                  type: string
+    
+    output:
+      markdown_documentation: |
+        # User Management API
+        
+        ## Overview
+        
+        The User Management API provides endpoints for managing user accounts.
+        
+        ## Authentication
+        
+        All endpoints require API key authentication via the `Authorization` header.
+        
+        ## Endpoints
+        
+        ### List Users
+        
+        **GET** `/users`
+        
+        Retrieves a list of all users in the system.
+        
+        #### Response
+        
+        ```json
+        [
+          {
+            "id": "user-123",
+            "email": "john@example.com",
+            "name": "John Doe"
+          }
+        ]
+        ```
+        
+        #### Example Request
+        
+        ```bash
+        curl -H "Authorization: Bearer YOUR_API_KEY" \
+             https://api.example.com/users
+        ```
+  
+  # Code Documentation Generation
+  code_documentation_example:
+    input:
+      python_code: |
+        class UserService:
+            """Service for managing user operations."""
+            
+            def __init__(self, database):
+                """Initialize the user service.
+                
+                Args:
+                    database: Database connection instance
+                """
+                self.db = database
+            
+            def create_user(self, email: str, name: str) -> User:
+                """Create a new user account.
+                
+                Args:
+                    email: User's email address
+                    name: User's full name
+                    
+                Returns:
+                    User: Created user object
+                    
+                Raises:
+                    ValidationError: If email is invalid
+                    DuplicateError: If user already exists
+                """
+                # Implementation here
+                pass
+    
+    output:
+      markdown_documentation: |
+        # UserService Class
+        
+        Service for managing user operations.
+        
+        ## Constructor
+        
+        ### `__init__(database)`
+        
+        Initialize the user service.
+        
+        **Parameters:**
+        - `database`: Database connection instance
+        
+        ## Methods
+        
+        ### `create_user(email, name)`
+        
+        Create a new user account.
+        
+        **Parameters:**
+        - `email` (str): User's email address
+        - `name` (str): User's full name
+        
+        **Returns:**
+        - `User`: Created user object
+        
+        **Raises:**
+        - `ValidationError`: If email is invalid
+        - `DuplicateError`: If user already exists
+        
+        **Example:**
+        ```python
+        service = UserService(database)
+        user = service.create_user("john@example.com", "John Doe")
+        ```
+  
+  # User Guide Generation
+  user_guide_example:
+    input:
+      feature_specification:
+        name: "Password Reset"
+        description: "Allow users to reset forgotten passwords"
+        user_journey: ["Request reset", "Receive email", "Click link", "Set new password"]
+    
+    output:
+      user_guide: |
+        # Password Reset Guide
+        
+        ## Overview
+        
+        If you've forgotten your password, you can easily reset it using our password reset feature.
+        
+        ## Step-by-Step Instructions
+        
+        ### 1. Request Password Reset
+        
+        1. Go to the login page
+        2. Click "Forgot Password?" link
+        3. Enter your email address
+        4. Click "Send Reset Email"
+        
+        ### 2. Check Your Email
+        
+        1. Check your email inbox (and spam folder)
+        2. Look for an email from "noreply@example.com"
+        3. The email should arrive within 5 minutes
+        
+        ### 3. Reset Your Password
+        
+        1. Click the reset link in the email
+        2. You'll be taken to a password reset page
+        3. Enter your new password twice
+        4. Click "Update Password"
+        
+        ## Troubleshooting
+        
+        **Didn't receive the email?**
+        - Check your spam folder
+        - Verify you entered the correct email address
+        - Wait up to 10 minutes for delivery
+        
+        **Reset link expired?**
+        - Reset links expire after 24 hours
+        - Request a new reset email
+        
+        ## Security Note
+        
+        Reset links can only be used once and expire after 24 hours for security.
+
+# CLI Usage Examples
+cli_usage: |
+  # Generate documentation for entire project
+  hugai docs generate --source src/ --output docs/ --format mkdocs
+  
+  # Generate API documentation from OpenAPI spec
+  hugai docs api --spec api/openapi.yaml --output docs/api/ --include-examples
+  
+  # Update existing documentation
+  hugai docs update --docs docs/ --source src/ --detect-changes
+  
+  # Generate user guides from specifications
+  hugai docs user-guide --specs requirements/ --templates templates/user-guide/
+  
+  # Validate documentation quality
+  hugai docs validate --docs docs/ --check grammar,links,completeness
+  
+  # Generate code documentation
+  hugai docs code --source src/ --format markdown --include-examples
+  
+  # Publish documentation
+  hugai docs publish --platform confluence --space DEV --auto-update

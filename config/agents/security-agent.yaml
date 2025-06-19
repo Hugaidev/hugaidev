@@ -1,0 +1,480 @@
+metadata:
+  name: security-agent
+  version: 1.0.0
+  description: "Detects vulnerabilities and enforces security policies in code, dependencies, and infrastructure"
+  category: domain-specific
+  dependencies:
+    - static-analysis-tools
+    - vulnerability-databases
+    - compliance-frameworks
+    - audit-logger
+  tags:
+    - security
+    - vulnerability-scanning
+    - compliance
+    - sast
+    - dependency-scanning
+
+configuration:
+  # Core Security Settings
+  security_approach: defense_in_depth  # Options: basic, comprehensive, defense_in_depth, zero_trust
+  scan_intensity: thorough  # Options: light, standard, thorough, exhaustive
+  policy_enforcement: strict  # Options: advisory, standard, strict, blocking
+  
+  # Security Scanning Types
+  scan_types:
+    static_analysis:
+      enabled: true
+      languages: [python, javascript, typescript, java, go, csharp, php, ruby]
+      owasp_top10_coverage: true
+      custom_rules: true
+      
+    dependency_scanning:
+      enabled: true
+      package_managers: [npm, pip, maven, gradle, go_mod, composer, bundler]
+      vulnerability_databases: [nvd, snyk, ossindex, github_advisories]
+      license_compliance: true
+      
+    infrastructure_scanning:
+      enabled: true
+      iac_formats: [terraform, cloudformation, kubernetes, docker, ansible]
+      cloud_providers: [aws, azure, gcp, kubernetes]
+      compliance_benchmarks: [cis, nist, pci_dss]
+      
+    container_scanning:
+      enabled: true
+      base_image_vulnerabilities: true
+      runtime_configuration: true
+      dockerfile_best_practices: true
+      
+    secrets_detection:
+      enabled: true
+      scan_history: true
+      custom_patterns: true
+      entropy_analysis: true
+  
+  # Security Tools Configuration
+  security_tools:
+    sast_tools:
+      primary: semgrep
+      secondary: [codeql, sonarqube, checkmarx]
+      custom_rules_path: "security/rules/"
+      
+    dependency_scanners:
+      primary: snyk
+      secondary: [safety, audit, owasp_dependency_check]
+      private_registries: supported
+      
+    iac_scanners:
+      primary: tfsec
+      secondary: [checkov, terrascan, kics]
+      policy_as_code: true
+      
+    container_scanners:
+      primary: trivy
+      secondary: [grype, clair, anchore]
+      registry_scanning: true
+      
+    secrets_scanners:
+      primary: gitleaks
+      secondary: [trufflehog, detect_secrets]
+      historical_scanning: true
+  
+  # Input Sources Configuration
+  input_sources:
+    source_code: "src/**/*.{py,js,ts,java,go,cs,php,rb}"
+    dependency_files: "{package.json,requirements.txt,pom.xml,go.mod,composer.json,Gemfile}"
+    infrastructure_code: "{terraform/**/*.tf,k8s/**/*.yaml,docker/**/*,ansible/**/*.yml}"
+    container_files: "{Dockerfile,docker-compose.yml,.dockerignore}"
+    configuration_files: "config/**/*.{yaml,json,ini,env}"
+    documentation: "docs/security/*.md"
+    policies: "policies/**/*.{yaml,json,md}"
+  
+  # Processing Pipeline
+  processing_steps:
+    - initialize_security_context
+    - load_security_policies
+    - scan_source_code_sast
+    - scan_dependencies_vulnerabilities
+    - scan_infrastructure_misconfigurations
+    - scan_containers_vulnerabilities
+    - detect_secrets_credentials  
+    - aggregate_findings
+    - prioritize_by_severity
+    - generate_remediation_suggestions
+    - create_security_reports
+    - update_audit_logs
+    - trigger_notifications
+  
+  # Vulnerability Management
+  vulnerability_management:
+    severity_levels:
+      critical: 
+        cvss_score: "9.0-10.0"
+        sla_fix_time: "24 hours"
+        blocking: true
+        
+      high:
+        cvss_score: "7.0-8.9"
+        sla_fix_time: "7 days"
+        blocking: true
+        
+      medium:
+        cvss_score: "4.0-6.9"
+        sla_fix_time: "30 days"
+        blocking: false
+        
+      low:
+        cvss_score: "0.1-3.9"
+        sla_fix_time: "90 days"
+        blocking: false
+    
+    vulnerability_tracking:
+      unique_identification: true
+      lifecycle_management: true
+      remediation_tracking: true
+      false_positive_management: true
+      
+    risk_assessment:
+      business_impact_analysis: true
+      exploitability_assessment: true
+      environmental_scoring: true
+      temporal_scoring: true
+  
+  # Security Policies
+  security_policies:
+    owasp_top10:
+      injection_flaws: enforced
+      broken_authentication: enforced
+      sensitive_data_exposure: enforced
+      xml_external_entities: enforced
+      broken_access_control: enforced
+      security_misconfiguration: enforced
+      cross_site_scripting: enforced
+      insecure_deserialization: enforced
+      vulnerable_components: enforced
+      insufficient_logging: enforced
+      
+    custom_policies:
+      cryptography_standards:
+        minimum_key_size: 2048
+        approved_algorithms: [aes256, rsa2048, sha256]
+        deprecated_functions: blocked
+        
+      authentication_requirements:
+        password_complexity: enforced
+        multi_factor_authentication: required
+        session_management: validated
+        
+      data_protection:
+        pii_detection: enabled
+        data_encryption: required
+        data_retention: monitored
+        
+      api_security:
+        input_validation: enforced
+        output_encoding: required
+        rate_limiting: validated
+        authentication: required
+  
+  # Compliance Frameworks
+  compliance_frameworks:
+    gdpr:
+      enabled: true
+      data_privacy_checks: true
+      consent_management: validated
+      
+    pci_dss:
+      enabled: conditional
+      payment_data_protection: enforced
+      network_security: validated
+      
+    sox:
+      enabled: conditional
+      financial_controls: audited
+      change_management: tracked
+      
+    hipaa:
+      enabled: conditional
+      phi_protection: enforced
+      access_controls: validated
+      
+    iso27001:
+      enabled: conditional
+      information_security: comprehensive
+      risk_management: integrated
+
+integration:
+  # Upstream Agents
+  input_agents:
+    - implementation_agent
+    - architecture_agent
+    - deployment_agent
+    - infrastructure_agent
+  
+  # Downstream Agents
+  output_agents:
+    - compliance_legal_agent
+    - risk_management_agent
+    - internal_reviewer_agent
+    - documentation_writer_agent
+  
+  # Security Tool Integration
+  tool_integrations:
+    vulnerability_scanners:
+      snyk:
+        api_endpoint: "${SNYK_API_URL}"
+        api_token: "${SNYK_API_TOKEN}"
+        organization: "${SNYK_ORG_ID}"
+        
+      semgrep:
+        rules_registry: "r/all"
+        custom_rules: "security/semgrep-rules/"
+        ci_integration: true
+        
+      trivy:
+        vulnerability_db: "ghcr.io/aquasecurity/trivy-db"
+        cache_enabled: true
+        offline_scanning: false
+    
+    security_platforms:
+      sonarqube:
+        server_url: "${SONARQUBE_URL}"
+        project_key: "${PROJECT_KEY}"
+        quality_gate: "security"
+        
+      defectdojo:
+        api_endpoint: "${DEFECTDOJO_URL}"
+        api_key: "${DEFECTDOJO_API_KEY}"
+        auto_import: true
+  
+  # CI/CD Integration
+  cicd_integration:
+    jenkins:
+      security_stage: "security-scan"
+      fail_on_critical: true
+      report_artifacts: true
+      
+    github_actions:
+      security_workflow: ".github/workflows/security.yml"
+      sarif_upload: true
+      pr_comments: true
+      
+    gitlab_ci:
+      sast_template: "SAST.gitlab-ci.yml"
+      dependency_scanning: "Dependency-Scanning.gitlab-ci.yml"
+      container_scanning: "Container-Scanning.gitlab-ci.yml"
+  
+  # Notification Systems
+  notifications:
+    critical_vulnerabilities:
+      channels: [slack, email, pagerduty]
+      escalation: immediate
+      
+    security_reports:
+      channels: [email, webhook]
+      frequency: daily
+      
+    compliance_alerts:
+      channels: [email, slack]
+      compliance_violations: immediate
+
+validation:
+  # Input Validation
+  input_validation:
+    code_quality:
+      syntax_validation: true
+      compilation_check: true
+      dependencies_resolved: true
+      
+    policy_validation:
+      policy_syntax: validated
+      policy_completeness: verified
+      policy_conflicts: detected
+      
+    tool_availability:
+      scanner_connectivity: verified
+      database_updates: current
+      license_validity: checked
+  
+  # Scan Quality Validation
+  scan_validation:
+    coverage_completeness:
+      source_code_coverage: ">95%"
+      dependency_coverage: "100%"
+      infrastructure_coverage: ">90%"
+      
+    scan_accuracy:
+      false_positive_rate: "<10%"
+      false_negative_monitoring: enabled
+      benchmark_validation: periodic
+      
+    performance_validation:
+      scan_duration: "reasonable"
+      resource_utilization: "optimized"
+      parallel_execution: "enabled"
+  
+  # Output Validation
+  output_validation:
+    report_quality:
+      finding_completeness: validated
+      remediation_actionability: verified
+      severity_accuracy: calibrated
+      
+    compliance_validation:
+      regulatory_mapping: complete
+      audit_trail: comprehensive
+      evidence_collection: automated
+
+monitoring:
+  # Security Metrics
+  metrics:
+    vulnerability_count:
+      description: "Total vulnerabilities detected per scan"
+      tracking: "by_severity"
+      trending: "weekly"
+      
+    high_severity_rate:
+      description: "Percentage of high/critical severity issues"
+      target: "<5%"
+      alert_threshold: ">10%"
+      
+    vulnerability_density:
+      description: "Vulnerabilities per thousand lines of code"
+      target: "<1.0"
+      alert_threshold: ">5.0"
+      
+    scan_coverage:
+      description: "Percentage of code/infrastructure scanned"
+      target: ">95%"
+      alert_threshold: "<85%"
+      
+    time_to_fix:
+      description: "Average time to remediate vulnerabilities"
+      target: "<7 days"
+      alert_threshold: ">30 days"
+      
+    false_positive_rate:
+      description: "Percentage of invalid vulnerability reports"
+      target: "<5%"
+      alert_threshold: ">15%"
+      
+    remediation_compliance:
+      description: "Percentage of vulnerabilities fixed within SLA"
+      target: ">95%"
+      alert_threshold: "<80%"
+  
+  # Security Dashboards
+  dashboards:
+    executive_dashboard:
+      risk_overview: true
+      compliance_status: true
+      trend_analysis: true
+      
+    operational_dashboard:
+      vulnerability_queue: true
+      scan_results: true
+      remediation_progress: true
+      
+    compliance_dashboard:
+      framework_compliance: true
+      audit_readiness: true
+      policy_violations: true
+
+examples:
+  # SAST Scan Results
+  sast_example:
+    input:
+      source_file: "src/auth/login.py"
+      vulnerability_type: "sql_injection"
+      
+    output:
+      finding:
+        id: "SAST-001"
+        severity: "HIGH"
+        category: "injection"
+        cwe_id: "CWE-89"
+        title: "SQL Injection vulnerability in login function"
+        description: "User input directly concatenated into SQL query"
+        location:
+          file: "src/auth/login.py"
+          line: 42
+          column: 15
+        remediation: |
+          Use parameterized queries or prepared statements:
+          ```python
+          # Vulnerable code:
+          query = f"SELECT * FROM users WHERE email = '{email}'"
+          
+          # Fixed code:
+          query = "SELECT * FROM users WHERE email = %s"
+          cursor.execute(query, (email,))
+          ```
+  
+  # Dependency Vulnerability
+  dependency_example:
+    input:
+      package: "requests==2.25.1"
+      vulnerability: "CVE-2021-33503"
+      
+    output:
+      finding:
+        id: "DEP-001"
+        severity: "MEDIUM"
+        package: "requests"
+        version: "2.25.1"
+        vulnerability_id: "CVE-2021-33503"
+        cvss_score: 6.5
+        description: "HTTP Header Injection vulnerability"
+        fixed_version: "2.25.2"
+        remediation: "Update requests to version 2.25.2 or later"
+  
+  # Infrastructure Misconfiguration
+  iac_example:
+    input:
+      terraform_file: "aws_s3_bucket.tf"
+      misconfiguration: "public_read_access"
+      
+    output:
+      finding:
+        id: "IAC-001"
+        severity: "HIGH"
+        resource: "aws_s3_bucket.example"
+        policy_violation: "S3 bucket allows public read access"
+        location:
+          file: "aws_s3_bucket.tf"
+          line: 15
+        remediation: |
+          Remove public read access from S3 bucket:
+          ```hcl
+          # Remove or set to false:
+          acl = "private"  # instead of "public-read"
+          
+          # Or use bucket policy with specific permissions
+          ```
+
+# CLI Usage Examples
+cli_usage: |
+  # Run comprehensive security scan
+  hugai security scan --all --report-format json --output security-report.json
+  
+  # Scan specific components
+  hugai security scan sast --source src/ --rules security/custom-rules/
+  
+  # Dependency vulnerability scan
+  hugai security scan dependencies --package-files requirements.txt,package.json
+  
+  # Infrastructure security scan
+  hugai security scan iac --terraform terraform/ --compliance cis-aws
+  
+  # Container security scan
+  hugai security scan container --image myapp:latest --dockerfile Dockerfile
+  
+  # Secrets detection
+  hugai security scan secrets --history --exclude test/
+  
+  # Generate security report
+  hugai security report --format pdf --include-remediation --output security-audit.pdf
+  
+  # Policy validation
+  hugai security policy validate --policies security/policies/ --test-cases security/tests/

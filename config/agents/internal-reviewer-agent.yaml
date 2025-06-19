@@ -1,0 +1,473 @@
+metadata:
+  name: internal-reviewer-agent
+  version: 1.0.0
+  description: "Automates artifact reviews by enforcing internal standards, consistency, and quality checks"
+  category: governance
+  dependencies:
+    - implementation-agent
+    - documentation-writer-agent
+    - security-agent
+    - static-analysis-tools
+  tags:
+    - code-review
+    - quality-assurance
+    - policy-enforcement
+    - standards-compliance
+    - automated-review
+
+configuration:
+  # Core Review Settings
+  review_approach: comprehensive  # Options: basic, standard, comprehensive, exhaustive
+  review_strictness: balanced  # Options: lenient, balanced, strict, pedantic
+  auto_approval: conditional  # Options: never, conditional, always
+  
+  # Review Scope Configuration
+  review_scope:
+    code_review:
+      enabled: true
+      languages: [python, javascript, typescript, java, go, csharp, php, ruby]
+      review_depth: comprehensive
+      performance_analysis: true
+      
+    documentation_review:
+      enabled: true
+      formats: [markdown, restructuredtext, asciidoc]
+      completeness_check: true
+      accuracy_validation: true
+      
+    configuration_review:
+      enabled: true
+      formats: [yaml, json, toml, ini, properties]
+      security_validation: true
+      best_practices_check: true
+      
+    infrastructure_review:
+      enabled: true
+      iac_formats: [terraform, cloudformation, kubernetes]
+      security_policies: enforced
+      cost_optimization: analyzed
+  
+  # Review Criteria and Standards
+  review_criteria:
+    code_quality:
+      complexity_thresholds:
+        cyclomatic_complexity: 10
+        cognitive_complexity: 15
+        nesting_depth: 4
+        function_length: 50
+        
+      naming_conventions:
+        enforce_style_guide: true
+        meaningful_names: required
+        consistency_check: true
+        
+      design_patterns:
+        solid_principles: validated
+        design_pattern_usage: recommended
+        anti_pattern_detection: enabled
+        
+      performance_considerations:
+        algorithm_efficiency: analyzed
+        resource_usage: monitored
+        scalability_concerns: flagged
+    
+    documentation_standards:
+      completeness_requirements:
+        public_api_documentation: required
+        configuration_documentation: required
+        usage_examples: required
+        
+      quality_standards:
+        grammar_check: automated
+        spelling_check: enforced
+        readability_score: ">60"
+        
+      structural_requirements:
+        proper_heading_hierarchy: enforced
+        consistent_formatting: required
+        valid_links: validated
+    
+    security_standards:
+      vulnerability_detection: comprehensive
+      secure_coding_practices: enforced
+      dependency_security: validated
+      secrets_detection: mandatory
+      
+    compliance_standards:
+      coding_standards: enforced
+      organizational_policies: validated
+      regulatory_requirements: checked
+      license_compliance: verified
+  
+  # Input Sources Configuration
+  input_sources:
+    source_code: "src/**/*.{py,js,ts,java,go,cs,php,rb}"
+    test_code: "tests/**/*.{py,js,ts,java,go,cs,php,rb}"
+    documentation: "docs/**/*.{md,rst,adoc}"
+    configuration_files: "**/*.{yaml,json,toml,ini,properties}"
+    infrastructure_code: "{terraform,k8s,docker}/**/*"
+    review_policies: "policies/review/*.{md,yaml}"
+    style_guides: "standards/*.{md,yaml}"
+    checklists: "checklists/*.{md,yaml}"
+  
+  # Processing Pipeline
+  processing_steps:
+    - load_review_policies
+    - parse_input_artifacts
+    - analyze_code_quality
+    - check_documentation_completeness
+    - validate_security_standards
+    - verify_compliance_requirements
+    - detect_anti_patterns
+    - analyze_performance_implications
+    - generate_inline_comments
+    - create_summary_report
+    - calculate_review_scores
+    - determine_approval_status
+  
+  # Review Automation Rules
+  automation_rules:
+    auto_approval_criteria:
+      - no_critical_issues: true
+      - security_scan_passed: true
+      - test_coverage_adequate: ">80%"
+      - documentation_complete: true
+      - style_guide_compliant: true
+      
+    escalation_triggers:
+      - critical_security_issues: immediate
+      - architectural_changes: human_review
+      - performance_degradation: ">20%"
+      - compliance_violations: human_review
+      
+    blocking_conditions:
+      - failing_tests: true
+      - critical_vulnerabilities: true
+      - missing_documentation: conditional
+      - policy_violations: true
+  
+  # Review Templates and Checklists
+  review_templates:
+    code_review_checklist:
+      - functionality_correctness
+      - code_readability
+      - performance_efficiency
+      - security_considerations
+      - test_coverage
+      - documentation_completeness
+      
+    documentation_review_checklist:
+      - content_accuracy
+      - structural_organization
+      - grammar_and_spelling
+      - example_validity
+      - completeness_coverage
+      
+    configuration_review_checklist:
+      - security_configuration
+      - environment_specificity
+      - default_value_appropriateness
+      - documentation_alignment
+      
+    infrastructure_review_checklist:
+      - security_best_practices
+      - resource_optimization
+      - scalability_considerations
+      - disaster_recovery_planning
+
+integration:
+  # Upstream Agents
+  input_agents:
+    - implementation_agent
+    - documentation_writer_agent
+    - test_agent
+    - deployment_agent
+    - security_agent
+  
+  # Downstream Agents
+  output_agents:
+    - router_agent
+    - compliance_legal_agent
+    - maintenance_agent
+  
+  # Version Control Integration
+  vcs_integration:
+    github:
+      pull_request_comments: true
+      review_status_updates: true
+      branch_protection_rules: enforced
+      
+    gitlab:
+      merge_request_comments: true
+      approval_rules: managed
+      quality_gates: integrated
+      
+    bitbucket:
+      pull_request_integration: true
+      build_status_reporting: true
+      
+    azure_devops:
+      pull_request_policies: enforced
+      branch_policies: managed
+  
+  # Code Quality Tools Integration
+  quality_tools:
+    sonarqube:
+      quality_gates: integrated
+      code_smells: detected
+      technical_debt: calculated
+      
+    codeclimate:
+      maintainability_score: tracked
+      duplication_detection: enabled
+      
+    codebeat:
+      gpa_calculation: automated
+      complexity_analysis: comprehensive
+  
+  # Communication Integration
+  notification_systems:
+    slack:
+      review_notifications: enabled
+      channel_routing: by_team
+      
+    email:
+      review_summaries: weekly
+      escalation_alerts: immediate
+      
+    teams:
+      review_discussions: threaded
+      approval_workflows: integrated
+
+validation:
+  # Input Validation
+  input_validation:
+    artifact_quality:
+      syntax_validation: enforced
+      format_compliance: verified
+      completeness_check: automated
+      
+    policy_validation:
+      policy_syntax: validated
+      policy_completeness: verified
+      policy_conflicts: detected
+      
+    tool_integration:
+      linter_connectivity: verified
+      security_scanner_status: checked
+      quality_tool_availability: confirmed
+  
+  # Review Quality Validation
+  review_validation:
+    review_completeness:
+      all_criteria_evaluated: verified
+      evidence_provided: required
+      recommendations_actionable: validated
+      
+    review_accuracy:
+      false_positive_rate: "<10%"
+      consistency_check: automated
+      human_reviewer_agreement: ">85%"
+      
+    review_timeliness:
+      review_completion_time: "<4 hours"
+      escalation_response_time: "<1 hour"
+      feedback_delivery_time: "<30 minutes"
+  
+  # Output Validation
+  output_validation:
+    report_quality:
+      finding_clarity: verified
+      recommendation_specificity: validated
+      severity_accuracy: calibrated
+      
+    integration_validation:
+      vcs_comment_formatting: correct
+      notification_delivery: successful
+      dashboard_updates: reflected
+
+monitoring:
+  # Review Performance Metrics
+  metrics:
+    review_coverage:
+      description: "Percentage of artifacts reviewed automatically"
+      target: ">95%"
+      alert_threshold: "<85%"
+      calculation: "reviewed_artifacts / total_artifacts * 100"
+      
+    review_pass_rate:
+      description: "Percentage of reviews completed without requesting changes"
+      target: ">70%"
+      alert_threshold: "<50%"
+      
+    mean_time_to_review:
+      description: "Average time to complete a review cycle"
+      target: "<2 hours"
+      alert_threshold: ">8 hours"
+      
+    issue_detection_rate:
+      description: "Number of issues identified per thousand lines of code"
+      target: "5-15"
+      alert_threshold: ">30"
+      
+    false_positive_rate:
+      description: "Percentage of flagged issues deemed invalid"
+      target: "<10%"
+      alert_threshold: ">25%"
+      
+    review_throughput:
+      description: "Number of review tasks processed per hour"
+      target: ">20"
+      alert_threshold: "<10"
+      
+    review_accuracy_score:
+      description: "Agreement rate with human reviewer decisions"
+      target: ">85%"
+      alert_threshold: "<70%"
+  
+  # Quality Metrics
+  quality_metrics:
+    defect_prevention_rate:
+      description: "Percentage of potential defects caught in review"
+      target: ">80%"
+      measurement: "defects_prevented / total_potential_defects"
+      
+    review_satisfaction:
+      description: "Developer satisfaction with review quality"
+      target: ">4.0/5.0"
+      measurement: "feedback_surveys"
+      
+    policy_compliance_rate:
+      description: "Percentage adherence to organizational policies"
+      target: ">95%"
+      measurement: "policy_violations / total_checks"
+  
+  # Operational Metrics
+  operational_metrics:
+    review_automation_rate: ">90%"
+    human_escalation_rate: "<15%"
+    review_cycle_efficiency: "improving"
+
+examples:
+  # Code Review Example
+  code_review_example:
+    input:
+      python_code: |
+        def processUserData(userData):
+            if userData == None:
+                return
+            result = []
+            for i in range(len(userData)):
+                if userData[i]['status'] == 'active':
+                    result.append(userData[i])
+            return result
+    
+    output:
+      review_comments:
+        - line: 1
+          severity: "minor"
+          category: "naming"
+          message: "Function name should use snake_case: 'process_user_data'"
+          suggestion: "def process_user_data(user_data):"
+          
+        - line: 2
+          severity: "minor"
+          category: "style"
+          message: "Use 'is None' instead of '== None'"
+          suggestion: "if user_data is None:"
+          
+        - line: 5
+          severity: "medium"
+          category: "performance"
+          message: "Consider using list comprehension for better readability and performance"
+          suggestion: "return [user for user in user_data if user['status'] == 'active']"
+      
+      summary:
+        total_issues: 3
+        critical: 0
+        major: 0
+        minor: 3
+        recommendation: "APPROVE_WITH_SUGGESTIONS"
+        overall_score: 8.5
+  
+  # Documentation Review Example
+  documentation_review_example:
+    input:
+      markdown_content: |
+        # API Documentation
+        
+        This API provides user managment functionality.
+        
+        ## Endpoints
+        
+        ### GET /users
+        
+        Gets users
+    
+    output:
+      review_comments:
+        - line: 3
+          severity: "minor"
+          category: "spelling"
+          message: "Typo: 'managment' should be 'management'"
+          suggestion: "This API provides user management functionality."
+          
+        - line: 7
+          severity: "major"
+          category: "completeness"
+          message: "Missing detailed endpoint description, parameters, and response format"
+          suggestion: "Add request/response examples, parameter descriptions, and error codes"
+      
+      summary:
+        total_issues: 2
+        critical: 0
+        major: 1
+        minor: 1
+        recommendation: "REQUEST_CHANGES"
+        completeness_score: 4.0
+  
+  # Security Review Example
+  security_review_example:
+    input:
+      code_snippet: |
+        @app.route('/user/<user_id>')
+        def get_user(user_id):
+            query = f"SELECT * FROM users WHERE id = {user_id}"
+            return execute_query(query)
+    
+    output:
+      security_findings:
+        - line: 3
+          severity: "critical"
+          category: "security"
+          cwe_id: "CWE-89"
+          message: "SQL injection vulnerability: user input directly in query"
+          suggestion: "Use parameterized queries: execute_query('SELECT * FROM users WHERE id = %s', [user_id])"
+          remediation_priority: "immediate"
+      
+      security_score: 2.0
+      recommendation: "BLOCK_MERGE"
+      compliance_status: "FAILED"
+
+# CLI Usage Examples
+cli_usage: |
+  # Review specific files or directories
+  hugai review --source src/user_service.py --policies policies/review/
+  
+  # Batch review for pull request
+  hugai review pr --pr-number 123 --repository company/project
+  
+  # Review with specific checklist
+  hugai review --checklist security --source src/ --strict
+  
+  # Generate review report
+  hugai review report --source src/ --output review-report.html --format html
+  
+  # Interactive review mode
+  hugai review interactive --source src/ --fix-suggestions
+  
+  # Policy compliance check
+  hugai review compliance --policies standards/ --source src/ --detailed
+  
+  # Review configuration files
+  hugai review config --infrastructure terraform/ --security-focus

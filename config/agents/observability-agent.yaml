@@ -1,0 +1,525 @@
+metadata:
+  name: observability-agent-configuration
+  version: 1.0.0
+  description: "AI agent specialized in system observability, monitoring, and distributed tracing for HUGAI applications"
+  category: specialized-agents
+  dependencies:
+    - llm-models
+    - observability-stack
+    - monitoring-tools
+    - tracing-systems
+  tags:
+    - observability
+    - monitoring
+    - tracing
+    - metrics
+    - logging
+
+configuration:
+  # Observability Agent Philosophy
+  agent_philosophy:
+    purpose: "Provide comprehensive observability and monitoring capabilities to ensure HUGAI systems are transparent, debuggable, and maintainable"
+    principles:
+      three_pillars_observability: "Integrate metrics, logs, and traces for complete system visibility"
+      proactive_monitoring: "Detect and predict issues before they impact users"
+      context_aware_analysis: "Correlate data across different observability signals"
+      actionable_insights: "Transform raw data into actionable operational intelligence"
+      scalable_observability: "Design monitoring solutions that scale with system complexity"
+
+  # Core Capabilities
+  core_capabilities:
+    metrics_management:
+      metrics_collection:
+        - "application_performance_metrics"
+        - "infrastructure_resource_metrics"
+        - "business_kpi_metrics"
+        - "user_experience_metrics"
+        - "security_metrics"
+        - "cost_optimization_metrics"
+      
+      metrics_types:
+        counters:
+          - "http_requests_total"
+          - "errors_total"
+          - "user_registrations_total"
+          - "ai_agent_invocations_total"
+        
+        gauges:
+          - "active_users_current"
+          - "memory_usage_bytes"
+          - "cpu_utilization_percent"
+          - "queue_depth_current"
+        
+        histograms:
+          - "http_request_duration_seconds"
+          - "database_query_duration_seconds"
+          - "ai_agent_response_time_seconds"
+          - "file_upload_size_bytes"
+        
+        summaries:
+          - "response_time_quantiles"
+          - "data_processing_quantiles"
+          - "user_session_duration_quantiles"
+    
+    logging_management:
+      log_collection:
+        - "application_logs"
+        - "system_logs"
+        - "security_logs"
+        - "audit_logs"
+        - "error_logs"
+        - "access_logs"
+      
+      log_analysis:
+        - "error_pattern_detection"
+        - "anomaly_identification"
+        - "trend_analysis"
+        - "correlation_analysis"
+        - "root_cause_analysis"
+      
+      log_enrichment:
+        - "contextual_metadata_addition"
+        - "correlation_id_tracking"
+        - "user_journey_mapping"
+        - "service_dependency_mapping"
+    
+    distributed_tracing:
+      trace_collection:
+        - "request_flow_tracing"
+        - "service_interaction_tracing"
+        - "database_operation_tracing"
+        - "external_api_call_tracing"
+        - "ai_agent_workflow_tracing"
+      
+      trace_analysis:
+        - "performance_bottleneck_identification"
+        - "service_dependency_mapping"
+        - "error_propagation_analysis"
+        - "latency_distribution_analysis"
+        - "critical_path_analysis"
+
+  # Agent Configuration
+  agent_configuration:
+    model_selection:
+      primary_model: "claude-3-5-sonnet"
+      fallback_models: ["gpt-4-turbo", "gemini-pro"]
+      
+      task_specific_models:
+        anomaly_detection: "claude-3-5-sonnet"
+        pattern_analysis: "gpt-4-turbo"
+        alert_correlation: "claude-3-haiku"
+        report_generation: "gpt-3.5-turbo"
+    
+    operational_parameters:
+      analysis_window: "rolling_24h"
+      anomaly_sensitivity: "medium"
+      correlation_threshold: 0.8
+      
+      human_escalation_triggers:
+        - "critical_system_anomaly_detected"
+        - "cascading_failure_pattern_identified"
+        - "security_incident_correlation_found"
+        - "business_impact_threshold_exceeded"
+    
+    integration_points:
+      observability_platforms:
+        - "prometheus"
+        - "grafana"
+        - "elasticsearch"
+        - "jaeger"
+        - "zipkin"
+        - "datadog"
+        - "new_relic"
+        - "splunk"
+      
+      log_aggregation:
+        - "elasticsearch"
+        - "fluentd"
+        - "logstash"
+        - "vector"
+        - "loki"
+      
+      tracing_systems:
+        - "jaeger"
+        - "zipkin"
+        - "aws_x_ray"
+        - "google_cloud_trace"
+        - "azure_application_insights"
+
+  # Observability Workflows
+  observability_workflows:
+    system_health_assessment:
+      workflow_name: "comprehensive_system_health_check"
+      
+      steps:
+        metrics_analysis:
+          description: "Analyze system metrics for health indicators"
+          actions:
+            - "collect_infrastructure_metrics"
+            - "analyze_application_performance_metrics"
+            - "evaluate_business_kpi_trends"
+            - "assess_user_experience_metrics"
+          
+          health_indicators:
+            - "response_time_within_sla"
+            - "error_rate_below_threshold"
+            - "resource_utilization_optimal"
+            - "throughput_meeting_demand"
+        
+        log_correlation_analysis:
+          description: "Correlate logs to identify patterns and issues"
+          depends_on: ["metrics_analysis"]
+          
+          actions:
+            - "aggregate_logs_across_services"
+            - "identify_error_patterns"
+            - "correlate_user_journeys"
+            - "detect_security_anomalies"
+          
+          correlation_methods:
+            - "temporal_correlation"
+            - "service_dependency_correlation"
+            - "user_session_correlation"
+            - "error_propagation_correlation"
+        
+        trace_path_analysis:
+          description: "Analyze distributed traces for performance insights"
+          depends_on: ["log_correlation_analysis"]
+          
+          actions:
+            - "map_request_flows"
+            - "identify_latency_bottlenecks"
+            - "analyze_service_dependencies"
+            - "detect_performance_regressions"
+        
+        health_report_generation:
+          description: "Generate comprehensive system health report"
+          depends_on: ["trace_path_analysis"]
+          
+          deliverables:
+            - "system_health_dashboard"
+            - "performance_trend_analysis"
+            - "issue_prioritization_matrix"
+            - "optimization_recommendations"
+    
+    incident_investigation:
+      workflow_name: "automated_incident_analysis"
+      
+      trigger_conditions:
+        - "alert_threshold_exceeded"
+        - "anomaly_detection_triggered"
+        - "user_reported_issue"
+        - "sla_violation_detected"
+      
+      investigation_steps:
+        context_gathering:
+          - "collect_related_metrics"
+          - "gather_relevant_logs"
+          - "extract_trace_information"
+          - "identify_affected_services"
+        
+        root_cause_analysis:
+          - "correlate_observability_signals"
+          - "analyze_temporal_patterns"
+          - "identify_change_correlations"
+          - "map_failure_propagation"
+        
+        impact_assessment:
+          - "assess_user_impact"
+          - "evaluate_business_impact"
+          - "estimate_recovery_time"
+          - "identify_mitigation_options"
+
+  # Monitoring Strategy
+  monitoring_strategy:
+    golden_signals:
+      latency:
+        metrics:
+          - "http_request_duration_p50"
+          - "http_request_duration_p95"
+          - "http_request_duration_p99"
+        thresholds:
+          warning: "2s"
+          critical: "5s"
+      
+      traffic:
+        metrics:
+          - "http_requests_per_second"
+          - "active_users"
+          - "database_connections"
+        thresholds:
+          warning: "1000_rps"
+          critical: "2000_rps"
+      
+      errors:
+        metrics:
+          - "error_rate_percentage"
+          - "http_4xx_rate"
+          - "http_5xx_rate"
+        thresholds:
+          warning: "1%"
+          critical: "5%"
+      
+      saturation:
+        metrics:
+          - "cpu_utilization_percentage"
+          - "memory_utilization_percentage"
+          - "disk_utilization_percentage"
+        thresholds:
+          warning: "70%"
+          critical: "90%"
+    
+    business_metrics:
+      user_engagement:
+        - "user_session_duration"
+        - "feature_adoption_rate"
+        - "user_retention_rate"
+        - "conversion_funnel_metrics"
+      
+      ai_agent_performance:
+        - "agent_response_accuracy"
+        - "agent_task_completion_rate"
+        - "human_approval_rate"
+        - "agent_cost_efficiency"
+
+  # Alerting Configuration
+  alerting_configuration:
+    alert_severity_levels:
+      critical:
+        description: "Immediate action required - system impact"
+        response_time: "5 minutes"
+        escalation: "on_call_engineer"
+        notification_channels: ["pagerduty", "slack", "sms"]
+      
+      warning:
+        description: "Attention needed - potential impact"
+        response_time: "30 minutes"
+        escalation: "team_lead"
+        notification_channels: ["slack", "email"]
+      
+      info:
+        description: "Informational - trending towards threshold"
+        response_time: "2 hours"
+        escalation: "none"
+        notification_channels: ["email"]
+    
+    alert_rules:
+      infrastructure_alerts:
+        - alert: "HighCPUUsage"
+          expr: "cpu_usage_percent > 90"
+          for: "5m"
+          severity: "critical"
+        
+        - alert: "HighMemoryUsage"
+          expr: "memory_usage_percent > 85"
+          for: "10m"
+          severity: "warning"
+        
+        - alert: "DiskSpaceLow"
+          expr: "disk_usage_percent > 90"
+          for: "5m"
+          severity: "critical"
+      
+      application_alerts:
+        - alert: "HighErrorRate"
+          expr: "error_rate > 5"
+          for: "2m"
+          severity: "critical"
+        
+        - alert: "SlowResponseTime"
+          expr: "response_time_p95 > 2"
+          for: "5m"
+          severity: "warning"
+        
+        - alert: "AIAgentFailureRate"
+          expr: "ai_agent_failure_rate > 10"
+          for: "3m"
+          severity: "critical"
+
+  # Dashboard Configuration
+  dashboard_configuration:
+    executive_dashboard:
+      panels:
+        - "system_health_overview"
+        - "business_kpi_summary"
+        - "user_experience_metrics"
+        - "cost_optimization_metrics"
+      
+      refresh_interval: "1m"
+      time_range: "last_24h"
+    
+    operational_dashboard:
+      panels:
+        - "infrastructure_resource_utilization"
+        - "application_performance_metrics"
+        - "error_rate_trends"
+        - "active_alerts_summary"
+      
+      refresh_interval: "30s"
+      time_range: "last_4h"
+    
+    developer_dashboard:
+      panels:
+        - "service_dependency_map"
+        - "distributed_trace_analysis"
+        - "log_analysis_insights"
+        - "performance_bottlenecks"
+      
+      refresh_interval: "1m"
+      time_range: "last_1h"
+
+  # Anomaly Detection
+  anomaly_detection:
+    detection_algorithms:
+      statistical_methods:
+        - "standard_deviation_based"
+        - "percentile_based"
+        - "seasonal_decomposition"
+        - "trend_analysis"
+      
+      machine_learning_methods:
+        - "isolation_forest"
+        - "autoencoder_based"
+        - "time_series_forecasting"
+        - "clustering_based"
+    
+    anomaly_types:
+      performance_anomalies:
+        - "response_time_spikes"
+        - "throughput_drops"
+        - "resource_usage_spikes"
+        - "error_rate_increases"
+      
+      behavioral_anomalies:
+        - "unusual_user_patterns"
+        - "unexpected_traffic_patterns"
+        - "abnormal_data_access_patterns"
+        - "suspicious_authentication_attempts"
+
+integration:
+  # Development Workflow Integration
+  development_integration:
+    observability_as_code:
+      infrastructure_monitoring:
+        - "terraform_monitoring_modules"
+        - "kubernetes_monitoring_manifests"
+        - "docker_monitoring_configurations"
+      
+      application_instrumentation:
+        - "opentelemetry_auto_instrumentation"
+        - "prometheus_metrics_generation"
+        - "structured_logging_implementation"
+    
+    ci_cd_integration:
+      observability_gates:
+        - "monitoring_coverage_validation"
+        - "alert_configuration_testing"
+        - "dashboard_functionality_testing"
+
+  # Incident Response Integration
+  incident_response_integration:
+    runbook_automation:
+      automated_diagnostics:
+        - "log_analysis_automation"
+        - "metric_correlation_automation"
+        - "trace_analysis_automation"
+      
+      remediation_suggestions:
+        - "scaling_recommendations"
+        - "configuration_adjustments"
+        - "rollback_suggestions"
+    
+    communication_integration:
+      incident_channels:
+        - "slack_incident_channels"
+        - "teams_notifications"
+        - "email_escalations"
+        - "pagerduty_integration"
+
+validation:
+  # Observability Agent Validation
+  agent_effectiveness:
+    detection_accuracy: ">95%"
+    false_positive_rate: "<5%"
+    mean_time_to_detection: "<5_minutes"
+    incident_correlation_accuracy: ">85%"
+  
+  # System Observability Validation
+  observability_validation:
+    monitoring_coverage: ">95%"
+    alert_noise_ratio: "<10%"
+    dashboard_utility: "high"
+    observability_overhead: "<5%"
+
+examples:
+  # Observability Configuration Example
+  observability_setup_example:
+    prometheus_config: |
+      global:
+        scrape_interval: 15s
+        evaluation_interval: 15s
+      
+      rule_files:
+        - "hugai_alert_rules.yml"
+      
+      scrape_configs:
+        - job_name: 'hugai-api'
+          static_configs:
+            - targets: ['hugai-api:8080']
+          metrics_path: '/metrics'
+          scrape_interval: 5s
+        
+        - job_name: 'hugai-agents'
+          static_configs:
+            - targets: ['hugai-agents:9090']
+          metrics_path: '/metrics'
+          scrape_interval: 10s
+    
+    grafana_dashboard: |
+      {
+        "dashboard": {
+          "title": "HUGAI System Overview",
+          "panels": [
+            {
+              "title": "Request Rate",
+              "type": "graph",
+              "targets": [
+                {
+                  "expr": "rate(http_requests_total[5m])",
+                  "legendFormat": "{{method}} {{status}}"
+                }
+              ]
+            },
+            {
+              "title": "AI Agent Response Time",
+              "type": "heatmap",
+              "targets": [
+                {
+                  "expr": "hugai_agent_response_time_seconds_bucket",
+                  "legendFormat": "{{agent_type}}"
+                }
+              ]
+            }
+          ]
+        }
+      }
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize observability agent
+  hugai agent init observability --stack prometheus,grafana,jaeger --auto-instrument
+  
+  # Deploy monitoring configuration
+  hugai agent observability deploy --environment production --dashboards all
+  
+  # Analyze system health
+  hugai agent observability health-check --detailed --period 24h --report
+  
+  # Investigate incident
+  hugai agent observability investigate --incident-id INC-123 --correlate-all
+  
+  # Configure alerting
+  hugai agent observability alerts configure --severity critical --escalation on-call
+  
+  # Generate observability report
+  hugai agent observability report --type weekly --stakeholders ops,dev --format pdf

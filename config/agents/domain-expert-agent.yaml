@@ -1,0 +1,477 @@
+metadata:
+  name: domain-expert-agent-configuration
+  version: 1.0.0
+  description: "AI agent specialized in domain-specific knowledge and expertise for various business and technical domains in HUGAI applications"
+  category: specialized-agents
+  dependencies:
+    - llm-models
+    - knowledge-base
+    - domain-ontologies
+    - expert-systems
+  tags:
+    - domain-expertise
+    - knowledge-management
+    - business-logic
+    - industry-knowledge
+    - specialized-consultation
+
+configuration:
+  # Domain Expert Agent Philosophy
+  agent_philosophy:
+    purpose: "Provide deep domain-specific expertise and knowledge to guide decision-making, validate requirements, and ensure domain accuracy in HUGAI solutions"
+    principles:
+      deep_domain_knowledge: "Maintain comprehensive understanding of specific business and technical domains"
+      contextual_expertise: "Apply domain knowledge within the specific context of each situation"
+      cross_domain_integration: "Connect insights across multiple domains when relevant"
+      continuous_learning: "Continuously update domain knowledge with latest industry developments"
+      human_expert_collaboration: "Collaborate effectively with human domain experts to augment their capabilities"
+
+  # Core Capabilities
+  core_capabilities:
+    domain_knowledge_areas:
+      technology_domains:
+        artificial_intelligence:
+          subdomains:
+            - "machine_learning_algorithms"
+            - "natural_language_processing"
+            - "computer_vision"
+            - "deep_learning_architectures"
+            - "reinforcement_learning"
+            - "ai_ethics_and_governance"
+            - "model_deployment_strategies"
+          
+          expertise_areas:
+            - "model_selection_guidance"
+            - "hyperparameter_optimization"
+            - "data_preprocessing_strategies"
+            - "feature_engineering_techniques"
+            - "model_evaluation_methodologies"
+            - "bias_detection_mitigation"
+            - "explainable_ai_implementation"
+        
+        software_engineering:
+          subdomains:
+            - "software_architecture_patterns"
+            - "design_patterns_best_practices"
+            - "scalability_performance_optimization"
+            - "microservices_architecture"
+            - "api_design_principles"
+            - "testing_strategies"
+            - "devops_practices"
+          
+          expertise_areas:
+            - "architecture_decision_guidance"
+            - "code_quality_assessment"
+            - "performance_bottleneck_identification"
+            - "security_vulnerability_analysis"
+            - "scalability_planning"
+            - "technical_debt_management"
+        
+        cybersecurity:
+          subdomains:
+            - "application_security"
+            - "network_security"
+            - "cloud_security"
+            - "data_protection"
+            - "identity_access_management"
+            - "threat_modeling"
+            - "incident_response"
+          
+          expertise_areas:
+            - "security_risk_assessment"
+            - "vulnerability_analysis"
+            - "security_control_design"
+            - "compliance_validation"
+            - "threat_intelligence_analysis"
+            - "security_architecture_review"
+      
+      business_domains:
+        financial_services:
+          subdomains:
+            - "banking_operations"
+            - "investment_management"
+            - "risk_management"
+            - "regulatory_compliance"
+            - "payment_processing"
+            - "fraud_detection"
+            - "credit_scoring"
+          
+          expertise_areas:
+            - "regulatory_requirement_analysis"
+            - "risk_model_validation"
+            - "financial_product_design"
+            - "compliance_framework_implementation"
+            - "anti_money_laundering_processes"
+            - "market_risk_assessment"
+        
+        healthcare:
+          subdomains:
+            - "clinical_workflows"
+            - "medical_device_integration"
+            - "patient_data_management"
+            - "telemedicine_platforms"
+            - "clinical_decision_support"
+            - "healthcare_analytics"
+            - "medical_imaging"
+          
+          expertise_areas:
+            - "hipaa_compliance_guidance"
+            - "clinical_workflow_optimization"
+            - "medical_data_interoperability"
+            - "patient_safety_protocols"
+            - "clinical_evidence_evaluation"
+            - "healthcare_quality_metrics"
+        
+        e_commerce:
+          subdomains:
+            - "online_marketplace_operations"
+            - "payment_gateway_integration"
+            - "inventory_management"
+            - "customer_experience_optimization"
+            - "recommendation_systems"
+            - "supply_chain_management"
+            - "digital_marketing"
+          
+          expertise_areas:
+            - "conversion_optimization_strategies"
+            - "customer_journey_analysis"
+            - "pricing_strategy_development"
+            - "fraud_prevention_implementation"
+            - "personalization_algorithms"
+            - "marketplace_platform_design"
+    
+    expertise_application:
+      requirements_validation:
+        domain_specific_validation:
+          - "business_rule_accuracy_verification"
+          - "industry_standard_compliance_check"
+          - "domain_terminology_validation"
+          - "workflow_process_verification"
+          - "regulatory_requirement_validation"
+        
+        gap_identification:
+          - "missing_domain_requirements"
+          - "incomplete_business_logic"
+          - "overlooked_compliance_considerations"
+          - "underdefined_domain_constraints"
+      
+      solution_design_guidance:
+        architecture_recommendations:
+          - "domain_specific_pattern_suggestions"
+          - "technology_stack_optimization"
+          - "integration_strategy_guidance"
+          - "scalability_consideration_advice"
+        
+        implementation_guidance:
+          - "best_practice_recommendations"
+          - "common_pitfall_warnings"
+          - "optimization_opportunities"
+          - "risk_mitigation_strategies"
+
+  # Agent Configuration
+  agent_configuration:
+    model_selection:
+      primary_model: "gpt-4"
+      fallback_models: ["claude-3-5-sonnet", "gpt-4-turbo"]
+      
+      domain_specific_models:
+        technical_domains: "claude-3-5-sonnet"
+        business_domains: "gpt-4"
+        regulatory_compliance: "gpt-4"
+        creative_domains: "gpt-4-turbo"
+    
+    operational_parameters:
+      expertise_confidence_threshold: 0.8
+      cross_domain_correlation_depth: "deep"
+      knowledge_recency_priority: "high"
+      
+      human_expert_escalation_triggers:
+        - "domain_expertise_confidence_below_threshold"
+        - "conflicting_domain_requirements_identified"
+        - "novel_domain_challenge_encountered"
+        - "regulatory_interpretation_required"
+        - "business_impact_assessment_needed"
+    
+    knowledge_sources:
+      structured_knowledge:
+        - "domain_ontologies"
+        - "industry_taxonomies"
+        - "regulatory_frameworks"
+        - "best_practice_catalogs"
+        - "standard_operating_procedures"
+      
+      dynamic_knowledge:
+        - "industry_publications"
+        - "regulatory_updates"
+        - "technology_trend_analysis"
+        - "case_study_repositories"
+        - "expert_consultation_records"
+
+  # Domain Expertise Workflows
+  expertise_workflows:
+    domain_analysis:
+      workflow_name: "comprehensive_domain_analysis"
+      
+      steps:
+        domain_identification:
+          description: "Identify relevant domains for the given context"
+          actions:
+            - "analyze_problem_context"
+            - "identify_primary_domains"
+            - "map_secondary_domain_influences"
+            - "assess_cross_domain_dependencies"
+          
+          analysis_dimensions:
+            - "business_function_analysis"
+            - "technical_component_analysis"
+            - "regulatory_environment_analysis"
+            - "industry_sector_analysis"
+        
+        knowledge_retrieval:
+          description: "Retrieve relevant domain knowledge and expertise"
+          depends_on: ["domain_identification"]
+          
+          actions:
+            - "access_domain_specific_knowledge_bases"
+            - "retrieve_relevant_best_practices"
+            - "identify_applicable_regulations"
+            - "gather_industry_benchmarks"
+          
+          knowledge_types:
+            - "procedural_knowledge"
+            - "declarative_knowledge"
+            - "heuristic_knowledge"
+            - "meta_knowledge"
+        
+        expertise_application:
+          description: "Apply domain expertise to the specific problem"
+          depends_on: ["knowledge_retrieval"]
+          
+          actions:
+            - "validate_domain_assumptions"
+            - "identify_domain_constraints"
+            - "recommend_domain_specific_solutions"
+            - "highlight_potential_risks"
+          
+          deliverables:
+            - "domain_expertise_assessment"
+            - "recommendation_matrix"
+            - "risk_mitigation_strategies"
+            - "implementation_guidance"
+    
+    requirements_domain_validation:
+      workflow_name: "domain_specific_requirements_validation"
+      
+      validation_scope:
+        - "business_logic_accuracy"
+        - "domain_terminology_correctness"
+        - "workflow_process_validity"
+        - "compliance_requirement_completeness"
+        - "industry_standard_adherence"
+      
+      validation_methods:
+        automated_validation:
+          - "terminology_consistency_check"
+          - "business_rule_logic_validation"
+          - "compliance_requirement_mapping"
+          - "industry_standard_comparison"
+        
+        expert_consultation:
+          - "complex_business_logic_review"
+          - "regulatory_interpretation_validation"
+          - "industry_specific_nuance_verification"
+          - "cross_domain_impact_assessment"
+
+  # Domain Knowledge Management
+  knowledge_management:
+    knowledge_acquisition:
+      continuous_learning:
+        - "industry_publication_monitoring"
+        - "regulatory_update_tracking"
+        - "technology_advancement_analysis"
+        - "best_practice_evolution_monitoring"
+      
+      expert_collaboration:
+        - "human_expert_knowledge_capture"
+        - "collaborative_knowledge_validation"
+        - "experience_based_insight_integration"
+        - "tacit_knowledge_documentation"
+    
+    knowledge_organization:
+      knowledge_structure:
+        hierarchical_organization:
+          - "domain_categories"
+          - "subdomain_specializations"
+          - "topic_areas"
+          - "specific_concepts"
+        
+        relationship_mapping:
+          - "concept_dependencies"
+          - "cross_domain_connections"
+          - "causal_relationships"
+          - "temporal_relationships"
+      
+      knowledge_versioning:
+        - "knowledge_update_tracking"
+        - "version_history_maintenance"
+        - "change_impact_analysis"
+        - "knowledge_deprecation_management"
+
+  # Expertise Consultation Services
+  consultation_services:
+    strategic_guidance:
+      business_strategy_consultation:
+        - "market_analysis_insights"
+        - "competitive_landscape_assessment"
+        - "technology_adoption_strategies"
+        - "digital_transformation_guidance"
+      
+      technical_architecture_consultation:
+        - "architecture_pattern_recommendations"
+        - "technology_stack_optimization"
+        - "scalability_planning_guidance"
+        - "integration_strategy_development"
+    
+    operational_excellence:
+      process_optimization:
+        - "workflow_efficiency_analysis"
+        - "bottleneck_identification"
+        - "automation_opportunity_assessment"
+        - "quality_improvement_strategies"
+      
+      risk_management:
+        - "domain_specific_risk_identification"
+        - "mitigation_strategy_development"
+        - "compliance_risk_assessment"
+        - "operational_risk_analysis"
+
+  # Cross-Domain Integration
+  cross_domain_capabilities:
+    multi_domain_analysis:
+      domain_interaction_analysis:
+        - "cross_domain_requirement_conflicts"
+        - "inter_domain_optimization_opportunities"
+        - "domain_boundary_definition"
+        - "integration_complexity_assessment"
+      
+      holistic_solution_design:
+        - "multi_domain_architecture_optimization"
+        - "cross_functional_workflow_design"
+        - "integrated_governance_frameworks"
+        - "comprehensive_risk_management"
+    
+    domain_translation:
+      knowledge_bridge_building:
+        - "technical_business_translation"
+        - "domain_terminology_mapping"
+        - "concept_abstraction_alignment"
+        - "stakeholder_communication_facilitation"
+
+integration:
+  # Business Process Integration
+  business_integration:
+    decision_support:
+      strategic_decision_support:
+        - "domain_expertise_input_provision"
+        - "risk_benefit_analysis_contribution"
+        - "alternative_solution_evaluation"
+        - "implementation_feasibility_assessment"
+    
+    knowledge_sharing:
+      organizational_learning:
+        - "best_practice_dissemination"
+        - "lessons_learned_documentation"
+        - "knowledge_transfer_facilitation"
+        - "expertise_capability_development"
+
+  # Technology Integration
+  technology_integration:
+    ai_model_enhancement:
+      domain_specific_training:
+        - "domain_corpus_development"
+        - "specialized_model_fine_tuning"
+        - "domain_specific_evaluation_metrics"
+        - "continuous_model_improvement"
+    
+    knowledge_system_integration:
+      enterprise_knowledge_systems:
+        - "knowledge_base_integration"
+        - "expert_system_connectivity"
+        - "ontology_alignment"
+        - "semantic_search_enhancement"
+
+validation:
+  # Domain Expert Agent Validation
+  agent_effectiveness:
+    expertise_accuracy: ">90%"
+    recommendation_quality: "high"
+    cross_domain_integration_success: ">85%"
+    knowledge_currency: "up_to_date"
+  
+  # Domain Knowledge Validation
+  knowledge_validation:
+    domain_coverage_completeness: ">90%"
+    knowledge_accuracy_verification: "validated"
+    expert_consensus_alignment: ">85%"
+    practical_applicability: "demonstrated"
+
+examples:
+  # Healthcare Domain Expertise Example
+  healthcare_domain_example:
+    consultation_request: |
+      ## Healthcare AI System Requirements Review
+      
+      **Context**: Developing AI-powered clinical decision support system
+      **Domain**: Healthcare - Clinical Workflows
+      **Scope**: Emergency department triage optimization
+      
+      **Requirements to Validate**:
+      1. Patient acuity scoring algorithm
+      2. Real-time vital sign monitoring integration
+      3. Electronic health record integration
+      4. Clinical alert prioritization system
+      
+    domain_expert_analysis: |
+      ## Domain Expert Analysis - Healthcare
+      
+      ### Clinical Workflow Validation
+      ✅ **Acuity Scoring**: ESI (Emergency Severity Index) alignment recommended
+      ⚠️ **Vital Sign Monitoring**: Consider HL7 FHIR standards for interoperability
+      ✅ **EHR Integration**: HIPAA compliance requirements addressed
+      ⚠️ **Alert Prioritization**: Clinical decision fatigue mitigation needed
+      
+      ### Regulatory Considerations
+      - FDA 510(k) classification assessment required
+      - HIPAA Security Rule implementation mandatory
+      - Clinical validation study design recommendations
+      
+      ### Implementation Recommendations
+      1. Implement clinical decision support hooks (CDS Hooks)
+      2. Design alert fatigue mitigation strategies
+      3. Ensure physician override capabilities
+      4. Plan for clinical workflow integration testing
+      
+      ### Risk Mitigation
+      - Patient safety validation protocols
+      - Clinical effectiveness measurement framework
+      - Liability and malpractice consideration documentation
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize domain expert agent
+  hugai agent init domain-expert --domains healthcare,fintech,ai --knowledge-sources industry,regulatory
+  
+  # Request domain expertise consultation
+  hugai agent domain-expert consult --domain healthcare --context "clinical-decision-support" --requirements requirements.md
+  
+  # Validate requirements against domain knowledge
+  hugai agent domain-expert validate --domain fintech --requirements banking-requirements.yaml --compliance
+  
+  # Cross-domain analysis
+  hugai agent domain-expert analyze --domains "ai,healthcare,compliance" --integration-assessment
+  
+  # Update domain knowledge
+  hugai agent domain-expert knowledge update --domain cybersecurity --sources "nist,iso27001" --validate
+  
+  # Generate domain-specific guidance
+  hugai agent domain-expert guide --domain e-commerce --topic "recommendation-systems" --best-practices

@@ -1,0 +1,508 @@
+metadata:
+  name: knowledge-base-manager-agent-configuration
+  version: 1.0.0
+  description: "AI agent specialized in knowledge base management, content curation, and intelligent information retrieval for HUGAI systems"
+  category: specialized-agents
+  dependencies:
+    - llm-models
+    - vector-databases
+    - search-engines
+    - content-management-systems
+  tags:
+    - knowledge-management
+    - content-curation
+    - information-retrieval
+    - documentation
+    - learning-systems
+
+configuration:
+  # Knowledge Base Manager Agent Philosophy
+  agent_philosophy:
+    purpose: "Manage, curate, and optimize organizational knowledge to enable efficient information discovery, learning, and decision-making across HUGAI systems"
+    principles:
+      comprehensive_knowledge_capture: "Systematically capture and organize all relevant organizational knowledge"
+      intelligent_content_curation: "Apply AI-driven curation to maintain knowledge quality and relevance"
+      context_aware_retrieval: "Provide contextually relevant information based on user needs and situations"
+      continuous_knowledge_evolution: "Continuously update and improve knowledge base content and structure"
+      democratized_knowledge_access: "Make knowledge accessible to all stakeholders in appropriate formats"
+
+  # Core Capabilities
+  core_capabilities:
+    knowledge_acquisition:
+      content_ingestion:
+        structured_sources:
+          - "documentation_repositories"
+          - "api_specifications"
+          - "configuration_files"
+          - "database_schemas"
+          - "process_definitions"
+          - "policy_documents"
+        
+        unstructured_sources:
+          - "meeting_transcripts"
+          - "email_communications"
+          - "chat_conversations"
+          - "presentation_materials"
+          - "video_recordings"
+          - "research_papers"
+        
+        dynamic_sources:
+          - "code_repositories"
+          - "issue_tracking_systems"
+          - "monitoring_logs"
+          - "user_feedback"
+          - "support_tickets"
+          - "community_forums"
+      
+      knowledge_extraction:
+        information_extraction_methods:
+          - "named_entity_recognition"
+          - "relationship_extraction"
+          - "concept_identification"
+          - "topic_modeling"
+          - "sentiment_analysis"
+          - "key_phrase_extraction"
+        
+        content_analysis:
+          - "document_classification"
+          - "content_quality_assessment"
+          - "redundancy_detection"
+          - "relevance_scoring"
+          - "authority_determination"
+          - "freshness_evaluation"
+    
+    knowledge_organization:
+      taxonomy_management:
+        hierarchical_classification:
+          - "domain_categories"
+          - "topic_hierarchies"
+          - "skill_taxonomies"
+          - "process_classifications"
+          - "technology_categorizations"
+        
+        faceted_classification:
+          - "content_type_facets"
+          - "audience_level_facets"
+          - "domain_area_facets"
+          - "lifecycle_stage_facets"
+          - "complexity_level_facets"
+      
+      semantic_organization:
+        ontology_development:
+          - "concept_relationship_modeling"
+          - "semantic_property_definition"
+          - "inference_rule_creation"
+          - "constraint_specification"
+        
+        knowledge_graph_construction:
+          - "entity_relationship_mapping"
+          - "property_graph_modeling"
+          - "semantic_annotation"
+          - "cross_reference_linking"
+    
+    content_curation:
+      quality_management:
+        content_validation:
+          - "accuracy_verification"
+          - "completeness_assessment"
+          - "consistency_checking"
+          - "currency_evaluation"
+          - "relevance_scoring"
+        
+        content_enhancement:
+          - "automatic_summarization"
+          - "keyword_enrichment"
+          - "cross_reference_addition"
+          - "example_generation"
+          - "illustration_creation"
+      
+      lifecycle_management:
+        content_versioning:
+          - "version_history_tracking"
+          - "change_impact_analysis"
+          - "approval_workflow_management"
+          - "rollback_capability"
+        
+        maintenance_automation:
+          - "outdated_content_detection"
+          - "broken_link_identification"
+          - "orphaned_content_discovery"
+          - "duplicate_content_merging"
+
+  # Agent Configuration
+  agent_configuration:
+    model_selection:
+      primary_model: "gpt-4"
+      fallback_models: ["claude-3-5-sonnet", "gpt-4-turbo"]
+      
+      task_specific_models:
+        content_analysis: "claude-3-5-sonnet"
+        summarization: "gpt-4"
+        question_answering: "gpt-4-turbo"
+        content_generation: "gpt-4"
+    
+    operational_parameters:
+      content_processing_batch_size: 100
+      relevance_threshold: 0.7
+      quality_score_minimum: 0.8
+      
+      human_escalation_triggers:
+        - "content_quality_concerns_identified"
+        - "conflicting_information_detected"
+        - "sensitive_content_classification_needed"
+        - "domain_expert_validation_required"
+        - "policy_compliance_verification_needed"
+    
+    knowledge_platforms:
+      vector_databases:
+        - "pinecone"
+        - "weaviate"
+        - "qdrant"
+        - "milvus"
+        - "faiss"
+      
+      search_engines:
+        - "elasticsearch"
+        - "opensearch"
+        - "solr"
+        - "algolia"
+      
+      content_management:
+        - "confluence"
+        - "notion"
+        - "sharepoint"
+        - "gitbook"
+        - "bookstack"
+
+  # Knowledge Management Workflows
+  knowledge_workflows:
+    content_ingestion_workflow:
+      workflow_name: "intelligent_content_ingestion"
+      
+      steps:
+        content_discovery:
+          description: "Discover and identify new content sources"
+          actions:
+            - "scan_configured_content_sources"
+            - "identify_new_content_items"
+            - "assess_content_relevance"
+            - "prioritize_ingestion_queue"
+          
+          discovery_methods:
+            - "scheduled_crawling"
+            - "api_based_monitoring"
+            - "webhook_notifications"
+            - "manual_submission"
+        
+        content_preprocessing:
+          description: "Prepare content for analysis and storage"
+          depends_on: ["content_discovery"]
+          
+          actions:
+            - "extract_text_from_documents"
+            - "clean_and_normalize_content"
+            - "detect_language_and_encoding"
+            - "identify_content_structure"
+          
+          preprocessing_steps:
+            - "format_conversion"
+            - "text_extraction"
+            - "metadata_extraction"
+            - "content_segmentation"
+        
+        content_analysis:
+          description: "Analyze content for classification and enrichment"
+          depends_on: ["content_preprocessing"]
+          
+          actions:
+            - "extract_key_concepts_entities"
+            - "classify_content_categories"
+            - "assess_content_quality"
+            - "identify_relationships"
+          
+          analysis_outputs:
+            - "content_classification"
+            - "entity_annotations"
+            - "quality_scores"
+            - "relationship_mappings"
+        
+        knowledge_integration:
+          description: "Integrate analyzed content into knowledge base"
+          depends_on: ["content_analysis"]
+          
+          actions:
+            - "update_knowledge_graph"
+            - "create_semantic_embeddings"
+            - "establish_cross_references"
+            - "update_search_indices"
+    
+    knowledge_retrieval_workflow:
+      workflow_name: "contextual_knowledge_retrieval"
+      
+      retrieval_methods:
+        semantic_search:
+          - "vector_similarity_search"
+          - "semantic_embedding_matching"
+          - "contextual_query_expansion"
+          - "multi_modal_search"
+        
+        structured_search:
+          - "faceted_search"
+          - "boolean_query_processing"
+          - "field_specific_filtering"
+          - "hierarchical_navigation"
+        
+        hybrid_search:
+          - "keyword_semantic_combination"
+          - "relevance_score_fusion"
+          - "context_aware_ranking"
+          - "personalized_results"
+      
+      result_processing:
+        relevance_ranking:
+          - "content_relevance_scoring"
+          - "user_context_consideration"
+          - "freshness_factor_integration"
+          - "authority_weight_application"
+        
+        result_presentation:
+          - "answer_generation"
+          - "source_attribution"
+          - "confidence_indication"
+          - "related_content_suggestions"
+
+  # Content Curation Strategies
+  curation_strategies:
+    automated_curation:
+      quality_assessment:
+        content_metrics:
+          - "readability_score"
+          - "completeness_index"
+          - "accuracy_rating"
+          - "uniqueness_measure"
+          - "utility_assessment"
+        
+        automated_improvements:
+          - "grammar_spell_correction"
+          - "structure_optimization"
+          - "link_validation_repair"
+          - "metadata_enhancement"
+      
+      content_enrichment:
+        automatic_tagging:
+          - "topic_tag_generation"
+          - "skill_level_tagging"
+          - "audience_targeting_tags"
+          - "content_type_classification"
+        
+        cross_reference_generation:
+          - "related_content_identification"
+          - "prerequisite_mapping"
+          - "follow_up_suggestions"
+          - "alternative_perspectives"
+    
+    human_ai_collaboration:
+      expert_validation:
+        validation_workflows:
+          - "subject_matter_expert_review"
+          - "peer_review_processes"
+          - "community_feedback_integration"
+          - "authority_verification"
+      
+      collaborative_editing:
+        - "suggested_improvements"
+        - "collaborative_annotation"
+        - "version_control_integration"
+        - "conflict_resolution"
+
+  # Knowledge Discovery and Analytics
+  discovery_analytics:
+    usage_analytics:
+      access_patterns:
+        - "content_popularity_tracking"
+        - "user_journey_analysis"
+        - "search_query_analysis"
+        - "engagement_metrics"
+      
+      knowledge_gaps:
+        - "unanswered_query_identification"
+        - "missing_content_detection"
+        - "outdated_information_flagging"
+        - "coverage_gap_analysis"
+    
+    knowledge_insights:
+      trend_analysis:
+        - "emerging_topic_identification"
+        - "knowledge_evolution_tracking"
+        - "expertise_mapping"
+        - "learning_path_optimization"
+      
+      recommendation_engine:
+        - "personalized_content_recommendations"
+        - "learning_path_suggestions"
+        - "expert_connection_recommendations"
+        - "skill_gap_identification"
+
+  # Integration and API Management
+  integration_capabilities:
+    api_endpoints:
+      content_management:
+        - "POST /knowledge/content" # Ingest new content
+        - "GET /knowledge/search" # Search knowledge base
+        - "PUT /knowledge/content/{id}" # Update content
+        - "DELETE /knowledge/content/{id}" # Remove content
+      
+      query_interface:
+        - "POST /knowledge/query" # Natural language query
+        - "GET /knowledge/recommendations" # Get recommendations
+        - "POST /knowledge/feedback" # Submit feedback
+        - "GET /knowledge/analytics" # Access analytics
+    
+    webhook_integrations:
+      content_notifications:
+        - "new_content_available"
+        - "content_updated"
+        - "quality_issues_detected"
+        - "expert_validation_required"
+
+  # Security and Access Control
+  security_management:
+    access_control:
+      role_based_access:
+        - "content_creator"
+        - "content_reviewer"
+        - "content_consumer"
+        - "knowledge_administrator"
+      
+      content_sensitivity:
+        - "public_knowledge"
+        - "internal_knowledge"
+        - "confidential_knowledge"
+        - "restricted_knowledge"
+    
+    data_privacy:
+      privacy_protection:
+        - "personal_information_detection"
+        - "sensitive_data_masking"
+        - "access_audit_logging"
+        - "data_retention_management"
+
+integration:
+  # Enterprise System Integration
+  enterprise_integration:
+    documentation_systems:
+      confluence_integration:
+        - "space_synchronization"
+        - "page_content_extraction"
+        - "metadata_preservation"
+        - "link_relationship_mapping"
+      
+      sharepoint_integration:
+        - "document_library_scanning"
+        - "permission_mapping"
+        - "version_history_preservation"
+        - "collaborative_editing_sync"
+    
+    development_tools:
+      code_repository_integration:
+        - "readme_documentation_extraction"
+        - "code_comment_analysis"
+        - "api_documentation_generation"
+        - "changelog_processing"
+      
+      issue_tracking_integration:
+        - "ticket_knowledge_extraction"
+        - "solution_documentation_creation"
+        - "knowledge_base_suggestions"
+        - "expert_identification"
+
+  # Learning and Development Integration
+  learning_integration:
+    training_platforms:
+      lms_integration:
+        - "course_content_synchronization"
+        - "learning_path_mapping"
+        - "progress_tracking_integration"
+        - "skill_assessment_linking"
+    
+    competency_management:
+      skill_tracking:
+        - "expertise_level_assessment"
+        - "skill_gap_identification"
+        - "learning_recommendation_generation"
+        - "expert_network_mapping"
+
+validation:
+  # Knowledge Base Manager Agent Validation
+  agent_effectiveness:
+    content_quality_improvement: "measurable"
+    search_relevance_accuracy: ">90%"
+    knowledge_coverage_completeness: ">85%"
+    user_satisfaction_score: ">4.2/5"
+  
+  # Knowledge Management System Validation
+  system_validation:
+    information_retrieval_accuracy: ">92%"
+    content_freshness_maintenance: "current"
+    knowledge_accessibility: "optimized"
+    organizational_learning_impact: "positive"
+
+examples:
+  # Knowledge Base Query Example
+  knowledge_query_example:
+    natural_language_query: |
+      "How do I implement secure authentication in a HUGAI microservices architecture?"
+    
+    processed_query: |
+      {
+        "intent": "implementation_guidance",
+        "domain": "software_architecture",
+        "topic": "authentication",
+        "context": "microservices",
+        "security_focus": true,
+        "audience_level": "intermediate"
+      }
+    
+    knowledge_response: |
+      ## Secure Authentication in HUGAI Microservices
+      
+      ### Recommended Approach: OAuth 2.0 + JWT
+      
+      **Implementation Strategy:**
+      1. **Central Authentication Service**: Implement dedicated auth service
+      2. **JWT Token Management**: Use short-lived access tokens + refresh tokens
+      3. **API Gateway Integration**: Centralize token validation
+      4. **Service-to-Service Auth**: Implement service account tokens
+      
+      **Security Best Practices:**
+      - Token encryption and signing
+      - Regular token rotation
+      - Proper CORS configuration
+      - Rate limiting implementation
+      
+      **Related Resources:**
+      - [HUGAI Auth Service Implementation Guide](link)
+      - [JWT Security Checklist](link)
+      - [Microservices Security Patterns](link)
+      
+      **Expert Contact:** @security-team for architecture review
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize knowledge base manager agent
+  hugai agent init knowledge-base-manager --platforms confluence,notion --vector-db pinecone
+  
+  # Ingest content from multiple sources
+  hugai agent kb ingest --sources confluence,github,jira --batch-size 100 --process-async
+  
+  # Query knowledge base
+  hugai agent kb query "How to deploy HUGAI agents in production?" --context microservices --format detailed
+  
+  # Analyze knowledge gaps
+  hugai agent kb analyze --gaps --coverage-report --recommendations
+  
+  # Curate and improve content
+  hugai agent kb curate --quality-threshold 0.8 --auto-improve --expert-validation
+  
+  # Generate knowledge reports
+  hugai agent kb report --type usage-analytics --period monthly --export pdf

@@ -1,0 +1,550 @@
+metadata:
+  name: deployment-agent
+  version: 1.0.0
+  description: "Automates packaging, configuration, and safe release of applications across environments"
+  category: operational
+  dependencies:
+    - devops-agent
+    - security-agent
+    - infrastructure-tools
+    - container-registry
+  tags:
+    - deployment
+    - infrastructure-as-code
+    - release-management
+    - automation
+    - rollback
+
+configuration:
+  # Core Deployment Settings
+  deployment_strategy: progressive  # Options: basic, progressive, canary, blue_green
+  environment_isolation: strict  # Options: loose, standard, strict, complete
+  rollback_capability: automatic  # Options: manual, assisted, automatic
+  
+  # Deployment Targets
+  target_environments:
+    development:
+      auto_deploy: true
+      approval_required: false
+      monitoring_duration: "5min"
+      
+    staging:
+      auto_deploy: true
+      approval_required: false
+      monitoring_duration: "15min"
+      smoke_tests: true
+      
+    production:
+      auto_deploy: false
+      approval_required: true
+      monitoring_duration: "60min"
+      canary_deployment: true
+      blue_green_deployment: available
+  
+  # Infrastructure Platforms
+  supported_platforms:
+    kubernetes:
+      enabled: true
+      versions: ["1.25", "1.26", "1.27", "1.28"]
+      deployment_tools: [helm, kustomize, kubectl]
+      ingress_controllers: [nginx, traefik, istio]
+      
+    aws:
+      enabled: true
+      services: [ecs, eks, lambda, beanstalk]
+      infrastructure_tools: [terraform, cloudformation, cdk]
+      
+    azure:
+      enabled: true
+      services: [aks, container_instances, app_service]
+      infrastructure_tools: [terraform, arm_templates, bicep]
+      
+    gcp:
+      enabled: true
+      services: [gke, cloud_run, app_engine]
+      infrastructure_tools: [terraform, deployment_manager]
+      
+    on_premise:
+      enabled: true
+      orchestration: [docker_swarm, nomad]
+      configuration_management: [ansible, puppet, chef]
+  
+  # Input Sources Configuration
+  input_sources:
+    build_artifacts: "build/artifacts/**/*"
+    container_images: "registry.config.yaml"
+    environment_configs: "env/**/*.{yaml,json,env}"
+    infrastructure_templates: "infrastructure/**/*.{tf,yaml,json}"
+    deployment_configs: "deployment/**/*.{yaml,json}"
+    secrets_manifests: "secrets/**/*.{yaml,json}"
+    ci_cd_configs: ".{github,gitlab-ci,jenkins}/**/*"
+    policies: "policies/deployment/*.yaml"
+  
+  # Processing Pipeline
+  processing_steps:
+    - load_build_artifacts
+    - validate_artifact_integrity
+    - load_environment_configurations
+    - render_deployment_templates
+    - validate_infrastructure_configuration
+    - generate_deployment_manifests
+    - create_rollback_procedures
+    - perform_dry_run_validation
+    - execute_security_checks
+    - package_release_bundle
+    - update_deployment_metadata
+    - trigger_deployment_workflow
+  
+  # Deployment Strategies
+  deployment_strategies:
+    rolling_update:
+      max_unavailable: "25%"
+      max_surge: "25%"
+      readiness_probe: required
+      
+    canary_deployment:
+      traffic_split: [10, 25, 50, 100]
+      success_criteria:
+        error_rate: "<1%"
+        latency_p95: "<500ms"
+        cpu_utilization: "<80%"
+      rollback_triggers:
+        error_rate: ">5%"
+        latency_p95: ">1000ms"
+        
+    blue_green_deployment:
+      health_check_timeout: "5min"
+      smoke_test_duration: "10min"
+      traffic_switch: atomic
+      
+    feature_flags:
+      progressive_rollout: true
+      user_segmentation: supported
+      instant_rollback: true
+  
+  # Container Management
+  container_management:
+    registry_configuration:
+      primary: "company-registry.io"
+      mirrors: ["docker.io", "gcr.io"]
+      authentication: "service_account"
+      
+    image_security:
+      vulnerability_scanning: required
+      image_signing: enforced
+      distroless_preferred: true
+      
+    optimization:
+      multi_stage_builds: encouraged
+      layer_caching: enabled
+      image_size_limits: "500MB"
+  
+  # Infrastructure as Code
+  infrastructure_as_code:
+    terraform:
+      version: ">=1.5.0"
+      state_backend: "remote"
+      plan_validation: required
+      cost_estimation: enabled
+      
+    helm:
+      version: ">=3.10.0"
+      chart_validation: strict
+      dependency_management: automated
+      
+    kustomize:
+      version: ">=4.5.0"
+      overlay_validation: enforced
+      
+    ansible:
+      version: ">=6.0.0"
+      playbook_validation: required
+      vault_integration: true
+  
+  # Security and Compliance
+  security_compliance:
+    secrets_management:
+      vault_integration: true
+      kubernetes_secrets: encrypted
+      rotation_policy: "90_days"
+      
+    network_security:
+      network_policies: enforced
+      service_mesh: optional
+      tls_encryption: required
+      
+    compliance_validation:
+      policy_checks: automated
+      audit_logging: comprehensive
+      change_tracking: enabled
+      
+    rbac_configuration:
+      least_privilege: enforced
+      service_accounts: dedicated
+      cluster_roles: minimal
+
+integration:
+  # Upstream Agents
+  input_agents:
+    - implementation_agent
+    - test_agent
+    - security_agent
+    - devops_agent
+  
+  # Downstream Agents
+  output_agents:
+    - observability_monitoring_agent
+    - maintenance_agent
+    - documentation_writer_agent
+  
+  # CI/CD Integration
+  cicd_platforms:
+    github_actions:
+      workflow_templates: "deployment-workflows/"
+      secrets_management: "github_secrets"
+      artifact_storage: "github_packages"
+      
+    gitlab_ci:
+      pipeline_templates: ".gitlab-ci/deployment/"
+      container_registry: "gitlab_registry"
+      kubernetes_integration: true
+      
+    jenkins:
+      pipeline_library: "shared-library/deployment"
+      credentials_management: "jenkins_vault"
+      kubernetes_plugin: true
+      
+    azure_devops:
+      pipeline_templates: "azure-pipelines/deployment"
+      artifact_feeds: "azure_artifacts"
+      service_connections: "azure_resource_manager"
+  
+  # Cloud Provider Integration
+  cloud_integrations:
+    aws:
+      iam_roles: "deployment-role"
+      ecr_integration: true
+      eks_integration: true
+      secrets_manager: true
+      
+    azure:
+      service_principal: "deployment-sp"
+      acr_integration: true
+      aks_integration: true
+      key_vault: true
+      
+    gcp:
+      service_account: "deployment-sa"
+      gcr_integration: true
+      gke_integration: true
+      secret_manager: true
+  
+  # Monitoring Integration
+  monitoring_integration:
+    prometheus:
+      metrics_collection: enabled
+      alerting_rules: deployed
+      
+    grafana:
+      dashboard_provisioning: automated
+      
+    elastic_stack:
+      log_aggregation: configured
+      
+    datadog:
+      apm_integration: optional
+
+validation:
+  # Input Validation
+  input_validation:
+    artifact_integrity:
+      checksum_validation: required
+      signature_verification: enforced
+      malware_scanning: enabled
+      
+    configuration_validation:
+      schema_validation: strict
+      environment_specific: validated
+      secrets_detection: automated
+      
+    template_validation:
+      syntax_checking: enforced
+      resource_limits: validated
+      security_policies: applied
+  
+  # Pre-deployment Validation
+  pre_deployment_validation:
+    dry_run_execution:
+      kubernetes_dry_run: enabled
+      terraform_plan: required
+      helm_dry_run: enabled
+      
+    resource_validation:
+      resource_quotas: checked
+      node_affinity: validated
+      storage_availability: verified
+      
+    dependency_validation:
+      service_dependencies: available
+      external_services: reachable
+      database_connectivity: tested
+  
+  # Post-deployment Validation
+  post_deployment_validation:
+    health_checks:
+      readiness_probes: passed
+      liveness_probes: configured
+      startup_probes: validated
+      
+    functional_validation:
+      smoke_tests: executed
+      integration_tests: passed
+      performance_baseline: maintained
+      
+    monitoring_validation:
+      metrics_collection: active
+      logging_functionality: working
+      alerting_configuration: deployed
+
+monitoring:
+  # Deployment Metrics
+  metrics:
+    deployment_frequency:
+      description: "Number of successful deployments per time period"
+      target: ">10 per week"
+      measurement: "weekly"
+      
+    deployment_success_rate:
+      description: "Percentage of deployments completed without failures"
+      target: ">98%"
+      alert_threshold: "<95%"
+      
+    mean_time_to_deploy:
+      description: "Average duration from initiation to completion"
+      target: "<30min"
+      alert_threshold: ">60min"
+      
+    deployment_lead_time:
+      description: "Time from commit to production deployment"
+      target: "<4 hours"
+      alert_threshold: ">24 hours"
+      
+    rollback_rate:
+      description: "Percentage of deployments requiring rollback"
+      target: "<2%"
+      alert_threshold: ">5%"
+      
+    change_failure_rate:
+      description: "Percentage of deployments causing incidents"
+      target: "<1%"
+      alert_threshold: ">3%"
+      
+    environment_validation_pass_rate:
+      description: "Percentage passing pre-deployment validation"
+      target: ">99%"
+      alert_threshold: "<95%"
+  
+  # Performance Monitoring
+  performance_monitoring:
+    deployment_pipeline_duration: tracked
+    resource_utilization: monitored
+    cost_per_deployment: calculated
+    
+  # Quality Metrics
+  quality_metrics:
+    infrastructure_drift: detected
+    configuration_compliance: validated
+    security_posture: assessed
+
+examples:
+  # Kubernetes Deployment
+  kubernetes_example:
+    input:
+      application: "user-service"
+      image: "registry.company.com/user-service:v1.2.3"
+      environment: "production"
+      
+    output:
+      deployment_yaml: |
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: user-service
+          namespace: production
+          labels:
+            app: user-service
+            version: v1.2.3
+        spec:
+          replicas: 3
+          strategy:
+            type: RollingUpdate
+            rollingUpdate:
+              maxUnavailable: 1
+              maxSurge: 1
+          selector:
+            matchLabels:
+              app: user-service
+          template:
+            metadata:
+              labels:
+                app: user-service
+                version: v1.2.3
+            spec:
+              containers:
+              - name: user-service
+                image: registry.company.com/user-service:v1.2.3
+                ports:
+                - containerPort: 8080
+                readinessProbe:
+                  httpGet:
+                    path: /health/ready
+                    port: 8080
+                  initialDelaySeconds: 10
+                  periodSeconds: 5
+                livenessProbe:
+                  httpGet:
+                    path: /health/live
+                    port: 8080
+                  initialDelaySeconds: 30
+                  periodSeconds: 10
+                resources:
+                  requests:
+                    memory: "256Mi"
+                    cpu: "250m"
+                  limits:
+                    memory: "512Mi"
+                    cpu: "500m"
+      
+      service_yaml: |
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: user-service
+          namespace: production
+        spec:
+          selector:
+            app: user-service
+          ports:
+          - port: 80
+            targetPort: 8080
+          type: ClusterIP
+  
+  # Terraform Infrastructure
+  terraform_example:
+    input:
+      cloud_provider: "aws"
+      environment: "production"
+      application: "web-app"
+      
+    output:
+      main_tf: |
+        terraform {
+          required_version = ">= 1.5.0"
+          required_providers {
+            aws = {
+              source  = "hashicorp/aws"
+              version = "~> 5.0"
+            }
+          }
+          backend "s3" {
+            bucket = "company-terraform-state"
+            key    = "production/web-app/terraform.tfstate"
+            region = "us-west-2"
+          }
+        }
+        
+        module "web_app" {
+          source = "./modules/web-app"
+          
+          environment     = "production"
+          app_name       = "web-app"
+          instance_type  = "t3.medium"
+          min_size       = 2
+          max_size       = 10
+          desired_size   = 3
+          
+          vpc_id         = data.aws_vpc.main.id
+          subnet_ids     = data.aws_subnets.private.ids
+          
+          tags = {
+            Environment = "production"
+            Application = "web-app"
+            ManagedBy   = "terraform"
+          }
+        }
+  
+  # Helm Chart
+  helm_example:
+    input:
+      chart_name: "api-gateway"
+      version: "2.1.0"
+      environment: "staging"
+      
+    output:
+      values_yaml: |
+        replicaCount: 2
+        
+        image:
+          repository: registry.company.com/api-gateway
+          tag: "2.1.0"
+          pullPolicy: IfNotPresent
+        
+        service:
+          type: ClusterIP
+          port: 80
+          targetPort: 8080
+        
+        ingress:
+          enabled: true
+          className: "nginx"
+          annotations:
+            cert-manager.io/cluster-issuer: "letsencrypt-prod"
+          hosts:
+            - host: api-staging.company.com
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - secretName: api-gateway-tls
+              hosts:
+                - api-staging.company.com
+        
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        
+        autoscaling:
+          enabled: true
+          minReplicas: 2
+          maxReplicas: 10
+          targetCPUUtilizationPercentage: 70
+
+# CLI Usage Examples
+cli_usage: |
+  # Deploy to specific environment
+  hugai deploy --environment staging --app user-service --version v1.2.3
+  
+  # Generate deployment manifests
+  hugai deployment generate --platform kubernetes --app web-app --output manifests/
+  
+  # Validate deployment configuration
+  hugai deployment validate --environment production --dry-run
+  
+  # Rollback deployment
+  hugai deployment rollback --environment production --app api-gateway --version v2.0.1
+  
+  # Deploy with canary strategy
+  hugai deploy canary --traffic-split 10,25,50,100 --success-criteria error_rate=1%
+  
+  # Infrastructure deployment
+  hugai deploy infrastructure --terraform infrastructure/ --environment production
+  
+  # Check deployment status
+  hugai deployment status --environment production --app user-service
+  
+  # Generate rollback plan
+  hugai deployment rollback-plan --from v1.3.0 --to v1.2.8 --output rollback.yaml
