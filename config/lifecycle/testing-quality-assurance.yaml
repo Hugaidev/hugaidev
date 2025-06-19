@@ -1,0 +1,678 @@
+metadata:
+  name: testing-quality-assurance-phase
+  version: 1.0.0
+  description: "Testing & Quality Assurance phase configuration for HUGAI development lifecycle"
+  category: lifecycle-phase
+  phase_order: 4
+  dependencies:
+    - test-agent
+    - internal-reviewer-agent
+    - security-agent
+    - implementation-phase
+  tags:
+    - testing
+    - quality-assurance
+    - automation
+    - security-testing
+    - performance-testing
+
+configuration:
+  # Phase Overview
+  phase_definition:
+    name: "Testing & Quality Assurance"
+    objective: "Ensure software reliability, security, and fairness through comprehensive AI-generated and human-validated testing practices"
+    duration_estimate: "2-6 weeks"
+    complexity_factors: [system_complexity, integration_points, security_requirements, performance_targets]
+  
+  # Phase Objectives
+  objectives:
+    comprehensive_test_generation:
+      description: "Automatically generate and maintain unit, integration, performance, and security tests"
+      success_criteria:
+        - "Complete test suite coverage for all code modules"
+        - "Integration tests cover all API endpoints and data flows"
+        - "Performance tests validate all SLA requirements"
+        - "Security tests cover all identified threat vectors"
+      
+    quality_validation:
+      description: "Validate functional correctness, security compliance, and system reliability"
+      success_criteria:
+        - "All functional requirements validated through automated tests"
+        - "Security compliance verified through comprehensive scanning"
+        - "System reliability confirmed through stress and chaos testing"
+        - "Data integrity validated through end-to-end testing"
+      
+    test_maintenance:
+      description: "Prevent test brittleness by updating tests alongside code changes"
+      success_criteria:
+        - "Test suites automatically updated with code changes"
+        - "Deprecated tests identified and removed"
+        - "Test data and mocks kept current with system evolution"
+        - "Flaky tests identified and stabilized or removed"
+      
+    defect_prevention:
+      description: "Proactively identify and prevent defects through predictive analysis"
+      success_criteria:
+        - "Defect hotspots identified and additional testing applied"
+        - "Code quality metrics maintained above thresholds"
+        - "Regression testing prevents defect reintroduction"
+        - "Early defect detection minimizes production issues"
+  
+  # AI Agent Configuration
+  ai_agents:
+    test_agent:
+      role: "Primary test generation and maintenance"
+      responsibilities:
+        - "Generate comprehensive test suites for all code modules"
+        - "Create test data and mock environments"
+        - "Maintain and update tests with code changes"
+        - "Identify defect hotspots and generate additional tests"
+        - "Predict test flakiness and recommend stabilization"
+      inputs: ["source_code", "requirements", "test_specifications", "historical_defects"]
+      outputs: ["test_suites", "test_data", "test_reports", "defect_predictions"]
+      
+    internal_reviewer_agent:
+      role: "Test quality review and validation"
+      responsibilities:
+        - "Review test coverage and identify gaps"
+        - "Validate edge-case handling in test scenarios"
+        - "Flag test quality issues and redundancies"
+        - "Ensure test maintainability and readability"
+      inputs: ["generated_tests", "coverage_reports", "quality_metrics"]
+      outputs: ["test_review_feedback", "coverage_analysis", "quality_recommendations"]
+      
+    security_agent:
+      role: "Security and vulnerability testing"
+      responsibilities:
+        - "Generate security-focused test scenarios"
+        - "Perform vulnerability scanning and penetration testing"
+        - "Validate security controls and compliance requirements"
+        - "Create tests for security regression prevention"
+      inputs: ["security_requirements", "threat_models", "compliance_frameworks"]
+      outputs: ["security_tests", "vulnerability_reports", "penetration_test_results"]
+      
+    prompt_refiner_agent:
+      role: "Test scenario refinement and optimization"
+      responsibilities:
+        - "Refine test generation prompts for better coverage"
+        - "Optimize test scenarios for edge cases and boundary conditions"
+        - "Enhance test readability and maintainability"
+        - "Standardize test documentation and reporting"
+      inputs: ["test_requirements", "scenario_descriptions", "test_feedback"]
+      outputs: ["refined_test_prompts", "optimized_scenarios", "test_templates"]
+  
+  # Human Participants
+  human_participants:
+    qa_engineers:
+      role: "Test validation and quality oversight"
+      responsibilities:
+        - "Validate and approve AI-generated test suites"
+        - "Design manual testing scenarios for complex workflows"
+        - "Execute exploratory testing to complement automated tests"
+        - "Analyze test results and coordinate defect resolution"
+      checkpoints: ["test_suite_approval", "quality_gate_assessment"]
+      
+    security_engineers:
+      role: "Security testing validation and compliance"
+      responsibilities:
+        - "Review and validate security test scenarios"
+        - "Verify penetration testing results"
+        - "Ensure compliance with security standards and regulations"
+        - "Approve security-critical test modifications"
+      checkpoints: ["security_gate", "penetration_test_approval"]
+      
+    performance_engineers:
+      role: "Performance testing and optimization"
+      responsibilities:
+        - "Design and validate performance test scenarios"
+        - "Analyze performance test results and identify bottlenecks"
+        - "Set and monitor performance baselines and thresholds"
+        - "Recommend performance optimizations based on test data"
+      checkpoints: ["performance_gate", "sla_validation"]
+      
+    developers:
+      role: "Test integration and defect resolution"
+      responsibilities:
+        - "Integrate AI-generated tests into development workflow"
+        - "Fix defects identified through automated testing"
+        - "Maintain test code quality and documentation"
+        - "Provide feedback on test effectiveness and coverage"
+      checkpoints: ["test_integration_review", "defect_resolution_validation"]
+  
+  # Test Types and Strategies
+  test_types:
+    unit_tests:
+      scope: "Individual functions, methods, and classes"
+      coverage_target: ">90%"
+      automation_level: "fully_automated"
+      frameworks: ["pytest", "junit", "jest", "go_test"]
+      generation_strategy: "ai_generated_with_human_review"
+      
+    integration_tests:
+      scope: "API endpoints, service interactions, data flows"
+      coverage_target: ">85%"
+      automation_level: "fully_automated"
+      frameworks: ["supertest", "testcontainers", "spring_boot_test"]
+      generation_strategy: "ai_generated_based_on_api_specs"
+      
+    end_to_end_tests:
+      scope: "Complete user workflows and business processes"
+      coverage_target: ">80%"
+      automation_level: "hybrid"
+      frameworks: ["cypress", "selenium", "playwright"]
+      generation_strategy: "ai_assisted_with_manual_design"
+      
+    performance_tests:
+      scope: "Load, stress, and scalability validation"
+      coverage_target: "all_critical_paths"
+      automation_level: "fully_automated"
+      frameworks: ["jmeter", "locust", "gatling", "k6"]
+      generation_strategy: "ai_generated_based_on_sla_requirements"
+      
+    security_tests:
+      scope: "Vulnerability scanning, penetration testing, compliance"
+      coverage_target: "all_attack_vectors"
+      automation_level: "hybrid"
+      frameworks: ["owasp_zap", "burp_suite", "nmap", "sqlmap"]
+      generation_strategy: "ai_generated_based_on_threat_models"
+      
+    accessibility_tests:
+      scope: "WCAG compliance and usability validation"
+      coverage_target: "all_user_interfaces"
+      automation_level: "hybrid"
+      frameworks: ["axe_core", "lighthouse", "pa11y"]
+      generation_strategy: "ai_assisted_with_manual_validation"
+  
+  # Key Artifacts & Deliverables
+  artifacts:
+    automated_test_suites:
+      description: "Comprehensive test suites covering all test types"
+      organization: "test_pyramid_structure"
+      formats: ["source_code", "test_configs", "test_data"]
+      quality_criteria:
+        - "Tests follow established patterns and conventions"
+        - "Test coverage meets or exceeds target thresholds"
+        - "Tests are maintainable and well-documented"
+        - "Test execution is fast and reliable"
+      
+    test_data_sets:
+      description: "Curated test data and mock environments for reproducible testing"
+      types: ["synthetic_data", "anonymized_production_data", "edge_case_data"]
+      management_strategy: "version_controlled_and_automated"
+      quality_criteria:
+        - "Data covers all testing scenarios and edge cases"
+        - "Data is refreshed and maintained automatically"
+        - "Sensitive data is properly anonymized or synthetic"
+        - "Data generation is reproducible and consistent"
+      
+    quality_reports:
+      description: "Comprehensive testing and quality analysis reports"
+      formats: ["html", "json", "pdf"]
+      content:
+        - "Test execution results and trends"
+        - "Code coverage analysis and gaps"
+        - "Defect analysis and hotspot identification"
+        - "Performance benchmarks and SLA compliance"
+        - "Security vulnerability assessments"
+      
+    test_coverage_dashboards:
+      description: "Real-time dashboards showing test coverage and quality metrics"
+      visualization_tools: ["grafana", "sonarqube", "codecov"]
+      metrics_tracked:
+        - "Code coverage by module and test type"
+        - "Test execution times and success rates"
+        - "Defect trends and resolution times"
+        - "Security vulnerability counts and severity"
+      
+    defect_analysis_reports:
+      description: "AI-generated analysis of defect patterns and predictions"
+      analysis_types: ["hotspot_identification", "root_cause_analysis", "trend_prediction"]
+      actionable_insights:
+        - "Code areas requiring additional testing"
+        - "Common defect patterns and prevention strategies"
+        - "Resource allocation recommendations"
+        - "Testing strategy optimization suggestions"
+  
+  # Governance Checkpoints
+  governance_checkpoints:
+    test_suite_approval:
+      type: "human_checkpoint"
+      description: "QA sign-off on AI-generated test suites before merging"
+      participants: ["qa_engineers", "test_leads"]
+      entry_criteria:
+        - "Test suites generated for all code modules"
+        - "Coverage targets met or justified if not"
+        - "Test quality review completed"
+      exit_criteria:
+        - "Test suites approved by QA team"
+        - "Test integration validated"
+        - "Test documentation complete"
+      duration: "2-4 hours"
+      
+    security_gate:
+      type: "automated_gate"
+      description: "Mandatory pass on security and vulnerability scans"
+      validation_rules:
+        - "No critical security vulnerabilities"
+        - "Security test coverage meets requirements"
+        - "Penetration test results acceptable"
+      blocking_conditions:
+        - "Critical vulnerabilities unaddressed"
+        - "Security test failures"
+        - "Compliance violations detected"
+      
+    performance_gate:
+      type: "automated_gate"
+      description: "Validate performance tests against SLA thresholds"
+      validation_rules:
+        - "All performance SLAs met"
+        - "Load test results within acceptable ranges"
+        - "Resource utilization optimized"
+      blocking_conditions:
+        - "SLA violations detected"
+        - "Performance degradation identified"
+        - "Scalability issues found"
+      
+    quality_gate_assessment:
+      type: "hybrid_checkpoint"
+      description: "Comprehensive quality validation before release"
+      automated_checks:
+        - "Code coverage thresholds met"
+        - "Test execution success rates acceptable"
+        - "Defect counts within limits"
+      human_validation:
+        participants: ["qa_engineers", "release_managers"]
+        criteria: ["test_strategy_effectiveness", "risk_assessment", "release_readiness"]
+  
+  # Test Automation Strategy
+  test_automation:
+    automation_pyramid:
+      unit_tests: "70%"
+      integration_tests: "20%"
+      end_to_end_tests: "10%"
+      
+    ci_cd_integration:
+      commit_stage: ["unit_tests", "static_analysis", "security_scans"]
+      acceptance_stage: ["integration_tests", "api_tests", "contract_tests"]
+      deployment_stage: ["smoke_tests", "health_checks", "monitoring_validation"]
+      
+    parallel_execution:
+      enabled: true
+      max_parallel_jobs: 10
+      test_splitting_strategy: "duration_based"
+      
+    flaky_test_management:
+      detection: "automated_pattern_analysis"
+      quarantine: "temporary_isolation"
+      resolution: "ai_assisted_stabilization"
+  
+  # Metrics & Quality Gates
+  metrics:
+    test_coverage:
+      description: "Percentage of code covered by automated tests"
+      targets:
+        unit_coverage: ">90%"
+        integration_coverage: ">85%"
+        end_to_end_coverage: ">80%"
+      calculation: "covered_lines / total_lines * 100"
+      alert_thresholds:
+        unit_coverage: "<80%"
+        integration_coverage: "<70%"
+        end_to_end_coverage: "<60%"
+      
+    defect_escape_rate:
+      description: "Defects found in production vs. pre-release"
+      target: "<5%"
+      calculation: "production_defects / (production_defects + prerelease_defects) * 100"
+      alert_threshold: ">10%"
+      
+    test_flakiness:
+      description: "Rate of intermittent test failures"
+      target: "<2%"
+      calculation: "flaky_test_runs / total_test_runs * 100"
+      alert_threshold: ">5%"
+      
+    test_execution_time:
+      description: "Average time for complete test suite execution"
+      target: "<30 minutes"
+      calculation: "total_execution_time / test_runs"
+      alert_threshold: ">60 minutes"
+      
+    security_vulnerability_count:
+      description: "Number of security vulnerabilities by severity"
+      targets:
+        critical: 0
+        high: "<5"
+        medium: "<20"
+      alert_thresholds:
+        critical: ">0"
+        high: ">10"
+        medium: ">50"
+      
+    test_maintenance_rate:
+      description: "Frequency of test updates per code change"
+      target: ">90%"
+      calculation: "tests_updated / code_changes * 100"
+      alert_threshold: "<70%"
+
+integration:
+  # Testing Framework Integration
+  testing_frameworks:
+    python:
+      unit_testing: "pytest"
+      integration_testing: "pytest + testcontainers"
+      performance_testing: "locust"
+      
+    javascript:
+      unit_testing: "jest"
+      integration_testing: "supertest"
+      end_to_end_testing: "cypress"
+      
+    java:
+      unit_testing: "junit5"
+      integration_testing: "spring_boot_test"
+      performance_testing: "gatling"
+      
+    go:
+      unit_testing: "go_test"
+      integration_testing: "testcontainers_go"
+      performance_testing: "k6"
+  
+  # CI/CD Pipeline Integration
+  cicd_integration:
+    github_actions:
+      test_workflows: ["unit_tests", "integration_tests", "security_scans"]
+      parallel_execution: "matrix_strategy"
+      artifact_management: "test_results_upload"
+      
+    jenkins:
+      pipeline_stages: ["test", "quality_gate", "security_scan"]
+      parallel_builds: "declarative_pipeline"
+      
+    gitlab_ci:
+      test_stages: ["unit", "integration", "performance", "security"]
+      coverage_reporting: "integrated"
+  
+  # Quality Tool Integration
+  quality_tools:
+    sonarqube:
+      quality_gates: "customized_for_project"
+      coverage_integration: "multiple_languages"
+      
+    codecov:
+      coverage_reporting: "automated"
+      trend_analysis: "enabled"
+      
+    snyk:
+      vulnerability_scanning: "dependency_and_code"
+      fix_suggestions: "automated_pr_creation"
+
+validation:
+  # Test Strategy Validation
+  test_strategy_validation:
+    coverage_adequacy:
+      functional_coverage: "requirements_mapped_to_tests"
+      risk_coverage: "high_risk_areas_thoroughly_tested"
+      regression_coverage: "previous_defects_tested"
+      
+    test_quality:
+      maintainability: "tests_follow_best_practices"
+      reliability: "low_flakiness_rates"
+      performance: "fast_execution_times"
+      
+    automation_effectiveness:
+      roi_analysis: "automation_cost_vs_manual_effort"
+      defect_detection: "early_defect_identification"
+      feedback_speed: "rapid_developer_feedback"
+  
+  # Test Execution Validation
+  execution_validation:
+    environment_consistency:
+      test_environments: "production_like_configurations"
+      data_consistency: "reliable_test_data"
+      isolation: "tests_dont_interfere_with_each_other"
+      
+    result_reliability:
+      repeatability: "consistent_results_across_runs"
+      determinism: "predictable_test_outcomes"
+      traceability: "clear_failure_root_causes"
+  
+  # Quality Gate Validation
+  quality_gate_validation:
+    gate_effectiveness:
+      defect_prevention: "gates_catch_quality_issues"
+      false_positive_rate: "minimal_incorrect_failures"
+      coverage_verification: "gates_enforce_coverage_requirements"
+      
+    process_compliance:
+      checkpoint_execution: "all_required_checkpoints_completed"
+      approval_workflow: "proper_sign_off_procedures"
+      documentation: "test_results_properly_documented"
+
+examples:
+  # E-commerce API Testing
+  ecommerce_api_testing:
+    project: "E-commerce Platform API"
+    test_strategy: "comprehensive_api_testing"
+    
+    generated_tests:
+      unit_tests: |
+        # Generated Unit Tests for UserService
+        import pytest
+        from unittest.mock import Mock, patch
+        from src.services.user_service import UserService
+        from src.models.user import User
+        
+        class TestUserService:
+            def setup_method(self):
+                self.mock_db = Mock()
+                self.user_service = UserService(self.mock_db)
+            
+            def test_create_user_success(self):
+                # Test successful user creation
+                user_data = {
+                    "email": "test@example.com",
+                    "name": "Test User",
+                    "password": "securepassword123"
+                }
+                
+                self.mock_db.save.return_value = User(**user_data)
+                
+                result = self.user_service.create_user(user_data)
+                
+                assert result.email == user_data["email"]
+                assert result.name == user_data["name"]
+                self.mock_db.save.assert_called_once()
+            
+            def test_create_user_duplicate_email(self):
+                # Test user creation with duplicate email
+                user_data = {"email": "existing@example.com"}
+                self.mock_db.save.side_effect = IntegrityError("Duplicate email")
+                
+                with pytest.raises(DuplicateEmailError):
+                    self.user_service.create_user(user_data)
+      
+      integration_tests: |
+        # Generated Integration Tests for User API
+        import pytest
+        from fastapi.testclient import TestClient
+        from app import app
+        from database import get_db_connection
+        
+        client = TestClient(app)
+        
+        class TestUserAPI:
+            def test_user_registration_flow(self):
+                # Test complete user registration workflow
+                registration_data = {
+                    "email": "newuser@example.com",
+                    "name": "New User",
+                    "password": "securepassword123"
+                }
+                
+                # Register user
+                response = client.post("/api/users/register", json=registration_data)
+                assert response.status_code == 201
+                user_id = response.json()["id"]
+                
+                # Verify user can login
+                login_response = client.post("/api/auth/login", json={
+                    "email": registration_data["email"],
+                    "password": registration_data["password"]
+                })
+                assert login_response.status_code == 200
+                assert "access_token" in login_response.json()
+                
+                # Verify user profile retrieval
+                token = login_response.json()["access_token"]
+                profile_response = client.get(
+                    f"/api/users/{user_id}",
+                    headers={"Authorization": f"Bearer {token}"}
+                )
+                assert profile_response.status_code == 200
+                assert profile_response.json()["email"] == registration_data["email"]
+      
+      performance_tests: |
+        # Generated Performance Tests using Locust
+        from locust import HttpUser, task, between
+        import json
+        
+        class EcommerceUserBehavior(HttpUser):
+            wait_time = between(1, 3)
+            
+            def on_start(self):
+                # User registration and login
+                self.register_and_login()
+            
+            def register_and_login(self):
+                # Register a new user
+                registration_data = {
+                    "email": f"user{self.environment.runner.user_count}@example.com",
+                    "name": "Test User",
+                    "password": "password123"
+                }
+                
+                response = self.client.post("/api/users/register", json=registration_data)
+                if response.status_code == 201:
+                    # Login to get token
+                    login_response = self.client.post("/api/auth/login", json={
+                        "email": registration_data["email"],
+                        "password": registration_data["password"]
+                    })
+                    
+                    if login_response.status_code == 200:
+                        self.token = login_response.json()["access_token"]
+                        self.headers = {"Authorization": f"Bearer {self.token}"}
+            
+            @task(3)
+            def browse_products(self):
+                # Simulate product browsing
+                self.client.get("/api/products?page=1&limit=20")
+                self.client.get("/api/products/categories")
+            
+            @task(2)
+            def search_products(self):
+                # Simulate product search
+                search_terms = ["laptop", "phone", "headphones", "book"]
+                term = random.choice(search_terms)
+                self.client.get(f"/api/products/search?q={term}")
+            
+            @task(1)
+            def add_to_cart(self):
+                # Simulate adding items to cart
+                if hasattr(self, 'headers'):
+                    cart_item = {
+                        "product_id": "prod_123",
+                        "quantity": 2
+                    }
+                    self.client.post("/api/cart/items", 
+                                   json=cart_item, 
+                                   headers=self.headers)
+  
+  # Security Testing Example
+  security_testing_example:
+    project: "Financial Services API"
+    security_focus: "comprehensive_security_validation"
+    
+    security_tests:
+      authentication_tests: |
+        # Generated Authentication Security Tests
+        import pytest
+        import requests
+        from security_test_framework import SecurityTestBase
+        
+        class TestAuthenticationSecurity(SecurityTestBase):
+            
+            def test_jwt_token_expiration(self):
+                # Test that expired tokens are rejected
+                expired_token = self.generate_expired_token()
+                
+                response = self.client.get(
+                    "/api/protected-endpoint",
+                    headers={"Authorization": f"Bearer {expired_token}"}
+                )
+                
+                assert response.status_code == 401
+                assert "token expired" in response.json()["error"].lower()
+            
+            def test_sql_injection_protection(self):
+                # Test SQL injection attempts on login endpoint
+                injection_payloads = [
+                    "admin' OR '1'='1",
+                    "admin'; DROP TABLE users; --",
+                    "admin' UNION SELECT * FROM users --"
+                ]
+                
+                for payload in injection_payloads:
+                    response = self.client.post("/api/auth/login", json={
+                        "email": payload,
+                        "password": "password"
+                    })
+                    
+                    # Should return 400 (bad request) or 401 (unauthorized)
+                    # but never 500 (internal server error indicating SQL injection)
+                    assert response.status_code in [400, 401]
+                    assert "error" in response.json()
+            
+            def test_rate_limiting(self):
+                # Test rate limiting on sensitive endpoints
+                login_endpoint = "/api/auth/login"
+                
+                # Attempt multiple rapid requests
+                for i in range(10):
+                    response = self.client.post(login_endpoint, json={
+                        "email": "test@example.com",
+                        "password": "wrongpassword"
+                    })
+                
+                # Should be rate limited after several attempts
+                assert response.status_code == 429
+                assert "rate limit" in response.json()["error"].lower()
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize testing phase
+  hugai lifecycle start testing-qa --implementation-complete
+  
+  # Generate comprehensive test suite
+  hugai test generate --source src/ --types unit,integration,e2e --coverage 90
+  
+  # Run specific test types
+  hugai test run unit --parallel --coverage-report
+  hugai test run integration --environment staging
+  hugai test run performance --load-profile high --duration 10m
+  
+  # Execute security testing
+  hugai test security --scan-type full --include-penetration-testing
+  
+  # Analyze test quality
+  hugai test analyze --flaky-detection --coverage-gaps --optimization-suggestions
+  
+  # Run quality gates
+  hugai checkpoint run quality-gate --all-tests --blocking
+  
+  # Generate test reports
+  hugai test report --format html,pdf --include-trends --output test-reports/
+  
+  # Test maintenance operations
+  hugai test maintain --remove-flaky --update-stale --optimize-execution

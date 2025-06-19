@@ -1,0 +1,74 @@
+name: Validate HUGAI Configurations
+
+on:
+  push:
+    paths:
+      - 'config/**/*.yaml'
+      - 'config/**/*.yml'
+      - 'config/schemas/**/*.json'
+      - '.github/workflows/validate-configs.yml'
+  pull_request:
+    paths:
+      - 'config/**/*.yaml'
+      - 'config/**/*.yml'
+      - 'config/schemas/**/*.json'
+      - '.github/workflows/validate-configs.yml'
+
+jobs:
+  validate:
+    name: Validate Configuration Files
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install validation dependencies
+      run: |
+        pip install -r config/requirements.txt
+    
+    - name: Validate all configurations
+      run: |
+        cd config
+        python validate-config.py
+    
+    - name: Upload validation report
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: validation-report
+        path: config/validation-report.json
+        retention-days: 30
+    
+    - name: Comment PR with validation results
+      if: github.event_name == 'pull_request' && failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const path = 'config/validation-report.json';
+          
+          if (fs.existsSync(path)) {
+            const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+            const comment = `## ❌ Configuration Validation Failed
+            
+            ${report.summary}
+            
+            ### Errors:
+            ${report.errors.map(error => `- ${error}`).join('\n')}
+            
+            Please fix the configuration errors before merging.`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          }

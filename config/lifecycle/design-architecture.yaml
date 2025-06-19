@@ -1,0 +1,542 @@
+metadata:
+  name: design-architecture-phase
+  version: 1.0.0
+  description: "Design & Architecture phase configuration for HUGAI development lifecycle"
+  category: lifecycle-phase
+  phase_order: 2
+  dependencies:
+    - architecture-agent
+    - security-agent
+    - prompt-refiner-agent
+    - domain-expert-agent
+    - planning-requirements-phase
+  tags:
+    - design
+    - architecture
+    - patterns
+    - security
+    - api-design
+
+configuration:
+  # Phase Overview
+  phase_definition:
+    name: "Design & Architecture"
+    objective: "Craft scalable, secure, and maintainable system designs with AI-generated patterns and human expertise"
+    duration_estimate: "3-6 weeks"
+    complexity_factors: [system_scale, integration_complexity, security_requirements, performance_constraints]
+  
+  # Phase Objectives
+  objectives:
+    architecture_design:
+      description: "Generate architecture proposals and select design patterns aligned with requirements"
+      success_criteria:
+        - "System architecture documented with clear patterns"
+        - "Design patterns selected with documented rationale"
+        - "Architecture aligns with functional and non-functional requirements"
+      
+    system_definition:
+      description: "Define system boundaries, interactions, and data flows for modularity and scalability"
+      success_criteria:
+        - "System boundaries clearly defined"
+        - "Component interactions documented"
+        - "Data flows mapped and validated"
+        - "Scalability patterns implemented"
+      
+    interface_contracts:
+      description: "Produce interface contracts (APIs, schemas) and validate against standards"
+      success_criteria:
+        - "API contracts defined using OpenAPI/GraphQL"
+        - "Data schemas documented and validated"
+        - "Interface contracts reviewed and approved"
+        - "Backward compatibility considerations addressed"
+      
+    security_compliance:
+      description: "Validate design against security and compliance standards"
+      success_criteria:
+        - "Security threat model completed"
+        - "Compliance requirements addressed in design"
+        - "Security controls integrated into architecture"
+        - "Risk mitigation strategies defined"
+  
+  # AI Agent Configuration
+  ai_agents:
+    architecture_agent:
+      role: "Primary system design and pattern recommendation"
+      responsibilities:
+        - "Generate architecture proposals based on requirements"
+        - "Recommend appropriate design patterns"
+        - "Create system diagrams and documentation"
+        - "Analyze trade-offs between design alternatives"
+      inputs: ["validated_requirements", "technical_constraints", "quality_attributes"]
+      outputs: ["architecture_specifications", "design_patterns", "system_diagrams"]
+      
+    security_agent:
+      role: "Security analysis and threat modeling"
+      responsibilities:
+        - "Perform threat modeling on proposed architecture"
+        - "Identify security vulnerabilities and risks"
+        - "Recommend security controls and patterns"
+        - "Validate compliance with security standards"
+      inputs: ["architecture_designs", "security_requirements", "threat_models"]
+      outputs: ["security_assessment", "threat_analysis", "security_recommendations"]
+      
+    prompt_refiner_agent:
+      role: "Design prompt optimization and clarification"
+      responsibilities:
+        - "Clarify ambiguous design requirements"
+        - "Refine architecture queries for better AI output"
+        - "Standardize design documentation format"
+      inputs: ["design_requirements", "stakeholder_feedback", "architecture_queries"]
+      outputs: ["refined_design_prompts", "clarified_requirements"]
+      
+    domain_expert_agent:
+      role: "Domain-specific validation and enrichment"
+      responsibilities:
+        - "Validate architecture against domain best practices"
+        - "Provide industry-specific design recommendations"
+        - "Identify domain constraints and opportunities"
+      inputs: ["architecture_proposals", "domain_knowledge", "industry_standards"]
+      outputs: ["domain_validation", "industry_recommendations", "constraint_analysis"]
+  
+  # Human Participants
+  human_participants:
+    solution_architect:
+      role: "Architecture oversight and approval"
+      responsibilities:
+        - "Review and approve AI-generated architecture designs"
+        - "Guide design decisions and pattern selection"
+        - "Ensure architectural consistency across systems"
+        - "Validate technical feasibility and scalability"
+      checkpoints: ["pre_design_review", "architecture_review_board"]
+      
+    security_officer:
+      role: "Security and compliance validation"
+      responsibilities:
+        - "Review security architecture and threat models"
+        - "Validate compliance with regulatory requirements"
+        - "Approve security controls and mitigation strategies"
+        - "Ensure data privacy and protection measures"
+      checkpoints: ["security_compliance_gate"]
+      
+    domain_experts:
+      role: "Business domain validation and guidance"
+      responsibilities:
+        - "Provide domain-specific requirements and constraints"
+        - "Validate business rule implementation in design"
+        - "Review API contracts for domain accuracy"
+        - "Ensure design supports business processes"
+      checkpoints: ["domain_validation_review"]
+      
+    compliance_officer:
+      role: "Regulatory compliance oversight"
+      responsibilities:
+        - "Ensure design meets regulatory requirements"
+        - "Review data handling and privacy controls"
+        - "Validate audit and monitoring capabilities"
+        - "Approve compliance-critical design decisions"
+      checkpoints: ["compliance_validation"]
+  
+  # Key Artifacts & Deliverables
+  artifacts:
+    system_architecture_specification:
+      description: "Comprehensive system architecture with context and component diagrams"
+      format: "yaml"
+      template: "templates/system_architecture.yaml"
+      diagrams: ["c4_context", "c4_container", "c4_component", "sequence_diagrams"]
+      quality_criteria:
+        - "All components and their responsibilities clearly defined"
+        - "System boundaries and external dependencies identified"
+        - "Data flows and integration points documented"
+      
+    design_pattern_documentation:
+      description: "Selected design patterns with rationale and trade-offs"
+      format: "markdown"
+      template: "templates/design_patterns.md"
+      quality_criteria:
+        - "Pattern selection rationale clearly documented"
+        - "Trade-offs and alternatives considered"
+        - "Implementation guidance provided"
+      
+    api_contracts:
+      description: "API specifications using OpenAPI or GraphQL"
+      format: "yaml/json"
+      templates: ["templates/openapi.yaml", "templates/graphql.yaml"]
+      quality_criteria:
+        - "All endpoints documented with examples"
+        - "Request/response schemas defined"
+        - "Error handling patterns specified"
+        - "Authentication and authorization documented"
+      
+    data_schema_definitions:
+      description: "Data models and schema specifications"
+      format: "yaml/json"
+      template: "templates/data_schemas.yaml"
+      quality_criteria:
+        - "All data entities and relationships defined"
+        - "Data validation rules specified"
+        - "Migration strategies documented"
+      
+    security_assessment_report:
+      description: "Security and threat analysis with risk mitigations"
+      format: "markdown"
+      template: "templates/security_assessment.md"
+      quality_criteria:
+        - "Comprehensive threat model completed"
+        - "Security controls mapped to threats"
+        - "Risk levels assessed and documented"
+        - "Mitigation strategies defined"
+      
+    architecture_decision_records:
+      description: "ADRs capturing key architectural decisions"
+      format: "markdown"
+      template: "templates/adr.md"
+      storage: "docs/adr/"
+      quality_criteria:
+        - "All significant decisions documented"
+        - "Context and rationale clearly explained"
+        - "Consequences and trade-offs analyzed"
+  
+  # Governance Checkpoints
+  governance_checkpoints:
+    pre_design_review:
+      type: "human_checkpoint"
+      description: "Validate requirements alignment and scope before detailed design"
+      participants: ["solution_architect", "domain_experts", "product_owner"]
+      entry_criteria:
+        - "Requirements phase completed and approved"
+        - "Technical constraints identified"
+        - "Quality attributes defined"
+      exit_criteria:
+        - "Design scope and approach approved"
+        - "Architecture goals and constraints agreed"
+        - "Success criteria established"
+      duration: "2 hours"
+      
+    architecture_review_board:
+      type: "human_checkpoint"
+      description: "Comprehensive review of AI-generated architecture designs"
+      participants: ["solution_architect", "senior_architects", "domain_experts"]
+      entry_criteria:
+        - "Architecture specifications completed"
+        - "Design patterns documented"
+        - "System diagrams generated"
+      exit_criteria:
+        - "Architecture design approved"
+        - "Design patterns validated"
+        - "Implementation approach agreed"
+      duration: "3 hours"
+      
+    security_compliance_gate:
+      type: "automated_gate"
+      description: "Automated and manual security validation"
+      automated_checks:
+        - "Security threat model completeness"
+        - "Compliance requirements coverage"
+        - "Security controls mapping"
+      manual_validation:
+        participants: ["security_officer", "compliance_officer"]
+        duration: "2 hours"
+      blocking_conditions:
+        - "High-risk threats without mitigation"
+        - "Critical compliance requirements unaddressed"
+        - "Security architecture gaps identified"
+  
+  # Design Patterns Library
+  design_patterns:
+    architectural_patterns:
+      microservices:
+        description: "Distributed system with independently deployable services"
+        use_cases: ["high_scalability", "team_autonomy", "technology_diversity"]
+        trade_offs: ["complexity_increase", "network_overhead", "distributed_debugging"]
+        
+      event_driven:
+        description: "Loosely coupled system using events for communication"
+        use_cases: ["real_time_processing", "loose_coupling", "scalability"]
+        trade_offs: ["eventual_consistency", "debugging_complexity", "event_versioning"]
+        
+      hexagonal:
+        description: "Ports and adapters pattern for testable, maintainable code"
+        use_cases: ["testability", "technology_independence", "clean_architecture"]
+        trade_offs: ["initial_complexity", "abstraction_overhead"]
+        
+    integration_patterns:
+      api_gateway:
+        description: "Single entry point for client requests to microservices"
+        use_cases: ["microservices_aggregation", "cross_cutting_concerns", "client_simplification"]
+        
+      saga_pattern:
+        description: "Distributed transaction management across services"
+        use_cases: ["distributed_transactions", "data_consistency", "compensation_logic"]
+        
+    security_patterns:
+      oauth2_jwt:
+        description: "Token-based authentication and authorization"
+        use_cases: ["api_security", "single_sign_on", "stateless_authentication"]
+        
+      zero_trust:
+        description: "Never trust, always verify security model"
+        use_cases: ["cloud_native", "remote_work", "advanced_threats"]
+  
+  # Metrics & Quality Gates
+  metrics:
+    design_completeness:
+      description: "Percentage of requirements covered by design artifacts"
+      target: ">95%"
+      calculation: "requirements_covered / total_requirements * 100"
+      alert_threshold: "<85%"
+      
+    security_risk_score:
+      description: "Aggregated severity of identified security threats"
+      target: "<5.0"
+      calculation: "weighted_risk_score"
+      scale: "1-10 (10 = highest risk)"
+      alert_threshold: ">7.0"
+      
+    pattern_reuse_index:
+      description: "Ratio of reused patterns to custom implementations"
+      target: ">70%"
+      calculation: "reused_patterns / total_patterns * 100"
+      alert_threshold: "<50%"
+      
+    api_compliance_rate:
+      description: "Percentage of endpoints conforming to contract specifications"
+      target: ">98%"
+      calculation: "compliant_endpoints / total_endpoints * 100"
+      alert_threshold: "<90%"
+      
+    architecture_debt_ratio:
+      description: "Measure of architectural technical debt"
+      target: "<15%"
+      calculation: "debt_items / total_components * 100"
+      alert_threshold: ">25%"
+  
+  # Quality Gates
+  quality_gates:
+    design_completeness_gate:
+      type: "automated"
+      validation_rules:
+        - "All functional requirements mapped to components"
+        - "Non-functional requirements addressed"
+        - "Integration points documented"
+      blocking_threshold: "<90% completeness"
+      
+    security_validation_gate:
+      type: "hybrid"
+      automated_checks:
+        - "Threat model completeness"
+        - "Security controls coverage"
+        - "Compliance requirements mapping"
+      human_validation: "security_officer_approval"
+      
+    api_design_gate:
+      type: "automated"
+      validation_rules:
+        - "All APIs follow organizational standards"
+        - "OpenAPI specifications valid"
+        - "Error handling patterns consistent"
+      blocking_threshold: "<95% compliance"
+
+integration:
+  # Tool Integrations
+  tools:
+    diagramming:
+      mermaid:
+        integration: "markdown_embedded"
+        diagram_types: ["sequence", "class", "component", "deployment"]
+        
+      structurizr:
+        workspace_url: "${STRUCTURIZR_WORKSPACE_URL}"
+        api_key: "${STRUCTURIZR_API_KEY}"
+        c4_model_support: true
+        
+      drawio:
+        integration: "export_import"
+        formats: ["xml", "png", "svg"]
+        
+    api_tooling:
+      openapi_generator:
+        generators: ["client", "server", "documentation"]
+        customization: "templates_supported"
+        
+      swagger_ui:
+        deployment: "automated"
+        customization: "branded"
+        
+    security_scanning:
+      owasp_zap:
+        api_scanning: "automated"
+        baseline_scanning: "enabled"
+        
+      snyk:
+        iac_scanning: "terraform_support"
+        dependency_scanning: "package_manager_support"
+        
+    collaboration:
+      confluence:
+        space_key: "ARCH"
+        page_templates: ["architecture_spec", "adr", "api_documentation"]
+        
+      miro:
+        workspace_integration: "design_workshops"
+        template_library: "architecture_patterns"
+  
+  # Workflow Integration
+  workflow_triggers:
+    phase_start:
+      - "load_approved_requirements"
+      - "initialize_architecture_context"
+      - "setup_design_workspace"
+      
+    design_generation:
+      - "run_architecture_analysis"
+      - "generate_system_diagrams"
+      - "create_api_contracts"
+      
+    security_validation:
+      - "perform_threat_modeling"
+      - "run_security_scans"
+      - "validate_compliance"
+
+validation:
+  # Input Validation
+  input_validation:
+    requirements_quality:
+      completeness: "all_functional_and_nonfunctional_requirements"
+      clarity: "unambiguous_and_testable"
+      traceability: "linked_to_business_objectives"
+      
+    technical_constraints:
+      feasibility: "technically_achievable"
+      consistency: "non_contradictory"
+      completeness: "all_constraints_identified"
+      
+    quality_attributes:
+      measurability: "quantifiable_targets"
+      achievability: "realistic_expectations"
+      relevance: "business_value_aligned"
+  
+  # Design Validation
+  design_validation:
+    architecture_consistency:
+      pattern_application: "correctly_implemented"
+      component_cohesion: "high_cohesion_low_coupling"
+      interface_consistency: "uniform_design_principles"
+      
+    scalability_validation:
+      load_capacity: "meets_performance_requirements"
+      growth_accommodation: "handles_expected_scale"
+      resource_efficiency: "optimal_resource_utilization"
+      
+    security_validation:
+      threat_coverage: "all_identified_threats_addressed"
+      control_effectiveness: "security_controls_adequate"
+      compliance_adherence: "regulatory_requirements_met"
+  
+  # Output Validation
+  output_validation:
+    documentation_quality:
+      completeness: "all_sections_documented"
+      accuracy: "technically_correct"
+      clarity: "understandable_by_stakeholders"
+      
+    diagram_validation:
+      syntax_correctness: "valid_diagram_notation"
+      completeness: "all_components_represented"
+      consistency: "aligned_with_documentation"
+
+examples:
+  # Microservices E-commerce Architecture
+  microservices_example:
+    project: "E-commerce Platform"
+    architecture_style: "microservices"
+    
+    system_components:
+      user_service:
+        responsibilities: ["authentication", "user_profiles", "preferences"]
+        technology: "Node.js + MongoDB"
+        api_endpoints: ["/users", "/auth", "/profile"]
+        
+      product_service:
+        responsibilities: ["catalog_management", "search", "recommendations"]
+        technology: "Python + Elasticsearch"
+        api_endpoints: ["/products", "/search", "/recommendations"]
+        
+      order_service:
+        responsibilities: ["order_processing", "payment_coordination", "fulfillment"]
+        technology: "Java + PostgreSQL"
+        api_endpoints: ["/orders", "/payments", "/fulfillment"]
+        
+    integration_patterns:
+      api_gateway: "Kong"
+      service_mesh: "Istio"
+      event_bus: "Apache Kafka"
+      
+    security_controls:
+      authentication: "OAuth 2.0 + JWT"
+      authorization: "RBAC"
+      encryption: "TLS 1.3 + AES-256"
+      api_security: "Rate limiting + Input validation"
+  
+  # Monolithic Healthcare Application
+  monolithic_example:
+    project: "Patient Management System"
+    architecture_style: "modular_monolith"
+    compliance_requirements: ["HIPAA", "FDA_510k"]
+    
+    system_modules:
+      patient_module:
+        responsibilities: ["patient_registration", "medical_records", "appointment_scheduling"]
+        data_access: "JPA + PostgreSQL"
+        
+      clinical_module:
+        responsibilities: ["diagnosis_tracking", "treatment_plans", "clinical_notes"]
+        integrations: ["hl7_fhir", "medical_devices"]
+        
+      billing_module:
+        responsibilities: ["insurance_claims", "payment_processing", "financial_reporting"]
+        compliance: ["PCI_DSS", "financial_regulations"]
+        
+    security_architecture:
+      data_encryption: "AES-256 at rest, TLS 1.3 in transit"
+      access_controls: "RBAC with MFA for privileged access"
+      audit_logging: "Comprehensive audit trail for HIPAA compliance"
+      backup_strategy: "Encrypted backups with geographic distribution"
+      
+    compliance_controls:
+      hipaa:
+        - "Patient data encryption"
+        - "Access logging and monitoring"
+        - "Business Associate Agreements"
+        - "Breach notification procedures"
+        
+      fda_510k:
+        - "Software risk classification"
+        - "Clinical validation protocols"
+        - "Quality management system"
+        - "Post-market surveillance"
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize design phase
+  hugai lifecycle start design-architecture --requirements requirements.yaml
+  
+  # Generate architecture design
+  hugai architecture design --requirements requirements.yaml --patterns microservices
+  
+  # Create system diagrams
+  hugai diagram generate --architecture system.yaml --format c4,sequence --output diagrams/
+  
+  # Generate API contracts
+  hugai api generate --architecture system.yaml --format openapi --output api/
+  
+  # Run security analysis
+  hugai security analyze --architecture system.yaml --threat-model --output security-report.md
+  
+  # Execute architecture review
+  hugai checkpoint run architecture-review --artifacts architecture/ --participants architects
+  
+  # Validate design quality
+  hugai design validate --architecture system.yaml --check completeness,security,patterns
+  
+  # Generate ADRs
+  hugai adr create --decision microservices-adoption --context requirements.yaml --output docs/adr/
