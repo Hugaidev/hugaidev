@@ -1,0 +1,22 @@
+# HUGAI Configuration Validation Dependencies
+
+# JSON Schema validation
+jsonschema>=4.17.0
+
+# YAML parsing and generation
+PyYAML>=6.0
+
+# Enhanced JSON schema validation with format checkers
+jsonschema[format]>=4.17.0
+
+# Template engine for configuration generation
+Jinja2>=3.1.0
+
+# File system monitoring for sync automation
+watchdog>=3.0.0
+
+# Optional: Rich console output for better formatting
+rich>=13.0.0
+
+# Optional: Click for enhanced CLI interfaces
+click>=8.0.0

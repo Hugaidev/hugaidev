@@ -1,0 +1,37 @@
+sync_rules:
+  config_to_docs:
+    agents:
+      source_pattern: config/agents/*.yaml
+      target_pattern: docs/agents/{name}.md
+      template: agent-doc-template.md
+    lifecycle:
+      source_pattern: config/lifecycle/*.yaml
+      target_pattern: docs/methodology/{name}.md
+      template: lifecycle-doc-template.md
+    tools:
+      source_pattern: config/tools/*.yaml
+      target_pattern: docs/tools/{name}.md
+      template: tool-doc-template.md
+    llms:
+      source_pattern: config/llms/*.yaml
+      target_pattern: docs/llms/{name}.md
+      template: llm-doc-template.md
+validation:
+  enabled: true
+  schema_validation: true
+  link_validation: true
+  content_validation: true
+backup:
+  enabled: true
+  max_backups: 10
+  compress: true
+git_integration:
+  enabled: true
+  auto_commit: false
+  commit_message_template: 'docs: sync configuration changes for {files}'
+notifications:
+  enabled: true
+  channels:
+  - console
+  - file
+  log_file: sync.log
