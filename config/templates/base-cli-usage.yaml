@@ -1,0 +1,115 @@
+# Base CLI Usage Template
+# This template defines common CLI command patterns used across HUGAI configurations
+# Provides consistent command structure and examples
+
+cli_usage:
+  # Command prefix for this component
+  command_prefix: "hugai {{component_type | default('component')}}"
+  
+  # Available commands
+  commands:
+    # Core lifecycle commands
+    - command: "{{command_prefix}} start {{name}}"
+      description: "Start the {{component_type | default('component')}}"
+      example: "{{command_prefix}} start {{name}} --config {{config_file | default('config.yaml')}}"
+      parameters:
+        {% for param in start_parameters | default([]) %}
+        - name: "{{param.name}}"
+          type: "{{param.type}}"
+          required: {{param.required | default(false)}}
+          description: "{{param.description}}"
+        {% endfor %}
+
+    - command: "{{command_prefix}} stop {{name}}"
+      description: "Stop the {{component_type | default('component')}}"
+      example: "{{command_prefix}} stop {{name}}"
+
+    - command: "{{command_prefix}} status {{name}}"
+      description: "Check the status of the {{component_type | default('component')}}"
+      example: "{{command_prefix}} status {{name}} --verbose"
+
+    - command: "{{command_prefix}} config {{name}}"
+      description: "Manage {{component_type | default('component')}} configuration"
+      example: "{{command_prefix}} config {{name}} --validate --show"
+      subcommands:
+        - name: "validate"
+          description: "Validate configuration file"
+        - name: "show" 
+          description: "Display current configuration"
+        - name: "update"
+          description: "Update configuration parameters"
+
+    # Monitoring commands
+    - command: "{{command_prefix}} logs {{name}}"
+      description: "View {{component_type | default('component')}} logs"
+      example: "{{command_prefix}} logs {{name}} --follow --lines 100"
+      parameters:
+        - name: "--follow"
+          type: "flag"
+          required: false
+          description: "Follow log output in real-time"
+        - name: "--lines"
+          type: "integer"
+          required: false
+          description: "Number of lines to display"
+
+    - command: "{{command_prefix}} metrics {{name}}"
+      description: "Display {{component_type | default('component')}} metrics"
+      example: "{{command_prefix}} metrics {{name}} --format json --period 1h"
+
+    # Custom commands specific to this component
+    {% for command in custom_commands | default([]) %}
+    - command: "{{command_prefix}} {{command.name}} {{name}}"
+      description: "{{command.description}}"
+      example: "{{command.example}}"
+      {% if command.parameters %}
+      parameters: {{command.parameters | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+  # Global options available for all commands
+  global_options:
+    - name: "--config"
+      type: "string"
+      description: "Path to configuration file"
+      default: "config/{{component_type | default('component')}}s/{{name}}.yaml"
+    
+    - name: "--verbose"
+      type: "flag" 
+      description: "Enable verbose output"
+    
+    - name: "--dry-run"
+      type: "flag"
+      description: "Show what would be done without executing"
+    
+    - name: "--help"
+      type: "flag"
+      description: "Show help information"
+
+  # Usage examples with common scenarios
+  examples:
+    - name: "Quick Start"
+      description: "Get started with {{name}} quickly"
+      commands:
+        - "{{command_prefix}} config {{name}} --validate"
+        - "{{command_prefix}} start {{name}}"
+        - "{{command_prefix}} status {{name}}"
+
+    - name: "Development Mode"
+      description: "Run {{name}} in development mode with debugging"
+      commands:
+        - "{{command_prefix}} start {{name}} --debug --watch"
+        - "{{command_prefix}} logs {{name}} --follow"
+
+    - name: "Production Deployment"
+      description: "Deploy {{name}} in production environment"
+      commands:
+        - "{{command_prefix}} config {{name}} --validate --env production"
+        - "{{command_prefix}} start {{name}} --env production --replicas 3"
+        - "{{command_prefix}} metrics {{name}} --dashboard"
+
+    {% for example in custom_examples | default([]) %}
+    - name: "{{example.name}}"
+      description: "{{example.description}}"
+      commands: {{example.commands | to_yaml}}
+    {% endfor %}

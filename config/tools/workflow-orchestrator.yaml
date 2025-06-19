@@ -1,0 +1,891 @@
+metadata:
+  name: workflow-orchestrator-configuration
+  version: 1.0.0
+  description: "Advanced workflow orchestration system for HUGAI development processes, managing complex multi-agent workflows with human checkpoints"
+  category: infrastructure-tools
+  dependencies:
+    - workflow-engine
+    - task-scheduler
+    - agent-coordinator
+    - human-interaction-manager
+  tags:
+    - workflow-orchestration
+    - process-automation
+    - multi-agent-coordination
+    - human-in-the-loop
+    - task-management
+
+configuration:
+  # Workflow Orchestration Philosophy
+  orchestration_philosophy:
+    purpose: "Orchestrate complex HUGAI workflows that seamlessly integrate AI agents with human oversight and decision-making"
+    principles:
+      human_governance: "Human oversight and approval at critical decision points"
+      intelligent_routing: "Dynamic task routing based on complexity and requirements"
+      failure_recovery: "Robust error handling and recovery mechanisms"
+      scalable_coordination: "Support for parallel execution and dynamic scaling"
+      audit_transparency: "Complete visibility into workflow execution and decisions"
+
+  # Workflow Engine Configuration
+  workflow_engine:
+    primary_engine: "temporal"
+    fallback_engine: "airflow"
+    
+    temporal_configuration:
+      version: "1.21.0"
+      
+      server_configuration:
+        frontend_address: "temporal-frontend:7233"
+        persistence:
+          default_store: "sql"
+          
+          sql_config:
+            driver_name: "postgres"
+            database_name: "temporal"
+            host: "${TEMPORAL_DB_HOST}"
+            port: 5432
+            user: "${TEMPORAL_DB_USER}"
+            password: "${TEMPORAL_DB_PASSWORD}"
+            max_connections: 20
+            max_idle_connections: 20
+            max_connection_lifetime: "1h"
+        
+        cluster_metadata:
+          current_cluster_name: "hugai-cluster"
+          cluster_information:
+            hugai-cluster:
+              enabled: true
+              initial_failover_version: 1
+              rpc_address: "temporal-frontend:7233"
+        
+        dynamic_config:
+          frontend:
+            rps_limit: 1200
+            domain_rps_limit: 1000
+          
+          matching:
+            rps_limit: 1200
+            domain_rps_limit: 1000
+          
+          history:
+            rps_limit: 3000
+            domain_rps_limit: 2400
+      
+      namespace_configuration:
+        hugai_workflows:
+          name: "hugai-workflows"
+          description: "Main namespace for HUGAI development workflows"
+          
+          retention_period: "7d"
+          emit_metrics: true
+          
+          archival_config:
+            state: "enabled"
+            uri: "s3://hugai-temporal-archival"
+            
+          bad_binaries:
+            binaries: {}
+        
+        hugai_testing:
+          name: "hugai-testing"
+          description: "Testing namespace for HUGAI workflows"
+          
+          retention_period: "3d"
+          emit_metrics: false
+      
+      worker_configuration:
+        hugai_workers:
+          task_queue: "hugai-main-queue"
+          max_concurrent_activities: 100
+          max_concurrent_local_activities: 100
+          max_concurrent_activity_task_pollers: 5
+          max_concurrent_workflow_task_pollers: 5
+          
+          activity_interceptors:
+            - "logging_interceptor"
+            - "metrics_interceptor"
+            - "error_handling_interceptor"
+          
+          workflow_interceptors:
+            - "logging_interceptor"
+            - "metrics_interceptor"
+            - "human_checkpoint_interceptor"
+    
+    airflow_configuration:
+      version: "2.7.3"
+      
+      core_configuration:
+        dags_folder: "/opt/airflow/dags"
+        base_log_folder: "/opt/airflow/logs"
+        remote_logging: true
+        remote_log_conn_id: "s3_default"
+        remote_base_log_folder: "s3://hugai-airflow-logs"
+        
+        executor: "CeleryExecutor"
+        sql_alchemy_conn: "${AIRFLOW_DATABASE_URL}"
+        
+        parallelism: 32
+        max_active_runs_per_dag: 16
+        max_active_tasks_per_dag: 16
+        
+        load_examples: false
+        load_default_connections: false
+      
+      webserver_configuration:
+        web_server_port: 8080
+        web_server_host: "0.0.0.0"
+        secret_key: "${AIRFLOW_SECRET_KEY}"
+        
+        authenticate: true
+        auth_backend: "airflow.contrib.auth.backends.google_auth"
+        
+        expose_config: false
+        expose_hostname: false
+        expose_stacktrace: false
+      
+      celery_configuration:
+        broker_url: "${CELERY_BROKER_URL}"
+        result_backend: "${CELERY_RESULT_BACKEND}"
+        
+        worker_concurrency: 16
+        worker_log_level: "INFO"
+        
+        task_track_started: true
+        task_time_limit: 300
+        task_soft_time_limit: 240
+
+  # Workflow Definitions
+  workflow_definitions:
+    hugai_development_workflow:
+      name: "hugai-development-workflow"
+      version: "1.0"
+      description: "Complete HUGAI development lifecycle workflow"
+      
+      workflow_type: "stateful"
+      execution_timeout: "24h"
+      task_timeout: "2h"
+      
+      input_schema:
+        type: "object"
+        properties:
+          project_id:
+            type: "string"
+            description: "Unique project identifier"
+          
+          requirements:
+            type: "object"
+            description: "Project requirements and specifications"
+          
+          priority:
+            type: "string"
+            enum: ["low", "medium", "high", "critical"]
+            default: "medium"
+          
+          team_assignments:
+            type: "object"
+            description: "Team member assignments and roles"
+        
+        required: ["project_id", "requirements"]
+      
+      stages:
+        planning_and_requirements:
+          stage_id: "planning"
+          stage_name: "Planning & Requirements Analysis"
+          execution_type: "sequential"
+          
+          tasks:
+            requirements_analysis:
+              task_id: "req_analysis"
+              task_type: "ai_agent_task"
+              agent_type: "requirements_analyzer"
+              
+              input_mapping:
+                requirements: "${workflow.input.requirements}"
+                project_context: "${workflow.input.project_id}"
+              
+              timeout: "30m"
+              retry_policy:
+                max_attempts: 3
+                backoff_coefficient: 2.0
+                initial_interval: "10s"
+              
+              success_criteria:
+                - "requirements_completeness > 0.9"
+                - "requirements_clarity > 0.8"
+                - "no_critical_ambiguities"
+            
+            human_requirements_review:
+              task_id: "req_review"
+              task_type: "human_checkpoint"
+              checkpoint_type: "requirements_validation"
+              
+              depends_on: ["req_analysis"]
+              
+              human_reviewers:
+                required_roles: ["product_manager", "tech_lead"]
+                min_approvals: 2
+                
+              review_criteria:
+                - "business_value_alignment"
+                - "technical_feasibility"
+                - "resource_estimation"
+                - "timeline_realism"
+              
+              timeout: "48h"
+              escalation_policy:
+                escalate_after: "24h"
+                escalate_to: ["engineering_manager", "product_director"]
+            
+            scope_prioritization:
+              task_id: "scope_priority"
+              task_type: "ai_agent_task"
+              agent_type: "project_planner"
+              
+              depends_on: ["req_review"]
+              
+              input_mapping:
+                validated_requirements: "${tasks.req_review.output.approved_requirements}"
+                team_capacity: "${workflow.input.team_assignments}"
+              
+              output_mapping:
+                prioritized_features: "$.prioritized_features"
+                development_plan: "$.development_plan"
+        
+        design_and_architecture:
+          stage_id: "design"
+          stage_name: "Design & Architecture"
+          execution_type: "parallel_with_dependencies"
+          
+          depends_on: ["planning"]
+          
+          tasks:
+            system_architecture:
+              task_id: "sys_arch"
+              task_type: "ai_agent_task"
+              agent_type: "architecture_agent"
+              
+              input_mapping:
+                requirements: "${stages.planning.output.validated_requirements}"
+                constraints: "${workflow.input.technical_constraints}"
+              
+              configuration:
+                architecture_patterns: ["microservices", "event_driven", "hexagonal"]
+                scalability_requirements: "high"
+                security_requirements: "strict"
+            
+            database_design:
+              task_id: "db_design"
+              task_type: "ai_agent_task"
+              agent_type: "database_designer"
+              
+              depends_on: ["sys_arch"]
+              
+              input_mapping:
+                data_models: "${tasks.sys_arch.output.data_models}"
+                performance_requirements: "${tasks.sys_arch.output.performance_requirements}"
+            
+            api_design:
+              task_id: "api_design"
+              task_type: "ai_agent_task"
+              agent_type: "api_designer"
+              
+              depends_on: ["sys_arch"]
+              
+              input_mapping:
+                service_boundaries: "${tasks.sys_arch.output.service_boundaries}"
+                integration_requirements: "${tasks.sys_arch.output.integrations}"
+            
+            architecture_review:
+              task_id: "arch_review"
+              task_type: "human_checkpoint"
+              checkpoint_type: "architecture_validation"
+              
+              depends_on: ["sys_arch", "db_design", "api_design"]
+              
+              human_reviewers:
+                required_roles: ["senior_architect", "security_engineer"]
+                min_approvals: 2
+              
+              review_artifacts:
+                - "${tasks.sys_arch.output.architecture_document}"
+                - "${tasks.db_design.output.schema_design}"
+                - "${tasks.api_design.output.api_specification}"
+        
+        implementation:
+          stage_id: "implementation"
+          stage_name: "Code Implementation"
+          execution_type: "parallel_with_coordination"
+          
+          depends_on: ["design"]
+          
+          tasks:
+            code_generation:
+              task_id: "code_gen"
+              task_type: "ai_agent_task"
+              agent_type: "implementation_agent"
+              
+              input_mapping:
+                architecture: "${stages.design.output.approved_architecture}"
+                specifications: "${stages.design.output.detailed_specs}"
+              
+              parallel_execution:
+                enabled: true
+                max_parallel_tasks: 5
+                coordination_strategy: "dependency_aware"
+              
+              sub_tasks:
+                - component: "user_service"
+                  priority: "high"
+                  estimated_effort: "2d"
+                
+                - component: "auth_service"
+                  priority: "high"
+                  estimated_effort: "1.5d"
+                
+                - component: "project_service"
+                  priority: "medium"
+                  estimated_effort: "3d"
+                
+                - component: "agent_orchestrator"
+                  priority: "high"
+                  estimated_effort: "2.5d"
+            
+            code_review:
+              task_id: "code_review"
+              task_type: "human_checkpoint"
+              checkpoint_type: "code_validation"
+              
+              depends_on: ["code_gen"]
+              
+              review_strategy: "component_based"
+              
+              human_reviewers:
+                required_roles: ["senior_developer", "tech_lead"]
+                min_approvals: 1
+                assignment_strategy: "expertise_based"
+              
+              automated_pre_checks:
+                - "static_analysis_passed"
+                - "security_scan_clean"
+                - "test_coverage_adequate"
+        
+        testing_and_qa:
+          stage_id: "testing"
+          stage_name: "Testing & Quality Assurance"
+          execution_type: "pipeline"
+          
+          depends_on: ["implementation"]
+          
+          tasks:
+            test_generation:
+              task_id: "test_gen"
+              task_type: "ai_agent_task"
+              agent_type: "test_agent"
+              
+              input_mapping:
+                code_components: "${stages.implementation.output.code_artifacts}"
+                test_requirements: "${stages.design.output.test_specifications}"
+              
+              test_types:
+                - "unit_tests"
+                - "integration_tests"
+                - "api_tests"
+                - "end_to_end_tests"
+            
+            test_execution:
+              task_id: "test_exec"
+              task_type: "automated_task"
+              
+              depends_on: ["test_gen"]
+              
+              execution_strategy: "parallel_by_type"
+              
+              test_suites:
+                unit_tests:
+                  timeout: "10m"
+                  parallel_workers: 4
+                  coverage_threshold: 80
+                
+                integration_tests:
+                  timeout: "30m"
+                  parallel_workers: 2
+                  environment: "testing"
+                
+                e2e_tests:
+                  timeout: "60m"
+                  parallel_workers: 1
+                  environment: "staging"
+            
+            quality_gate_assessment:
+              task_id: "quality_gate"
+              task_type: "human_checkpoint"
+              checkpoint_type: "quality_validation"
+              
+              depends_on: ["test_exec"]
+              
+              human_reviewers:
+                required_roles: ["qa_lead", "product_manager"]
+                min_approvals: 2
+              
+              quality_criteria:
+                - "all_tests_passing"
+                - "coverage_threshold_met"
+                - "performance_benchmarks_satisfied"
+                - "user_acceptance_criteria_validated"
+        
+        deployment:
+          stage_id: "deployment"
+          stage_name: "Deployment & Release"
+          execution_type: "sequential_with_gates"
+          
+          depends_on: ["testing"]
+          
+          tasks:
+            staging_deployment:
+              task_id: "staging_deploy"
+              task_type: "automated_task"
+              
+              input_mapping:
+                artifacts: "${stages.implementation.output.build_artifacts}"
+                configuration: "${deployment_configs.staging}"
+              
+              deployment_strategy: "blue_green"
+              
+              validation_steps:
+                - "health_checks"
+                - "smoke_tests"
+                - "integration_validation"
+            
+            production_approval:
+              task_id: "prod_approval"
+              task_type: "human_checkpoint"
+              checkpoint_type: "production_deployment_approval"
+              
+              depends_on: ["staging_deploy"]
+              
+              human_reviewers:
+                required_roles: ["release_manager", "security_officer"]
+                min_approvals: 2
+                approval_chain: "sequential"
+              
+              approval_criteria:
+                - "staging_validation_successful"
+                - "security_review_completed"
+                - "rollback_plan_verified"
+                - "stakeholder_notification_sent"
+            
+            production_deployment:
+              task_id: "prod_deploy"
+              task_type: "automated_task"
+              
+              depends_on: ["prod_approval"]
+              
+              deployment_strategy: "canary"
+              
+              canary_configuration:
+                initial_percentage: 10
+                increment_percentage: 25
+                increment_interval: "10m"
+                success_criteria:
+                  - "error_rate < 1%"
+                  - "response_time_p95 < 500ms"
+      
+      error_handling:
+        global_error_policies:
+          - error_type: "agent_task_failure"
+            retry_strategy: "exponential_backoff"
+            max_retries: 3
+            escalation: "human_intervention"
+          
+          - error_type: "human_checkpoint_timeout"
+            escalation_strategy: "role_hierarchy"
+            fallback_action: "workflow_pause"
+          
+          - error_type: "critical_system_failure"
+            immediate_action: "workflow_halt"
+            notification: "emergency_alert"
+            recovery_strategy: "manual_intervention"
+      
+      monitoring_and_observability:
+        metrics_collection:
+          - "workflow_execution_time"
+          - "task_success_rate"
+          - "human_checkpoint_approval_time"
+          - "error_rate_by_stage"
+          - "resource_utilization"
+        
+        alerting:
+          - condition: "workflow_execution_time > 48h"
+            severity: "warning"
+            notification: "slack_and_email"
+          
+          - condition: "error_rate > 10%"
+            severity: "critical"
+            notification: "pagerduty"
+          
+          - condition: "human_checkpoint_timeout > 72h"
+            severity: "high"
+            notification: "escalation_chain"
+
+  # Human Interaction Management
+  human_interaction_management:
+    checkpoint_coordination:
+      checkpoint_scheduler:
+        strategy: "intelligent_scheduling"
+        
+        scheduling_factors:
+          - "reviewer_availability"
+          - "workload_distribution"
+          - "expertise_matching"
+          - "timezone_optimization"
+          - "priority_weighting"
+        
+        notification_strategy:
+          advance_notice: "24h"
+          reminder_intervals: ["24h", "4h", "1h"]
+          escalation_intervals: ["24h", "48h", "72h"]
+        
+        load_balancing:
+          max_concurrent_reviews_per_person: 5
+          expertise_weight: 0.7
+          availability_weight: 0.3
+          workload_weight: 0.4
+      
+      review_interfaces:
+        web_interface:
+          url: "https://review.hugai.dev"
+          
+          features:
+            - "side_by_side_comparison"
+            - "inline_commenting"
+            - "collaborative_editing"
+            - "decision_tracking"
+            - "audit_trail_visualization"
+          
+          customization:
+            role_based_views: true
+            personalized_dashboards: true
+            notification_preferences: true
+        
+        mobile_interface:
+          app_name: "HUGAI Reviewer"
+          
+          features:
+            - "push_notifications"
+            - "offline_review_capability"
+            - "voice_annotations"
+            - "quick_approval_actions"
+        
+        integration_interfaces:
+          slack_bot:
+            commands:
+              - "/hugai review list"
+              - "/hugai review approve {review_id}"
+              - "/hugai review request-changes {review_id}"
+              - "/hugai review delegate {review_id} @user"
+          
+          email_interface:
+            review_notifications: true
+            quick_action_buttons: true
+            digest_summaries: true
+    
+    decision_tracking:
+      decision_capture:
+        structured_feedback:
+          approval_types:
+            - "unconditional_approval"
+            - "conditional_approval"
+            - "request_changes"
+            - "rejection"
+          
+          feedback_categories:
+            - "functional_requirements"
+            - "technical_implementation"
+            - "security_concerns"
+            - "performance_implications"
+            - "user_experience"
+            - "business_impact"
+        
+        rationale_capture:
+          required_for: ["rejection", "request_changes"]
+          structured_templates: true
+          free_form_comments: true
+          
+        metadata_tracking:
+          - "decision_timestamp"
+          - "reviewer_identity"
+          - "review_context"
+          - "related_artifacts"
+          - "confidence_level"
+      
+      decision_analytics:
+        metrics_tracking:
+          - "decision_consistency"
+          - "review_quality_scores"
+          - "reviewer_agreement_rates"
+          - "decision_impact_analysis"
+        
+        pattern_analysis:
+          - "common_rejection_reasons"
+          - "reviewer_bias_detection"
+          - "decision_time_patterns"
+          - "quality_correlation_analysis"
+
+  # Workflow Execution Engine
+  execution_engine:
+    task_coordination:
+      task_scheduler:
+        scheduling_algorithm: "priority_with_dependencies"
+        
+        priority_calculation:
+          factors:
+            business_impact: 0.4
+            technical_complexity: 0.2
+            resource_availability: 0.2
+            deadline_pressure: 0.2
+        
+        dependency_resolution:
+          strategy: "topological_sort_with_optimization"
+          parallel_execution: true
+          resource_contention_handling: "queuing_with_backpressure"
+        
+        load_balancing:
+          agent_pool_management: "dynamic_scaling"
+          resource_allocation: "capacity_based"
+          failover_strategy: "graceful_degradation"
+      
+      state_management:
+        persistence_strategy: "event_sourcing"
+        
+        state_storage:
+          primary: "postgresql"
+          backup: "s3"
+          
+          state_snapshots:
+            frequency: "every_stage_completion"
+            retention: "90_days"
+            compression: true
+        
+        checkpoint_recovery:
+          automatic_recovery: true
+          recovery_strategies:
+            - "last_known_good_state"
+            - "stage_rollback"
+            - "partial_replay"
+            - "manual_intervention"
+    
+    resource_management:
+      compute_resources:
+        agent_pool_sizing:
+          min_agents: 5
+          max_agents: 50
+          scaling_triggers:
+            - "queue_depth > 10"
+            - "average_wait_time > 5m"
+            - "cpu_utilization > 80%"
+        
+        resource_allocation:
+          cpu_limits:
+            light_tasks: "0.5 CPU"
+            medium_tasks: "2 CPU"
+            heavy_tasks: "4 CPU"
+          
+          memory_limits:
+            light_tasks: "1 GiB"
+            medium_tasks: "4 GiB"
+            heavy_tasks: "8 GiB"
+          
+          timeout_limits:
+            quick_tasks: "5m"
+            standard_tasks: "30m"
+            complex_tasks: "2h"
+      
+      storage_management:
+        workflow_data:
+          storage_backend: "distributed_file_system"
+          replication_factor: 3
+          retention_policy: "project_lifecycle_plus_1_year"
+        
+        artifact_management:
+          versioning: true
+          deduplication: true
+          compression: true
+          
+          lifecycle_policies:
+            hot_tier: "30_days"
+            warm_tier: "90_days"
+            cold_tier: "1_year"
+            archive_tier: "indefinite"
+
+integration:
+  # External System Integration
+  external_integrations:
+    project_management:
+      jira_integration:
+        enabled: true
+        
+        synchronization:
+          workflow_to_epic: true
+          stage_to_story: true
+          task_to_subtask: true
+          
+          status_mapping:
+            workflow_states:
+              running: "In Progress"
+              paused: "On Hold"
+              completed: "Done"
+              failed: "Failed"
+        
+        automation:
+          create_tickets: true
+          update_status: true
+          log_time: true
+          attach_artifacts: true
+      
+      github_integration:
+        enabled: true
+        
+        repository_management:
+          branch_creation: "automatic"
+          pr_creation: "stage_completion"
+          merge_strategy: "workflow_controlled"
+        
+        webhook_subscriptions:
+          - "pull_request_approved"
+          - "ci_status_changed"
+          - "release_created"
+    
+    communication_platforms:
+      slack_integration:
+        channels:
+          workflow_updates: "#hugai-workflows"
+          critical_alerts: "#hugai-critical"
+          team_notifications: "#hugai-team"
+        
+        bot_capabilities:
+          workflow_status_queries: true
+          approval_actions: true
+          escalation_management: true
+          
+      microsoft_teams:
+        enabled: false
+        
+      email_notifications:
+        smtp_configuration:
+          host: "${SMTP_HOST}"
+          port: 587
+          username: "${SMTP_USERNAME}"
+          password: "${SMTP_PASSWORD}"
+        
+        notification_templates:
+          workflow_started: "workflow_started.html"
+          checkpoint_required: "checkpoint_required.html"
+          workflow_completed: "workflow_completed.html"
+          workflow_failed: "workflow_failed.html"
+
+  # Monitoring and Observability
+  monitoring_integration:
+    metrics_collection:
+      prometheus_metrics:
+        workflow_metrics:
+          - "hugai_workflow_duration_seconds"
+          - "hugai_workflow_success_rate"
+          - "hugai_workflow_active_count"
+          - "hugai_task_execution_time"
+          - "hugai_human_checkpoint_duration"
+        
+        system_metrics:
+          - "hugai_agent_pool_utilization"
+          - "hugai_queue_depth"
+          - "hugai_resource_usage"
+    
+    alerting_integration:
+      alert_rules:
+        workflow_health:
+          - alert: "WorkflowHighFailureRate"
+            expr: "rate(hugai_workflow_failures_total[5m]) > 0.1"
+            duration: "5m"
+            severity: "critical"
+          
+          - alert: "LongRunningWorkflow"
+            expr: "hugai_workflow_duration_seconds > 86400"
+            duration: "1m"
+            severity: "warning"
+        
+        human_checkpoint_alerts:
+          - alert: "CheckpointTimeout"
+            expr: "hugai_human_checkpoint_duration > 259200"  # 72 hours
+            duration: "1m"
+            severity: "high"
+
+validation:
+  # Workflow Orchestration Validation
+  orchestration_effectiveness:
+    workflow_success_rate: ">95%"
+    average_execution_time: "within_business_sla"
+    human_checkpoint_completion_rate: ">98%"
+    resource_utilization_efficiency: ">80%"
+  
+  # Quality Assurance Validation
+  quality_validation:
+    workflow_repeatability: "deterministic_outcomes"
+    error_recovery_success: ">95%"
+    audit_trail_completeness: "100%"
+    compliance_adherence: "validated"
+
+examples:
+  # Simple Workflow Definition
+  simple_workflow_example:
+    workflow_definition: |
+      name: "code-review-workflow"
+      version: "1.0"
+      
+      input:
+        pull_request_id: string
+        repository: string
+        
+      tasks:
+        - name: "ai-review"
+          type: "ai_agent_task"
+          agent: "code_reviewer"
+          input:
+            pr_id: "${input.pull_request_id}"
+            repo: "${input.repository}"
+        
+        - name: "human-review"
+          type: "human_checkpoint"
+          depends_on: ["ai-review"]
+          reviewers:
+            roles: ["senior_developer"]
+            count: 2
+          input:
+            ai_feedback: "${tasks.ai-review.output}"
+        
+        - name: "merge-decision"
+          type: "conditional_task"
+          depends_on: ["human-review"]
+          condition: "${tasks.human-review.approved == true}"
+          actions:
+            approved: "merge_pull_request"
+            rejected: "request_changes"
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize workflow orchestrator
+  hugai workflow init --engine temporal --namespace hugai-workflows
+  
+  # Deploy workflow definition
+  hugai workflow deploy --file hugai-dev-workflow.yaml --validate --dry-run
+  
+  # Start workflow execution
+  hugai workflow start hugai-development-workflow --input project.json --priority high
+  
+  # Monitor workflow execution
+  hugai workflow status --workflow-id wf-123 --watch --detailed
+  
+  # Manage human checkpoints
+  hugai workflow checkpoint list --assigned-to-me --pending
+  hugai workflow checkpoint approve --checkpoint-id cp-456 --comment "LGTM"
+  
+  # Workflow analytics and reporting
+  hugai workflow analytics --period weekly --metrics success-rate,duration,efficiency

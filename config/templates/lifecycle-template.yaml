@@ -1,0 +1,167 @@
+# HUGAI Lifecycle Phase Configuration Template
+# This template provides a standardized structure for creating lifecycle phase configurations
+# Based on the lifecycle-schema.json validation requirements
+
+# Include base metadata template with lifecycle-specific defaults
+{% set category = phase %}
+{% include 'base-metadata.yaml' %}
+
+# Lifecycle-specific configuration
+configuration:
+  # Phase objectives
+  objectives: {{objectives | to_yaml}}
+
+  # Phase deliverables
+  deliverables:
+    {% for deliverable in deliverables %}
+    - name: "{{deliverable.name}}"
+      type: "{{deliverable.type}}"
+      description: "{{deliverable.description}}"
+      required: {{deliverable.required | default(true)}}
+      {% if deliverable.template %}
+      template: "{{deliverable.template}}"
+      {% endif %}
+      {% if deliverable.validation_criteria %}
+      validation_criteria: {{deliverable.validation_criteria | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+  # Agents involved in this phase
+  agents:
+    {% for agent in agents %}
+    - name: "{{agent.name}}"
+      role: "{{agent.role}}"
+      responsibilities: {{agent.responsibilities | to_yaml}}
+      {% if agent.allocation %}
+      allocation: {{agent.allocation}}
+      {% endif %}
+    {% endfor %}
+
+  # Tools used in this phase
+  tools:
+    {% for tool in tools %}
+    - name: "{{tool.name}}"
+      purpose: "{{tool.purpose}}"
+      required: {{tool.required | default(true)}}
+      {% if tool.configuration %}
+      configuration: {{tool.configuration | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+# Phase integration and dependencies
+integration:
+  dependencies:
+    predecessor_phases: {{predecessor_phases | default([]) | to_yaml}}
+    successor_phases: {{successor_phases | default([]) | to_yaml}}
+    parallel_phases: {{parallel_phases | default([]) | to_yaml}}
+
+  # Phase workflows
+  workflows:
+    {% for workflow in workflows %}
+    - name: "{{workflow.name}}"
+      description: "{{workflow.description | default('')}}"
+      steps:
+        {% for step in workflow.steps %}
+        - name: "{{step.name}}"
+          agent: "{{step.agent}}"
+          action: "{{step.action}}"
+          parallel: {{step.parallel | default(false)}}
+          {% if step.inputs %}
+          inputs: {{step.inputs | to_yaml}}
+          {% endif %}
+          {% if step.outputs %}
+          outputs: {{step.outputs | to_yaml}}
+          {% endif %}
+          {% if step.conditions %}
+          conditions: {{step.conditions | to_yaml}}
+          {% endif %}
+        {% endfor %}
+    {% endfor %}
+
+# Phase validation with checkpoints and gates
+validation:
+  # Human checkpoints
+  checkpoints:
+    {% for checkpoint in checkpoints | default([]) %}
+    - name: "{{checkpoint.name}}"
+      type: "{{checkpoint.type}}"
+      criteria: {{checkpoint.criteria | to_yaml}}
+      {% if checkpoint.stakeholders %}
+      stakeholders: {{checkpoint.stakeholders | to_yaml}}
+      {% endif %}
+      {% if checkpoint.approval_required %}
+      approval_required: {{checkpoint.approval_required}}
+      {% endif %}
+    {% endfor %}
+
+  # Automated quality gates
+  quality_gates:
+    {% for gate in quality_gates | default([]) %}
+    - name: "{{gate.name}}"
+      threshold: {{gate.threshold}}
+      metric: "{{gate.metric}}"
+      {% if gate.action_on_failure %}
+      action_on_failure: "{{gate.action_on_failure}}"
+      {% endif %}
+    {% endfor %}
+
+  # Phase completion criteria
+  completion_criteria:
+    {% for criteria in completion_criteria | default([]) %}
+    - description: "{{criteria.description}}"
+      type: "{{criteria.type | default('requirement')}}"
+      {% if criteria.validation_method %}
+      validation_method: "{{criteria.validation_method}}"
+      {% endif %}
+    {% endfor %}
+
+# Include base CLI usage template with lifecycle-specific settings
+{% set component_type = 'lifecycle' %}
+{% set custom_commands = [
+  {
+    'name': 'execute',
+    'description': 'Execute the lifecycle phase',
+    'example': 'hugai lifecycle execute ' + name + ' --env production'
+  },
+  {
+    'name': 'checkpoint',
+    'description': 'Trigger a human checkpoint',
+    'example': 'hugai lifecycle checkpoint ' + name + ' --type approval'
+  },
+  {
+    'name': 'gate',
+    'description': 'Check quality gates',
+    'example': 'hugai lifecycle gate ' + name + ' --gate code-quality'
+  }
+] %}
+{% include 'base-cli-usage.yaml' %}
+
+# Lifecycle-specific extensions
+lifecycle_extensions:
+  # Governance controls
+  governance:
+    human_oversight_required: {{human_oversight_required | default(true)}}
+    approval_workflow: "{{approval_workflow | default('standard')}}"
+    escalation_path: {{escalation_path | default([]) | to_yaml}}
+
+  # Phase timing and scheduling
+  timing:
+    estimated_duration: "{{estimated_duration | default('TBD')}}"
+    {% if dependencies_buffer %}
+    dependencies_buffer: "{{dependencies_buffer}}"
+    {% endif %}
+    {% if critical_path %}
+    critical_path: {{critical_path}}
+    {% endif %}
+
+  # Resource requirements
+  resources:
+    {% if compute_requirements %}
+    compute: {{compute_requirements | to_yaml}}
+    {% endif %}
+    {% if storage_requirements %}
+    storage: {{storage_requirements | to_yaml}}
+    {% endif %}
+    {% if human_resources %}
+    human: {{human_resources | to_yaml}}
+    {% endif %}

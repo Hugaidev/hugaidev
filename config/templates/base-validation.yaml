@@ -1,0 +1,72 @@
+# Base Validation Template
+# This template defines common validation patterns used across HUGAI configurations
+# Includes quality gates, metrics, and monitoring specifications
+
+validation:
+  # Quality gates for validation
+  quality_gates:
+    {% for gate in quality_gates | default([]) %}
+    - name: "{{gate.name}}"
+      criteria: "{{gate.criteria}}"
+      threshold: {{gate.threshold | default(0.8)}}
+      type: "{{gate.type | default('automated')}}"
+      {% if gate.timeout %}
+      timeout: {{gate.timeout}}
+      {% endif %}
+    {% endfor %}
+
+  # Performance and quality metrics
+  metrics:
+    {% for metric in metrics | default([]) %}
+    - name: "{{metric.name}}"
+      type: "{{metric.type}}"
+      threshold: {{metric.threshold}}
+      {% if metric.unit %}
+      unit: "{{metric.unit}}"
+      {% endif %}
+      {% if metric.alert_threshold %}
+      alert_threshold: {{metric.alert_threshold}}
+      {% endif %}
+    {% endfor %}
+
+  # Health checks
+  health_checks:
+    {% for check in health_checks | default([]) %}
+    - name: "{{check.name}}"
+      endpoint: "{{check.endpoint}}"
+      interval: {{check.interval | default(30)}}
+      timeout: {{check.timeout | default(5)}}
+      {% if check.retry_attempts %}
+      retry_attempts: {{check.retry_attempts}}
+      {% endif %}
+    {% endfor %}
+
+  # Error handling strategies
+  error_handling:
+    retry_policy:
+      max_attempts: {{max_retry_attempts | default(3)}}
+      backoff_strategy: "{{backoff_strategy | default('exponential')}}"
+      base_delay: {{base_delay | default(1)}}
+    
+    fallback_actions:
+      {% for action in fallback_actions | default([]) %}
+      - condition: "{{action.condition}}"
+        action: "{{action.action}}"
+        {% if action.parameters %}
+        parameters: {{action.parameters | to_yaml}}
+        {% endif %}
+      {% endfor %}
+
+  # Monitoring and alerting
+  monitoring:
+    log_level: "{{log_level | default('info')}}"
+    metrics_collection: {{metrics_collection | default(true)}}
+    trace_sampling: {{trace_sampling | default(0.1)}}
+    
+    alerts:
+      {% for alert in alerts | default([]) %}
+      - name: "{{alert.name}}"
+        condition: "{{alert.condition}}"
+        severity: "{{alert.severity | default('warning')}}"
+        notification_channels: {{alert.notification_channels | default(['email']) | to_yaml}}
+      {% endfor %}

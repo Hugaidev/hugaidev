@@ -1,0 +1,857 @@
+metadata:
+  name: observability-stack-configuration
+  version: 1.0.0
+  description: "Comprehensive observability stack for monitoring, logging, and tracing HUGAI applications and infrastructure"
+  category: infrastructure-tools
+  dependencies:
+    - prometheus
+    - grafana
+    - elasticsearch
+    - jaeger
+    - alertmanager
+  tags:
+    - observability
+    - monitoring
+    - logging
+    - tracing
+    - alerting
+    - metrics
+
+configuration:
+  # Observability Philosophy
+  observability_philosophy:
+    purpose: "Provide comprehensive visibility into HUGAI system behavior, performance, and health"
+    principles:
+      three_pillars: "Integrate metrics, logs, and traces for complete observability"
+      proactive_monitoring: "Detect and alert on issues before they impact users"
+      data_driven_decisions: "Enable informed decisions through actionable insights"
+      scalable_architecture: "Support observability at any scale with minimal overhead"
+      privacy_conscious: "Respect user privacy while maintaining operational visibility"
+
+  # Metrics Collection and Storage
+  metrics_platform:
+    prometheus_configuration:
+      version: "2.47.0"
+      retention_time: "30d"
+      storage_path: "/prometheus-data"
+      
+      global_config:
+        scrape_interval: "15s"
+        scrape_timeout: "10s"
+        evaluation_interval: "15s"
+        external_labels:
+          cluster: "hugai-production"
+          environment: "${ENVIRONMENT}"
+          region: "${AWS_REGION}"
+      
+      rule_files:
+        - "/etc/prometheus/rules/*.yml"
+        - "/etc/prometheus/hugai-rules/*.yml"
+      
+      scrape_configs:
+        kubernetes_pods:
+          job_name: "kubernetes-pods"
+          kubernetes_sd_configs:
+            - role: "pod"
+          
+          relabel_configs:
+            - source_labels: ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
+              action: "keep"
+              regex: "true"
+            
+            - source_labels: ["__meta_kubernetes_pod_annotation_prometheus_io_path"]
+              action: "replace"
+              target_label: "__metrics_path__"
+              regex: "(.+)"
+            
+            - source_labels: ["__address__", "__meta_kubernetes_pod_annotation_prometheus_io_port"]
+              action: "replace"
+              regex: "([^:]+)(?::[0-9]+)?;([0-9]+)"
+              replacement: "${1}:${2}"
+              target_label: "__address__"
+        
+        hugai_agents:
+          job_name: "hugai-agents"
+          kubernetes_sd_configs:
+            - role: "endpoints"
+              namespaces:
+                names: ["hugai-agents"]
+          
+          metrics_path: "/metrics"
+          scrape_interval: "10s"
+          
+          relabel_configs:
+            - source_labels: ["__meta_kubernetes_service_label_component"]
+              action: "keep"
+              regex: "hugai-agent"
+        
+        infrastructure_metrics:
+          job_name: "node-exporter"
+          static_configs:
+            - targets: ["node-exporter:9100"]
+          
+          scrape_interval: "30s"
+          metrics_path: "/metrics"
+        
+        application_metrics:
+          job_name: "hugai-applications"
+          consul_sd_configs:
+            - server: "consul.service.consul:8500"
+              services: ["hugai-app"]
+          
+          relabel_configs:
+            - source_labels: ["__meta_consul_service"]
+              target_label: "service"
+            - source_labels: ["__meta_consul_node"]
+              target_label: "node"
+      
+      remote_write:
+        - url: "https://prometheus-remote.hugai.dev/api/v1/write"
+          basic_auth:
+            username: "${REMOTE_WRITE_USERNAME}"
+            password: "${REMOTE_WRITE_PASSWORD}"
+          
+          queue_config:
+            max_samples_per_send: 10000
+            max_shards: 200
+            capacity: 500000
+      
+      alerting:
+        alertmanagers:
+          - static_configs:
+              - targets: ["alertmanager:9093"]
+            path_prefix: "/alertmanager"
+    
+    custom_metrics:
+      application_metrics:
+        hugai_agent_metrics:
+          - name: "hugai_agent_task_duration_seconds"
+            type: "histogram"
+            help: "Duration of agent task execution"
+            labels: ["agent_type", "task_type", "status"]
+          
+          - name: "hugai_agent_memory_usage_bytes"
+            type: "gauge"
+            help: "Current memory usage of agent"
+            labels: ["agent_type", "agent_id"]
+          
+          - name: "hugai_agent_requests_total"
+            type: "counter"
+            help: "Total number of requests processed by agent"
+            labels: ["agent_type", "endpoint", "status_code"]
+          
+          - name: "hugai_ai_model_inference_duration_seconds"
+            type: "histogram"
+            help: "Duration of AI model inference"
+            labels: ["model_name", "model_version", "input_type"]
+          
+          - name: "hugai_human_checkpoint_approval_duration_seconds"
+            type: "histogram"
+            help: "Duration for human checkpoint approval"
+            labels: ["checkpoint_type", "project", "outcome"]
+        
+        business_metrics:
+          - name: "hugai_code_generation_success_rate"
+            type: "gauge"
+            help: "Success rate of code generation tasks"
+            labels: ["language", "complexity"]
+          
+          - name: "hugai_deployment_frequency"
+            type: "counter"
+            help: "Number of deployments"
+            labels: ["environment", "service", "strategy"]
+          
+          - name: "hugai_user_satisfaction_score"
+            type: "gauge"
+            help: "User satisfaction score"
+            labels: ["feature", "user_segment"]
+        
+        infrastructure_metrics:
+          - name: "hugai_kubernetes_pod_restart_total"
+            type: "counter"
+            help: "Total pod restarts"
+            labels: ["namespace", "pod", "container"]
+          
+          - name: "hugai_database_connection_pool_active"
+            type: "gauge"
+            help: "Active database connections"
+            labels: ["database", "pool_name"]
+
+  # Logging Platform
+  logging_platform:
+    elasticsearch_configuration:
+      version: "8.10.0"
+      cluster_name: "hugai-logs"
+      
+      cluster_settings:
+        number_of_shards: 3
+        number_of_replicas: 1
+        refresh_interval: "5s"
+        
+      node_configuration:
+        master_nodes: 3
+        data_nodes: 6
+        ingest_nodes: 2
+        
+        heap_size: "4g"
+        memory_lock: true
+        
+        discovery_settings:
+          zen_minimum_master_nodes: 2
+          ping_timeout: "3s"
+          
+      index_management:
+        index_templates:
+          hugai_logs:
+            patterns: ["hugai-logs-*"]
+            settings:
+              number_of_shards: 1
+              number_of_replicas: 1
+              codec: "best_compression"
+              refresh_interval: "10s"
+            
+            mappings:
+              properties:
+                "@timestamp":
+                  type: "date"
+                  format: "strict_date_optional_time||epoch_millis"
+                
+                level:
+                  type: "keyword"
+                
+                message:
+                  type: "text"
+                  analyzer: "standard"
+                
+                service:
+                  type: "keyword"
+                
+                agent_type:
+                  type: "keyword"
+                
+                trace_id:
+                  type: "keyword"
+                
+                span_id:
+                  type: "keyword"
+                
+                user_id:
+                  type: "keyword"
+                
+                request_id:
+                  type: "keyword"
+        
+        index_lifecycle_management:
+          policy_name: "hugai-logs-policy"
+          phases:
+            hot:
+              actions:
+                rollover:
+                  max_size: "10gb"
+                  max_age: "1d"
+                  max_docs: 1000000
+            
+            warm:
+              min_age: "7d"
+              actions:
+                allocate:
+                  number_of_replicas: 0
+                shrink:
+                  number_of_shards: 1
+                forcemerge:
+                  max_num_segments: 1
+            
+            cold:
+              min_age: "30d"
+              actions:
+                allocate:
+                  include:
+                    box_type: "cold"
+            
+            delete:
+              min_age: "90d"
+      
+      security_configuration:
+        xpack_security: true
+        ssl_enabled: true
+        authentication: "native"
+        
+        roles:
+          hugai_developer:
+            indices:
+              - names: ["hugai-logs-*"]
+                privileges: ["read", "view_index_metadata"]
+          
+          hugai_operator:
+            indices:
+              - names: ["hugai-logs-*", ".kibana*"]
+                privileges: ["all"]
+            cluster: ["monitor", "manage_index_templates"]
+    
+    log_aggregation:
+      fluent_bit_configuration:
+        version: "2.1.0"
+        
+        input_configs:
+          kubernetes_logs:
+            name: "tail"
+            path: "/var/log/containers/*.log"
+            parser: "cri"
+            tag: "kube.*"
+            refresh_interval: 5
+            mem_buf_limit: "50MB"
+            skip_long_lines: true
+            
+            filters:
+              - name: "kubernetes"
+                match: "kube.*"
+                kube_url: "https://kubernetes.default.svc:443"
+                kube_ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+                kube_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+                merge_log: true
+                keep_log: false
+                annotations: false
+                labels: true
+              
+              - name: "nest"
+                match: "kube.*"
+                operation: "lift"
+                nested_under: "kubernetes"
+                add_prefix: "kubernetes_"
+              
+              - name: "modify"
+                match: "kube.*"
+                add:
+                  cluster_name: "hugai-production"
+                  environment: "${ENVIRONMENT}"
+          
+          application_logs:
+            name: "forward"
+            listen: "0.0.0.0"
+            port: 24224
+            tag: "hugai.app"
+        
+        output_configs:
+          elasticsearch:
+            name: "es"
+            match: "*"
+            host: "elasticsearch.logging.svc.cluster.local"
+            port: 9200
+            index: "hugai-logs"
+            type: "_doc"
+            
+            http_user: "${ES_USERNAME}"
+            http_passwd: "${ES_PASSWORD}"
+            tls: true
+            tls_verify: true
+            
+            logstash_format: true
+            logstash_prefix: "hugai-logs"
+            logstash_date_format: "%Y.%m.%d"
+            
+            retry_limit: 5
+            suppress_type_name: true
+        
+        parsing_rules:
+          json_parser:
+            name: "json"
+            format: "json"
+            time_key: "timestamp"
+            time_format: "%Y-%m-%dT%H:%M:%S.%L%z"
+            time_keep: true
+          
+          hugai_agent_parser:
+            name: "hugai_agent"
+            format: "regex"
+            regex: "^(?<timestamp>[^ ]*) (?<level>[^ ]*) (?<agent_type>[^ ]*) (?<message>.*)$"
+            time_key: "timestamp"
+            time_format: "%Y-%m-%dT%H:%M:%S.%L%z"
+    
+    log_analysis:
+      kibana_configuration:
+        version: "8.10.0"
+        elasticsearch_hosts: ["https://elasticsearch:9200"]
+        
+        index_patterns:
+          hugai_logs:
+            pattern: "hugai-logs-*"
+            time_field: "@timestamp"
+            
+            field_mappings:
+              level: "log level"
+              service: "service name"
+              agent_type: "AI agent type"
+              trace_id: "distributed trace ID"
+              message: "log message"
+        
+        dashboards:
+          hugai_overview:
+            visualizations:
+              - type: "line_chart"
+                title: "Log Volume Over Time"
+                data_source: "hugai-logs-*"
+                metrics: ["count"]
+                time_field: "@timestamp"
+                interval: "1m"
+              
+              - type: "pie_chart"
+                title: "Log Levels Distribution"
+                data_source: "hugai-logs-*"
+                field: "level"
+              
+              - type: "data_table"
+                title: "Recent Errors"
+                data_source: "hugai-logs-*"
+                filters: ["level:ERROR"]
+                columns: ["@timestamp", "service", "agent_type", "message"]
+                sort: ["@timestamp", "desc"]
+                size: 50
+          
+          hugai_agents:
+            visualizations:
+              - type: "heat_map"
+                title: "Agent Activity Heat Map"
+                data_source: "hugai-logs-*"
+                x_axis: "@timestamp"
+                y_axis: "agent_type"
+                metric: "count"
+              
+              - type: "metric"
+                title: "Active Agents"
+                data_source: "hugai-logs-*"
+                metric: "cardinality"
+                field: "agent_type"
+                time_range: "last_15_minutes"
+
+  # Distributed Tracing
+  tracing_platform:
+    jaeger_configuration:
+      version: "1.50.0"
+      deployment_strategy: "production"
+      
+      collector_configuration:
+        num_workers: 50
+        queue_size: 2000
+        
+        processors:
+          batch:
+            timeout: "1s"
+            send_batch_size: 1024
+            send_batch_max_size: 2048
+          
+          memory_limiter:
+            limit_mib: 512
+            spike_limit_mib: 128
+            check_interval: "5s"
+        
+        receivers:
+          jaeger:
+            protocols:
+              grpc:
+                endpoint: "0.0.0.0:14250"
+              thrift_http:
+                endpoint: "0.0.0.0:14268"
+              thrift_compact:
+                endpoint: "0.0.0.0:6831"
+              thrift_binary:
+                endpoint: "0.0.0.0:6832"
+          
+          otlp:
+            protocols:
+              grpc:
+                endpoint: "0.0.0.0:4317"
+              http:
+                endpoint: "0.0.0.0:4318"
+        
+        exporters:
+          elasticsearch:
+            endpoints: ["https://elasticsearch:9200"]
+            username: "${ES_USERNAME}"
+            password: "${ES_PASSWORD}"
+            
+            index_prefix: "jaeger-traces"
+            mapping_file: "/etc/jaeger/mapping.json"
+            
+            bulk:
+              actions: 1000
+              size: "5MB"
+              flush_interval: "200ms"
+      
+      agent_configuration:
+        strategies:
+          operation_strategies:
+            - operation: "hugai_agent_task"
+              strategy_type: "probabilistic"
+              strategy_param: 0.1
+            
+            - operation: "ai_model_inference"
+              strategy_type: "rate_limiting"
+              strategy_param: 100
+            
+            - operation: "database_query"
+              strategy_type: "probabilistic"
+              strategy_param: 0.01
+        
+        sampling_strategies:
+          default_strategy:
+            type: "probabilistic"
+            param: 0.001
+          
+          per_service_strategies:
+            - service: "hugai-requirements-analyzer"
+              type: "probabilistic"
+              param: 0.1
+              max_traces_per_second: 100
+            
+            - service: "hugai-implementation-agent"
+              type: "probabilistic"
+              param: 0.05
+              max_traces_per_second: 50
+            
+            - service: "hugai-security-agent"
+              type: "probabilistic"
+              param: 0.2
+              max_traces_per_second: 200
+    
+    trace_analysis:
+      span_analysis:
+        critical_paths:
+          - name: "user_request_to_response"
+            description: "Full user request processing pipeline"
+            root_operations: ["http_request"]
+            critical_operations: ["ai_inference", "database_query", "external_api_call"]
+          
+          - name: "ai_agent_task_execution"
+            description: "AI agent task processing"
+            root_operations: ["agent_task_start"]
+            critical_operations: ["model_inference", "context_retrieval", "result_generation"]
+        
+        performance_analysis:
+          latency_percentiles: [50, 75, 90, 95, 99, 99.9]
+          error_rate_calculation: "errors_per_minute"
+          throughput_calculation: "requests_per_second"
+          
+          sla_definitions:
+            - service: "hugai-api-gateway"
+              operation: "user_request"
+              latency_sla: "< 500ms p95"
+              availability_sla: "> 99.9%"
+            
+            - service: "hugai-agents"
+              operation: "task_execution"
+              latency_sla: "< 30s p95"
+              success_rate_sla: "> 95%"
+
+  # Alerting and Notification
+  alerting_platform:
+    alertmanager_configuration:
+      version: "0.26.0"
+      
+      global_config:
+        smtp_smarthost: "localhost:587"
+        smtp_from: "alerts@hugai.dev"
+        
+      route:
+        group_by: ["alertname", "cluster", "service"]
+        group_wait: "30s"
+        group_interval: "5m"
+        repeat_interval: "12h"
+        receiver: "default"
+        
+        routes:
+          - match:
+              severity: "critical"
+            receiver: "critical-alerts"
+            group_wait: "10s"
+            group_interval: "1m"
+            repeat_interval: "1h"
+          
+          - match:
+              severity: "warning"
+            receiver: "warning-alerts"
+            group_interval: "10m"
+            repeat_interval: "4h"
+          
+          - match_re:
+              service: "hugai-.*"
+            receiver: "hugai-team"
+            group_by: ["alertname", "service"]
+      
+      receivers:
+        - name: "default"
+          slack_configs:
+            - api_url: "${SLACK_WEBHOOK_URL}"
+              channel: "#alerts"
+              title: "HUGAI Alert"
+              text: "{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}"
+        
+        - name: "critical-alerts"
+          pagerduty_configs:
+            - service_key: "${PAGERDUTY_SERVICE_KEY}"
+              severity: "critical"
+              description: "{{ .CommonAnnotations.summary }}"
+          
+          slack_configs:
+            - api_url: "${SLACK_WEBHOOK_URL}"
+              channel: "#critical-alerts"
+              title: "🚨 CRITICAL ALERT"
+              text: "{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}"
+              send_resolved: true
+        
+        - name: "warning-alerts"
+          slack_configs:
+            - api_url: "${SLACK_WEBHOOK_URL}"
+              channel: "#warnings"
+              title: "⚠️ Warning Alert"
+              text: "{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}"
+        
+        - name: "hugai-team"
+          email_configs:
+            - to: "hugai-team@company.com"
+              subject: "HUGAI System Alert"
+              body: |
+                {{ range .Alerts }}
+                Alert: {{ .Annotations.summary }}
+                Description: {{ .Annotations.description }}
+                Runbook: {{ .Annotations.runbook_url }}
+                {{ end }}
+    
+    alert_rules:
+      infrastructure_alerts:
+        high_cpu_usage:
+          expr: "(100 - (avg(irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)) > 80"
+          for: "5m"
+          labels:
+            severity: "warning"
+          annotations:
+            summary: "High CPU usage detected"
+            description: "CPU usage is above 80% for more than 5 minutes"
+            runbook_url: "https://runbooks.hugai.dev/high-cpu"
+        
+        high_memory_usage:
+          expr: "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85"
+          for: "5m"
+          labels:
+            severity: "warning"
+          annotations:
+            summary: "High memory usage detected"
+            description: "Memory usage is above 85% for more than 5 minutes"
+        
+        disk_space_low:
+          expr: "(1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100 > 90"
+          for: "5m"
+          labels:
+            severity: "critical"
+          annotations:
+            summary: "Low disk space"
+            description: "Disk space usage is above 90%"
+      
+      application_alerts:
+        hugai_agent_down:
+          expr: "up{job=\"hugai-agents\"} == 0"
+          for: "1m"
+          labels:
+            severity: "critical"
+          annotations:
+            summary: "HUGAI Agent is down"
+            description: "HUGAI Agent {{ $labels.instance }} is not responding"
+        
+        high_error_rate:
+          expr: "rate(hugai_agent_requests_total{status_code=~\"5..\"}[5m]) > 0.1"
+          for: "2m"
+          labels:
+            severity: "warning"
+          annotations:
+            summary: "High error rate detected"
+            description: "Error rate is above 10% for agent {{ $labels.agent_type }}"
+        
+        slow_response_time:
+          expr: "histogram_quantile(0.95, rate(hugai_agent_task_duration_seconds_bucket[5m])) > 30"
+          for: "5m"
+          labels:
+            severity: "warning"
+          annotations:
+            summary: "Slow response times"
+            description: "95th percentile response time is above 30 seconds"
+        
+        ai_model_inference_failure:
+          expr: "rate(hugai_ai_model_inference_duration_seconds_count{status=\"failed\"}[5m]) > 0.05"
+          for: "3m"
+          labels:
+            severity: "critical"
+          annotations:
+            summary: "AI model inference failures"
+            description: "AI model inference failure rate is above 5%"
+
+  # Visualization and Dashboards
+  visualization_platform:
+    grafana_configuration:
+      version: "10.1.0"
+      
+      datasources:
+        prometheus:
+          name: "Prometheus"
+          type: "prometheus"
+          url: "http://prometheus:9090"
+          access: "proxy"
+          is_default: true
+          
+          json_data:
+            time_interval: "15s"
+            query_timeout: "60s"
+        
+        elasticsearch:
+          name: "Elasticsearch"
+          type: "elasticsearch"
+          url: "https://elasticsearch:9200"
+          database: "hugai-logs-*"
+          
+          basic_auth: true
+          basic_auth_user: "${ES_USERNAME}"
+          json_data:
+            es_version: "8.10.0"
+            time_field: "@timestamp"
+            interval: "Daily"
+        
+        jaeger:
+          name: "Jaeger"
+          type: "jaeger"
+          url: "http://jaeger-query:16686"
+          access: "proxy"
+      
+      dashboards:
+        hugai_overview:
+          title: "HUGAI System Overview"
+          tags: ["hugai", "overview"]
+          
+          panels:
+            - title: "System Health Score"
+              type: "stat"
+              targets:
+                - expr: "avg(up{job=~\"hugai-.*\"})"
+              
+              thresholds:
+                - color: "red"
+                  value: 0.95
+                - color: "yellow"
+                  value: 0.98
+                - color: "green"
+                  value: 0.99
+            
+            - title: "Request Rate"
+              type: "graph"
+              targets:
+                - expr: "sum(rate(hugai_agent_requests_total[5m]))"
+                  legend_format: "Requests/sec"
+              
+              y_axis:
+                unit: "reqps"
+            
+            - title: "Response Time Distribution"
+              type: "heatmap"
+              targets:
+                - expr: "rate(hugai_agent_task_duration_seconds_bucket[5m])"
+              
+              heatmap:
+                x_bucket_size: "30s"
+                y_bucket_size: "0.1"
+        
+        hugai_agents:
+          title: "HUGAI Agents Performance"
+          tags: ["hugai", "agents"]
+          
+          panels:
+            - title: "Agent Task Success Rate"
+              type: "graph"
+              targets:
+                - expr: "rate(hugai_agent_requests_total{status_code!~\"5..\"}[5m]) / rate(hugai_agent_requests_total[5m])"
+                  legend_format: "{{ agent_type }}"
+            
+            - title: "Agent Memory Usage"
+              type: "graph"
+              targets:
+                - expr: "hugai_agent_memory_usage_bytes"
+                  legend_format: "{{ agent_type }} - {{ agent_id }}"
+              
+              y_axis:
+                unit: "bytes"
+            
+            - title: "Active Agents by Type"
+              type: "pie"
+              targets:
+                - expr: "count by (agent_type) (hugai_agent_memory_usage_bytes > 0)"
+
+integration:
+  # Service Discovery Integration
+  service_discovery:
+    kubernetes:
+      enabled: true
+      namespaces: ["hugai-system", "hugai-agents", "hugai-web"]
+      annotation_discovery: true
+      label_discovery: true
+    
+    consul:
+      enabled: true
+      server: "consul.service.consul:8500"
+      services: ["hugai-app", "hugai-api"]
+      tag_separator: ","
+
+  # Security Integration
+  security_integration:
+    rbac:
+      enabled: true
+      roles:
+        viewer: ["read_metrics", "read_logs", "read_traces"]
+        operator: ["read_metrics", "read_logs", "read_traces", "manage_alerts"]
+        admin: ["all_permissions"]
+    
+    data_privacy:
+      log_scrubbing: true
+      sensitive_fields: ["email", "password", "token", "api_key"]
+      trace_anonymization: true
+
+validation:
+  # Observability Validation
+  observability_validation:
+    metrics_availability: ">99.9%"
+    log_ingestion_latency: "<30_seconds"
+    trace_sampling_accuracy: ">95%"
+    alert_delivery_time: "<5_minutes"
+  
+  # Performance Validation
+  performance_validation:
+    monitoring_overhead: "<5%_cpu_memory"
+    storage_efficiency: ">80%_compression"
+    query_performance: "<5_seconds_p95"
+    dashboard_load_time: "<3_seconds"
+
+examples:
+  # Custom Metric Example
+  custom_metric_example:
+    metric_definition: |
+      # HELP hugai_task_completion_time Time taken to complete a task
+      # TYPE hugai_task_completion_time histogram
+      hugai_task_completion_time_bucket{agent_type="requirements-analyzer",task_type="user_story_analysis",le="1"} 5
+      hugai_task_completion_time_bucket{agent_type="requirements-analyzer",task_type="user_story_analysis",le="5"} 15
+      hugai_task_completion_time_bucket{agent_type="requirements-analyzer",task_type="user_story_analysis",le="10"} 25
+      hugai_task_completion_time_bucket{agent_type="requirements-analyzer",task_type="user_story_analysis",le="+Inf"} 30
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize observability stack
+  hugai observability init --stack prometheus,grafana,elasticsearch,jaeger
+  
+  # Deploy monitoring components
+  hugai observability deploy --environment production --namespace hugai-monitoring
+  
+  # Configure custom metrics
+  hugai observability metrics add --name hugai_custom_metric --type counter --labels service,environment
+  
+  # Create custom dashboard
+  hugai observability dashboard create --template hugai-agents --output grafana-dashboard.json
+  
+  # View system health
+  hugai observability health --detailed --format table
+  
+  # Export observability configuration
+  hugai observability export --format yaml --output observability-config.yaml

@@ -1,0 +1,181 @@
+# HUGAI Tool Configuration Template
+# This template provides a standardized structure for creating tool configurations
+# Based on the tool-schema.json validation requirements
+
+# Include base metadata template
+{% include 'base-metadata.yaml' %}
+
+# Tool-specific configuration
+configuration:
+  # Tool purpose
+  purpose: "{{purpose}}"
+
+  # Tool capabilities
+  capabilities: {{capabilities | to_yaml}}
+
+  # System requirements
+  requirements:
+    system: {{system_requirements | default([]) | to_yaml}}
+    dependencies: {{dependencies | default([]) | to_yaml}}
+    permissions: {{permissions | default([]) | to_yaml}}
+
+  # Tool settings
+  settings:
+    default_config: {{default_config | default({}) | to_yaml}}
+    
+    environment_variables:
+      {% for env_var in environment_variables | default([]) %}
+      - name: "{{env_var.name}}"
+        required: {{env_var.required | default(true)}}
+        description: "{{env_var.description | default('')}}"
+        {% if env_var.default %}
+        default: "{{env_var.default}}"
+        {% endif %}
+        {% if env_var.validation %}
+        validation: "{{env_var.validation}}"
+        {% endif %}
+      {% endfor %}
+
+# Tool integration interfaces
+integration:
+  # Available interfaces
+  interfaces:
+    {% for interface in interfaces %}
+    - type: "{{interface.type}}"
+      endpoint: "{{interface.endpoint}}"
+      {% if interface.authentication %}
+      authentication:
+        method: "{{interface.authentication.method}}"
+        required: {{interface.authentication.required | default(false)}}
+        {% if interface.authentication.config %}
+        config: {{interface.authentication.config | to_yaml}}
+        {% endif %}
+      {% endif %}
+      {% if interface.rate_limits %}
+      rate_limits: {{interface.rate_limits | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+  # Communication protocols
+  protocols: {{protocols | default(['https']) | to_yaml}}
+
+  # External integrations
+  integrations:
+    {% for integration in external_integrations | default([]) %}
+    - name: "{{integration.name}}"
+      type: "{{integration.type}}"
+      endpoint: "{{integration.endpoint}}"
+      {% if integration.configuration %}
+      configuration: {{integration.configuration | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+# Tool validation and monitoring
+validation:
+  # Health checks
+  health_checks:
+    {% for check in health_checks | default([]) %}
+    - name: "{{check.name}}"
+      endpoint: "{{check.endpoint}}"
+      interval: {{check.interval | default(60)}}
+      timeout: {{check.timeout | default(10)}}
+      {% if check.expected_response %}
+      expected_response: {{check.expected_response | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+  # Performance metrics
+  performance_metrics:
+    {% for metric in performance_metrics | default([]) %}
+    - name: "{{metric.name}}"
+      type: "{{metric.type}}"
+      threshold: {{metric.threshold}}
+      {% if metric.unit %}
+      unit: "{{metric.unit}}"
+      {% endif %}
+      {% if metric.collection_interval %}
+      collection_interval: {{metric.collection_interval}}
+      {% endif %}
+    {% endfor %}
+
+  # Monitoring configuration
+  monitoring:
+    logs:
+      level: "{{log_level | default('info')}}"
+      format: "{{log_format | default('json')}}"
+      retention: "{{log_retention | default('7d')}}"
+    
+    metrics:
+      enabled: {{metrics_enabled | default(true)}}
+      endpoint: "{{metrics_endpoint | default('/metrics')}}"
+      interval: {{metrics_interval | default(30)}}
+
+# Include base CLI usage template with tool-specific settings
+{% set component_type = 'tool' %}
+{% set custom_commands = [
+  {
+    'name': 'install',
+    'description': 'Install the tool and its dependencies',
+    'example': 'hugai tool install ' + name + ' --version latest'
+  },
+  {
+    'name': 'configure',
+    'description': 'Configure tool settings',
+    'example': 'hugai tool configure ' + name + ' --interactive'
+  },
+  {
+    'name': 'test',
+    'description': 'Test tool functionality',
+    'example': 'hugai tool test ' + name + ' --all-interfaces'
+  }
+] %}
+{% include 'base-cli-usage.yaml' %}
+
+# Tool-specific extensions
+tool_extensions:
+  # Installation and setup
+  installation:
+    method: "{{installation_method | default('package')}}"
+    {% if installation_script %}
+    script: "{{installation_script}}"
+    {% endif %}
+    {% if docker_image %}
+    docker_image: "{{docker_image}}"
+    {% endif %}
+    {% if helm_chart %}
+    helm_chart: "{{helm_chart}}"
+    {% endif %}
+
+  # Configuration management
+  configuration_management:
+    config_format: "{{config_format | default('yaml')}}"
+    config_location: "{{config_location | default('/etc/hugai/tools/' + name + '.yaml')}}"
+    {% if config_validation %}
+    validation: {{config_validation | to_yaml}}
+    {% endif %}
+
+  # Security settings
+  security:
+    {% if authentication_required %}
+    authentication_required: {{authentication_required}}
+    {% endif %}
+    {% if ssl_required %}
+    ssl_required: {{ssl_required}}
+    {% endif %}
+    {% if access_controls %}
+    access_controls: {{access_controls | to_yaml}}
+    {% endif %}
+    {% if security_scanning %}
+    security_scanning: {{security_scanning | to_yaml}}
+    {% endif %}
+
+  # Scaling and performance
+  scaling:
+    horizontal_scaling: {{horizontal_scaling | default(false)}}
+    {% if horizontal_scaling %}
+    min_replicas: {{min_replicas | default(1)}}
+    max_replicas: {{max_replicas | default(10)}}
+    {% endif %}
+    {% if resource_limits %}
+    resource_limits: {{resource_limits | to_yaml}}
+    {% endif %}

@@ -1,0 +1,611 @@
+metadata:
+  name: code-search-rag-configuration
+  version: 1.0.0
+  description: "Code search and Retrieval-Augmented Generation system for HUGAI development workflows"
+  category: infrastructure-tools
+  dependencies:
+    - vector-database
+    - embedding-models
+    - llm-providers
+    - knowledge-graph
+  tags:
+    - code-search
+    - retrieval-augmented-generation
+    - knowledge-management
+    - semantic-search
+    - context-injection
+
+configuration:
+  # Search Philosophy
+  search_philosophy:
+    purpose: "Provide intelligent, context-aware code search and retrieval for AI agents and developers"
+    principles:
+      semantic_understanding: "Go beyond keyword matching to understand code semantics and intent"
+      context_preservation: "Maintain and leverage contextual relationships between code artifacts"
+      multi_modal_search: "Support searching across code, documentation, issues, and communication"
+      real_time_indexing: "Keep search indexes current with code changes"
+      privacy_first: "Ensure sensitive code and data remain secure and compliant"
+
+  # Vector Database Configuration
+  vector_database:
+    primary_provider: "pinecone"
+    fallback_provider: "chroma"
+    
+    pinecone_configuration:
+      api_key: "${PINECONE_API_KEY}"
+      environment: "us-west4-gcp-free"
+      index_configuration:
+        name: "hugai-codebase-v2"
+        dimension: 1536
+        metric: "cosine"
+        pods: 1
+        pod_type: "p1.x1"
+        metadata_config:
+          indexed: ["file_type", "language", "project", "author", "last_modified"]
+      
+      performance_settings:
+        batch_size: 100
+        upsert_timeout: 60
+        query_timeout: 10
+        connection_pool_size: 10
+    
+    chroma_configuration:
+      collection_name: "hugai_codebase"
+      embedding_function: "sentence_transformers"
+      distance_function: "cosine"
+      persistence_directory: "./chroma_db"
+      
+      settings:
+        anonymized_telemetry: false
+        allow_reset: false
+        persist_directory: "./chroma_persistent"
+    
+    backup_strategy:
+      frequency: "daily"
+      retention_days: 30
+      storage_location: "s3://hugai-search-backups/"
+      encryption: "AES-256"
+
+  # Embedding Models Configuration
+  embedding_models:
+    primary_model:
+      provider: "openai"
+      model: "text-embedding-3-large"
+      api_key: "${OPENAI_API_KEY}"
+      dimensions: 1536
+      max_input_tokens: 8191
+      
+      configuration:
+        batch_size: 2048
+        rate_limit: 3000 # requests per minute
+        retry_strategy: "exponential_backoff"
+        timeout: 30
+    
+    fallback_model:
+      provider: "sentence_transformers"
+      model: "all-MiniLM-L6-v2"
+      local_deployment: true
+      dimensions: 384
+      max_input_tokens: 512
+      
+      configuration:
+        device: "cuda" # or "cpu"
+        batch_size: 32
+        normalize_embeddings: true
+    
+    specialized_models:
+      code_specific:
+        provider: "huggingface"
+        model: "microsoft/codebert-base"
+        use_case: "code_similarity_search"
+        dimensions: 768
+      
+      documentation_specific:
+        provider: "sentence_transformers"
+        model: "all-mpnet-base-v2"
+        use_case: "documentation_search"
+        dimensions: 768
+
+  # Indexing Configuration
+  indexing_strategy:
+    content_preprocessing:
+      code_parsing:
+        enable_ast_parsing: true
+        extract_functions: true
+        extract_classes: true
+        extract_imports: true
+        extract_comments: true
+        preserve_structure: true
+      
+      chunk_strategy:
+        method: "semantic_chunking"
+        target_chunk_size: 1000 # characters
+        chunk_overlap: 200
+        respect_boundaries: ["function", "class", "module"]
+        
+        fallback_chunking:
+          method: "fixed_size"
+          size: 800
+          overlap: 150
+      
+      metadata_extraction:
+        file_metadata:
+          - "file_path"
+          - "file_size"
+          - "last_modified"
+          - "author"
+          - "git_commit_hash"
+          - "git_branch"
+        
+        code_metadata:
+          - "language"
+          - "function_names"
+          - "class_names"
+          - "imported_modules"
+          - "complexity_score"
+          - "test_coverage"
+        
+        semantic_metadata:
+          - "purpose_summary"
+          - "key_concepts"
+          - "dependencies"
+          - "related_files"
+    
+    file_type_handling:
+      source_code:
+        extensions: [".js", ".ts", ".py", ".java", ".go", ".rs", ".cpp", ".c", ".cs", ".rb", ".php"]
+        parser: "tree_sitter"
+        extract_docstrings: true
+        extract_inline_comments: true
+      
+      documentation:
+        extensions: [".md", ".rst", ".txt", ".adoc"]
+        parser: "markdown_parser"
+        extract_headings: true
+        extract_links: true
+        preserve_formatting: true
+      
+      configuration:
+        extensions: [".yaml", ".yml", ".json", ".toml", ".ini", ".xml"]
+        parser: "structured_parser"
+        validate_syntax: true
+        extract_schema: true
+      
+      ignore_patterns:
+        directories: ["node_modules", "vendor", "dist", "build", "__pycache__", ".git"]
+        files: ["*.log", "*.tmp", "*.cache", "*.lock"]
+        size_limit: "10MB"
+    
+    indexing_schedule:
+      real_time_indexing:
+        enabled: true
+        file_watcher: "inotify"
+        debounce_delay: 5 # seconds
+        batch_processing: true
+      
+      incremental_indexing:
+        frequency: "hourly"
+        change_detection: "git_diff"
+        reindex_threshold: 100 # files
+      
+      full_reindexing:
+        frequency: "weekly"
+        schedule: "sundays_02:00"
+        parallel_processing: true
+        worker_count: 4
+
+  # Search Configuration
+  search_configuration:
+    search_types:
+      semantic_search:
+        enabled: true
+        embedding_model: "primary"
+        similarity_threshold: 0.7
+        max_results: 20
+        rerank_results: true
+      
+      keyword_search:
+        enabled: true
+        fuzzy_matching: true
+        stemming: true
+        stop_words_removal: true
+        boost_exact_matches: 2.0
+      
+      hybrid_search:
+        enabled: true
+        semantic_weight: 0.7
+        keyword_weight: 0.3
+        fusion_method: "reciprocal_rank_fusion"
+        normalization: "min_max"
+      
+      regex_search:
+        enabled: true
+        timeout: 30 # seconds
+        case_sensitive: false
+        multiline: true
+    
+    query_processing:
+      query_expansion:
+        enabled: true
+        synonyms_database: "code_synonyms.json"
+        acronym_expansion: true
+        programming_terms: true
+      
+      intent_detection:
+        enabled: true
+        model: "intent_classifier_v2"
+        confidence_threshold: 0.8
+        intents:
+          - "find_function"
+          - "find_implementation"
+          - "find_usage_examples"
+          - "find_documentation"
+          - "find_tests"
+          - "find_similar_code"
+      
+      context_enrichment:
+        enabled: true
+        include_call_graph: true
+        include_import_graph: true
+        include_git_history: true
+        context_window: 5 # files
+    
+    result_ranking:
+      ranking_factors:
+        semantic_similarity: 0.4
+        keyword_relevance: 0.2
+        file_importance: 0.15
+        recency: 0.1
+        usage_frequency: 0.1
+        author_reputation: 0.05
+      
+      file_importance_signals:
+        - "git_commit_frequency"
+        - "number_of_imports"
+        - "test_coverage"
+        - "documentation_quality"
+        - "code_complexity"
+      
+      personalization:
+        enabled: true
+        user_history_weight: 0.1
+        team_preferences: 0.05
+        project_context: 0.2
+    
+    filtering_options:
+      file_filters:
+        - "file_type"
+        - "programming_language"
+        - "project"
+        - "author"
+        - "date_range"
+        - "file_size"
+      
+      content_filters:
+        - "function_signature"
+        - "class_inheritance"
+        - "import_dependencies"
+        - "test_coverage_level"
+        - "complexity_score"
+      
+      advanced_filters:
+        - "git_branch"
+        - "commit_hash"
+        - "pull_request"
+        - "issue_number"
+
+  # RAG Integration
+  rag_configuration:
+    context_retrieval:
+      retrieval_strategy: "multi_stage"
+      stages:
+        initial_retrieval:
+          method: "hybrid_search"
+          candidate_count: 100
+          diversity_threshold: 0.3
+        
+        reranking:
+          method: "cross_encoder"
+          model: "ms-marco-MiniLM-L-12-v2"
+          top_k: 20
+        
+        context_assembly:
+          method: "relevance_based"
+          max_context_tokens: 8000
+          overlap_handling: "merge"
+    
+    context_injection:
+      prompt_templates:
+        code_generation:
+          template: |
+            Based on the following code examples and patterns from the codebase:
+            
+            {context}
+            
+            Generate code for: {user_query}
+            
+            Ensure the generated code:
+            1. Follows the established patterns and conventions
+            2. Is consistent with the existing codebase style
+            3. Includes appropriate error handling
+            4. Has proper documentation
+          
+          max_context_length: 6000
+          context_selection: "most_relevant"
+        
+        code_explanation:
+          template: |
+            Using the following related code and documentation:
+            
+            {context}
+            
+            Explain the following code: {code_snippet}
+            
+            Focus on:
+            1. Purpose and functionality
+            2. How it relates to the broader codebase
+            3. Key design decisions
+            4. Potential improvements
+          
+          max_context_length: 4000
+          context_selection: "related_components"
+        
+        bug_fixing:
+          template: |
+            Given the following similar code patterns and related implementations:
+            
+            {context}
+            
+            Fix the bug in this code: {buggy_code}
+            Error: {error_message}
+            
+            Provide:
+            1. Root cause analysis
+            2. Fixed code
+            3. Explanation of the fix
+            4. Prevention strategies
+          
+          max_context_length: 5000
+          context_selection: "error_patterns"
+      
+      context_quality_control:
+        relevance_threshold: 0.6
+        diversity_requirement: true
+        freshness_boost: 0.1
+        authority_boost: 0.05
+        
+        quality_filters:
+          - "minimum_code_quality_score"
+          - "has_documentation"
+          - "test_coverage_threshold"
+          - "no_deprecated_patterns"
+
+  # Knowledge Graph Integration
+  knowledge_graph:
+    graph_database: "neo4j"
+    connection_config:
+      uri: "${NEO4J_URI}"
+      username: "${NEO4J_USERNAME}"
+      password: "${NEO4J_PASSWORD}"
+      database: "hugai_knowledge"
+    
+    entity_types:
+      code_entities:
+        - name: "File"
+          properties: ["path", "language", "size", "last_modified"]
+        - name: "Function"
+          properties: ["name", "signature", "complexity", "test_coverage"]
+        - name: "Class"
+          properties: ["name", "inheritance", "methods_count", "responsibility"]
+        - name: "Module"
+          properties: ["name", "exports", "dependencies", "purpose"]
+      
+      conceptual_entities:
+        - name: "Requirement"
+          properties: ["id", "description", "priority", "status"]
+        - name: "Feature"
+          properties: ["name", "description", "components", "status"]
+        - name: "Bug"
+          properties: ["id", "description", "severity", "resolution"]
+        - name: "TestCase"
+          properties: ["name", "coverage", "type", "assertions"]
+    
+    relationship_types:
+      code_relationships:
+        - "IMPORTS"
+        - "CALLS"
+        - "INHERITS_FROM"
+        - "IMPLEMENTS"
+        - "DEPENDS_ON"
+        - "TESTS"
+        - "DOCUMENTS"
+      
+      conceptual_relationships:
+        - "IMPLEMENTS_REQUIREMENT"
+        - "RELATES_TO"
+        - "FIXES_BUG"
+        - "ENABLES_FEATURE"
+        - "CONFLICTS_WITH"
+    
+    graph_queries:
+      common_patterns:
+        find_related_code: |
+          MATCH (f1:File)-[:CALLS|IMPORTS*1..3]-(f2:File)
+          WHERE f1.path = $file_path
+          RETURN f2.path, f2.language, f2.purpose
+          ORDER BY f2.last_modified DESC
+          LIMIT 20
+        
+        find_test_coverage: |
+          MATCH (f:File)-[:TESTS]-(t:TestCase)
+          WHERE f.path = $file_path
+          RETURN t.name, t.coverage, t.type
+        
+        find_implementation_patterns: |
+          MATCH (req:Requirement)-[:IMPLEMENTS_REQUIREMENT]-(f:File)
+          WHERE req.id = $requirement_id
+          RETURN f.path, f.language, f.implementation_approach
+
+integration:
+  # AI Agent Integration
+  agent_integration:
+    search_apis:
+      rest_api:
+        endpoint: "/api/v1/search"
+        authentication: "bearer_token"
+        rate_limiting: "100_requests_per_minute"
+        
+        endpoints:
+          semantic_search: "POST /search/semantic"
+          keyword_search: "POST /search/keyword"
+          hybrid_search: "POST /search/hybrid"
+          context_retrieval: "POST /rag/context"
+      
+      graphql_api:
+        endpoint: "/graphql"
+        schema_introspection: true
+        query_complexity_limit: 1000
+        
+        operations:
+          search_query: "search(query: String!, filters: SearchFilters): SearchResults"
+          rag_query: "retrieveContext(query: String!, maxTokens: Int): RAGContext"
+      
+      streaming_api:
+        protocol: "websocket"
+        endpoint: "/ws/search"
+        real_time_indexing: true
+        live_search_suggestions: true
+    
+    sdk_libraries:
+      python:
+        package: "hugai-search"
+        version: "1.0.0"
+        async_support: true
+        
+        usage_example: |
+          from hugai_search import SearchClient
+          
+          client = SearchClient(api_key="your_api_key")
+          results = await client.semantic_search(
+              query="authentication middleware",
+              filters={"language": "javascript"},
+              max_results=10
+          )
+      
+      javascript:
+        package: "@hugai/search"
+        version: "1.0.0"
+        typescript_support: true
+        
+        usage_example: |
+          import { SearchClient } from '@hugai/search';
+          
+          const client = new SearchClient({ apiKey: 'your_api_key' });
+          const results = await client.hybridSearch({
+            query: 'user authentication flow',
+            filters: { project: 'web-app' },
+            maxResults: 15
+          });
+
+  # Development Tool Integration
+  ide_integration:
+    vscode_extension:
+      name: "hugai-search"
+      features:
+        - "inline_search"
+        - "context_aware_suggestions"
+        - "code_explanation"
+        - "similar_code_finder"
+      
+      commands:
+        - command: "hugai.search"
+          title: "Search Codebase"
+          keybinding: "Ctrl+Shift+S"
+        
+        - command: "hugai.explainCode"
+          title: "Explain Selected Code"
+          keybinding: "Ctrl+Shift+E"
+    
+    intellij_plugin:
+      name: "hugai-search-plugin"
+      compatibility: ["IntelliJ IDEA", "PyCharm", "WebStorm"]
+      features:
+        - "semantic_search_tool_window"
+        - "rag_powered_code_completion"
+        - "contextual_documentation"
+    
+    cli_integration:
+      command: "hugai search"
+      subcommands:
+        - "semantic"
+        - "keyword" 
+        - "hybrid"
+        - "explain"
+        - "similar"
+
+validation:
+  # Search Quality Metrics
+  search_quality:
+    relevance_metrics:
+      precision_at_k: ">0.8"
+      recall_at_k: ">0.7"
+      mean_reciprocal_rank: ">0.85"
+      normalized_discounted_cumulative_gain: ">0.9"
+    
+    performance_metrics:
+      query_latency_p95: "<200ms"
+      indexing_throughput: ">1000_files_per_minute"
+      index_freshness: "<5_minutes"
+      availability: ">99.9%"
+  
+  # RAG Quality Metrics
+  rag_quality:
+    context_relevance: ">0.8"
+    answer_faithfulness: ">0.9"
+    context_utilization: ">0.7"
+    response_coherence: ">0.85"
+
+examples:
+  # Search Query Examples
+  search_examples:
+    semantic_queries:
+      - "find authentication middleware implementations"
+      - "locate error handling patterns"
+      - "search for database connection setup"
+      - "find similar API endpoint implementations"
+    
+    hybrid_queries:
+      - "JWT token validation AND security"
+      - "React components WITH state management"
+      - "Python decorators OR middleware patterns"
+    
+    filter_examples:
+      language_filter: |
+        {
+          "query": "user authentication",
+          "filters": {
+            "language": ["javascript", "typescript"],
+            "file_type": "source_code",
+            "project": "web-application"
+          }
+        }
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize search index for project
+  hugai search init --project-path . --languages js,ts,py --include-docs
+  
+  # Perform semantic search
+  hugai search semantic "authentication middleware" --language javascript
+  
+  # Hybrid search with filters
+  hugai search hybrid "error handling" --project web-app --max-results 15
+  
+  # Get code explanation with context
+  hugai search explain --file src/auth.js --function validateToken
+  
+  # Find similar code patterns
+  hugai search similar --file src/api/users.js --similarity-threshold 0.8
+  
+  # Monitor search performance
+  hugai search metrics --period daily --format dashboard

@@ -1,0 +1,873 @@
+metadata:
+  name: security-scanning-configuration
+  version: 1.0.0
+  description: "Comprehensive security scanning and vulnerability management for HUGAI applications and infrastructure"
+  category: infrastructure-tools
+  dependencies:
+    - static-analysis-tools
+    - dynamic-analysis-tools
+    - container-security
+    - compliance-frameworks
+  tags:
+    - security-scanning
+    - vulnerability-management
+    - compliance
+    - threat-detection
+    - security-automation
+
+configuration:
+  # Security Scanning Philosophy
+  security_philosophy:
+    purpose: "Provide comprehensive, automated security scanning and vulnerability management across the entire HUGAI ecosystem"
+    principles:
+      shift_left_security: "Integrate security scanning early in the development lifecycle"
+      defense_in_depth: "Multiple layers of security scanning and validation"
+      continuous_monitoring: "Always-on security monitoring and threat detection"
+      compliance_by_design: "Built-in compliance with regulatory standards"
+      zero_tolerance_critical: "Block critical vulnerabilities from reaching production"
+
+  # Static Application Security Testing (SAST)
+  sast_configuration:
+    primary_scanner: "semgrep"
+    fallback_scanner: "codeql"
+    
+    semgrep_configuration:
+      version: "1.45.0"
+      
+      rule_sets:
+        core_rules:
+          - "p/security-audit"
+          - "p/owasp-top-ten"
+          - "p/cwe-top-25"
+          - "p/sans-top-25"
+          - "p/pci-dss"
+          - "p/gdpr"
+        
+        language_specific:
+          javascript:
+            - "p/javascript"
+            - "p/react"
+            - "p/node.js"
+            - "p/typescript"
+          
+          python:
+            - "p/python"
+            - "p/django"
+            - "p/flask"
+            - "p/fastapi"
+          
+          java:
+            - "p/java"
+            - "p/spring"
+            - "p/struts"
+          
+          go:
+            - "p/golang"
+            - "p/gosec"
+        
+        custom_rules:
+          hugai_specific:
+            - "rules/hugai-api-security.yml"
+            - "rules/hugai-data-protection.yml"
+            - "rules/hugai-ai-model-security.yml"
+            - "rules/hugai-authentication.yml"
+      
+      scanning_configuration:
+        exclude_paths:
+          - "node_modules/"
+          - "vendor/"
+          - "dist/"
+          - "build/"
+          - "__pycache__/"
+          - "*.test.js"
+          - "*.spec.py"
+          - "test_*"
+        
+        include_paths:
+          - "src/"
+          - "lib/"
+          - "api/"
+          - "services/"
+          - "components/"
+        
+        severity_levels:
+          INFO: "log_only"
+          WARNING: "report_but_continue"
+          ERROR: "fail_build_in_ci"
+          CRITICAL: "block_deployment"
+        
+        output_formats:
+          - "json"
+          - "sarif"
+          - "junit"
+          - "text"
+        
+        performance_settings:
+          max_memory: "4GB"
+          timeout: "30m"
+          parallel_jobs: 4
+          cache_enabled: true
+    
+    codeql_configuration:
+      version: "2.15.0"
+      
+      query_suites:
+        - "security-and-quality"
+        - "security-extended"
+        - "code-scanning"
+      
+      languages:
+        - "javascript"
+        - "typescript"
+        - "python"
+        - "java"
+        - "go"
+        - "cpp"
+        - "csharp"
+      
+      custom_queries:
+        hugai_security_queries:
+          - "queries/ai-model-injection.ql"
+          - "queries/prompt-injection.ql"
+          - "queries/data-exfiltration.ql"
+          - "queries/privilege-escalation.ql"
+      
+      analysis_configuration:
+        build_mode: "autobuild"
+        debug_mode: false
+        
+        database_settings:
+          cleanup_after_analysis: true
+          compression: true
+          
+        threading:
+          max_threads: 8
+          thread_priority: "normal"
+    
+    vulnerability_classification:
+      severity_mapping:
+        critical:
+          cvss_score: ">= 9.0"
+          examples: ["remote_code_execution", "sql_injection", "authentication_bypass"]
+          action: "immediate_blocking"
+          sla: "fix_within_24_hours"
+        
+        high:
+          cvss_score: "7.0 - 8.9"
+          examples: ["cross_site_scripting", "path_traversal", "privilege_escalation"]
+          action: "block_production_deployment"
+          sla: "fix_within_1_week"
+        
+        medium:
+          cvss_score: "4.0 - 6.9"
+          examples: ["information_disclosure", "weak_cryptography", "denial_of_service"]
+          action: "create_tracking_ticket"
+          sla: "fix_within_1_month"
+        
+        low:
+          cvss_score: "< 4.0"
+          examples: ["code_quality_issues", "best_practice_violations"]
+          action: "informational_only"
+          sla: "fix_at_convenience"
+
+  # Dynamic Application Security Testing (DAST)
+  dast_configuration:
+    primary_scanner: "owasp_zap"
+    fallback_scanner: "burp_suite"
+    
+    owasp_zap_configuration:
+      version: "2.14.0"
+      
+      scan_types:
+        baseline_scan:
+          description: "Quick security scan for basic vulnerabilities"
+          duration: "5-10 minutes"
+          spider_enabled: true
+          active_scan_enabled: false
+          
+          target_configuration:
+            context: "hugai-web-app"
+            include_in_context: ["${HUGAI_WEB_URL}/*"]
+            exclude_from_context: [
+              "${HUGAI_WEB_URL}/logout",
+              "${HUGAI_WEB_URL}/admin/*",
+              "${HUGAI_WEB_URL}/test/*"
+            ]
+          
+          authentication:
+            method: "form_based"
+            login_url: "${HUGAI_WEB_URL}/login"
+            username_field: "email"
+            password_field: "password"
+            credentials:
+              username: "${DAST_TEST_USER}"
+              password: "${DAST_TEST_PASSWORD}"
+            
+            logged_in_indicator: "Dashboard"
+            logged_out_indicator: "Login"
+        
+        full_scan:
+          description: "Comprehensive security scan"
+          duration: "1-4 hours"
+          spider_enabled: true
+          active_scan_enabled: true
+          
+          active_scan_policy:
+            strength: "medium"
+            threshold: "medium"
+            
+            attack_categories:
+              - "injection"
+              - "broken_authentication"
+              - "sensitive_data_exposure"
+              - "xml_external_entities"
+              - "broken_access_control"
+              - "security_misconfiguration"
+              - "cross_site_scripting"
+              - "insecure_deserialization"
+              - "using_components_with_known_vulnerabilities"
+              - "insufficient_logging_monitoring"
+          
+          passive_scan_rules:
+            - "application_error_disclosure"
+            - "cookie_security"
+            - "information_disclosure"
+            - "missing_security_headers"
+            - "sql_injection_detection"
+            - "xss_detection"
+        
+        api_scan:
+          description: "API-specific security testing"
+          duration: "30-60 minutes"
+          
+          api_configuration:
+            definition_type: "openapi"
+            definition_url: "${HUGAI_API_URL}/openapi.json"
+            
+            authentication:
+              type: "bearer_token"
+              token: "${API_TEST_TOKEN}"
+            
+            scan_parameters:
+              include_endpoints: ["*"]
+              exclude_endpoints: ["/health", "/metrics"]
+              parameter_fuzzing: true
+              response_analysis: true
+      
+      reporting:
+        formats: ["html", "json", "xml", "md"]
+        include_false_positives: false
+        confidence_threshold: "medium"
+        
+        custom_report_sections:
+          - "executive_summary"
+          - "vulnerability_details"
+          - "remediation_guidance"
+          - "compliance_mapping"
+    
+    burp_suite_configuration:
+      version: "2023.10"
+      license_type: "enterprise"
+      
+      scan_configurations:
+        crawl_and_audit:
+          crawl_strategy: "most_complete"
+          crawl_limits:
+            max_unique_locations: 10000
+            max_crawl_duration: "60m"
+          
+          audit_configuration:
+            audit_speed: "normal"
+            audit_accuracy: "normal"
+            
+            issue_types:
+              - "sql_injection"
+              - "cross_site_scripting"
+              - "os_command_injection"
+              - "path_traversal"
+              - "server_side_request_forgery"
+              - "xml_injection"
+              - "ldap_injection"
+              - "code_injection"
+              - "file_path_manipulation"
+        
+        api_testing:
+          discovery_method: "openapi_specification"
+          specification_url: "${HUGAI_API_URL}/openapi.json"
+          
+          test_configuration:
+            parameter_pollution: true
+            input_validation_testing: true
+            business_logic_testing: true
+            
+            authentication_testing:
+              jwt_testing: true
+              session_management: true
+              authorization_bypass: true
+
+  # Container Security Scanning
+  container_security:
+    image_scanning:
+      primary_scanner: "trivy"
+      fallback_scanner: "grype"
+      
+      trivy_configuration:
+        version: "0.47.0"
+        
+        scan_types:
+          - "vulnerabilities"
+          - "misconfigurations"
+          - "secrets"
+          - "licenses"
+        
+        vulnerability_databases:
+          - "ghsa" # GitHub Security Advisory
+          - "nvd"  # National Vulnerability Database
+          - "redhat"
+          - "debian"
+          - "ubuntu"
+          - "alpine"
+          - "amazon"
+          - "oracle"
+          - "photon"
+          - "suse"
+        
+        scanning_configuration:
+          security_checks: "vuln,config,secret"
+          severity_levels: ["UNKNOWN", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
+          
+          ignore_policies:
+            - ".trivyignore"
+            - "security-ignore-policies.yaml"
+          
+          output_formats:
+            - "table"
+            - "json"
+            - "sarif"
+            - "cyclonedx"
+            - "spdx"
+        
+        policy_configuration:
+          rego_policies:
+            - "policies/dockerfile-best-practices.rego"
+            - "policies/kubernetes-security.rego"
+            - "policies/hugai-specific-policies.rego"
+          
+          custom_checks:
+            - "check-user-root"
+            - "check-exposed-ports"
+            - "check-package-managers"
+            - "check-secrets-files"
+      
+      grype_configuration:
+        version: "0.73.0"
+        
+        scanning_scope:
+          - "os-packages"
+          - "language-packages"
+          - "binaries"
+        
+        vulnerability_matching:
+          java:
+            use_cpes: true
+          
+          javascript:
+            search_remote_licenses: true
+          
+          python:
+            search_remote_licenses: true
+        
+        output_configuration:
+          format: "json"
+          template: "custom-template.tmpl"
+          
+          quality_gates:
+            critical: 0
+            high: 5
+            medium: 20
+            low: 50
+    
+    runtime_security:
+      scanner: "falco"
+      
+      falco_configuration:
+        version: "0.36.0"
+        
+        rules_files:
+          - "/etc/falco/falco_rules.yaml"
+          - "/etc/falco/falco_rules.local.yaml"
+          - "/etc/falco/hugai_rules.yaml"
+        
+        custom_rules:
+          hugai_specific:
+            - rule: "Hugai Agent Suspicious Activity"
+              desc: "Detect suspicious activity in HUGAI agents"
+              condition: >
+                spawned_process and
+                container.image.repository startswith "hugai" and
+                (proc.name in (nc, ncat, netcat, nmap, socat) or
+                 proc.name contains "wget" or
+                 proc.name contains "curl")
+              output: >
+                Suspicious activity in HUGAI agent
+                (user=%user.name command=%proc.cmdline image=%container.image.repository)
+              priority: "HIGH"
+            
+            - rule: "Hugai Unauthorized File Access"
+              desc: "Detect unauthorized file access in HUGAI containers"
+              condition: >
+                open_read and
+                container.image.repository startswith "hugai" and
+                fd.name startswith "/etc/passwd" or
+                fd.name startswith "/etc/shadow" or
+                fd.name contains "ssh"
+              output: >
+                Unauthorized file access in HUGAI container
+                (user=%user.name file=%fd.name image=%container.image.repository)
+              priority: "CRITICAL"
+        
+        output_configuration:
+          json_output: true
+          json_include_output_property: true
+          
+          outputs:
+            rate: 1
+            max_burst: 1000
+            
+            stdout_output:
+              enabled: true
+            
+            file_output:
+              enabled: true
+              filename: "/var/log/falco/events.log"
+              keep_alive: false
+            
+            syslog_output:
+              enabled: true
+              facility: "user"
+              format: "json"
+            
+            http_output:
+              enabled: true
+              url: "http://falcosidekick:2801"
+
+  # Infrastructure Security Scanning
+  infrastructure_security:
+    iac_scanning:
+      scanner: "checkov"
+      
+      checkov_configuration:
+        version: "3.0.0"
+        
+        frameworks:
+          - "terraform"
+          - "cloudformation"
+          - "kubernetes"
+          - "dockerfile"
+          - "helm"
+          - "serverless"
+          - "arm"
+          - "bicep"
+        
+        check_categories:
+          - "CKV_AWS_*"  # AWS checks
+          - "CKV_K8S_*"  # Kubernetes checks
+          - "CKV_DOCKER_*" # Docker checks
+          - "CKV2_*"     # Complex checks
+        
+        custom_checks:
+          hugai_policies:
+            - "hugai_terraform_policies/"
+            - "hugai_k8s_policies/"
+            - "hugai_docker_policies/"
+        
+        scanning_configuration:
+          download_external_modules: true
+          evaluate_variables: true
+          
+          baseline_file: ".checkov.baseline"
+          skip_checks: []
+          
+          output_formats:
+            - "cli"
+            - "json"
+            - "junitxml"
+            - "sarif"
+        
+        remediation:
+          auto_fix: false
+          create_pull_requests: true
+          
+          fix_types:
+            - "configuration_updates"
+            - "policy_additions"
+            - "security_improvements"
+    
+    kubernetes_security:
+      scanner: "kube-score"
+      
+      kube_score_configuration:
+        version: "1.16.1"
+        
+        checks:
+          - "pod-security-policy"
+          - "container-security-context"
+          - "container-resources"
+          - "pod-disruption-budget"
+          - "horizontal-pod-autoscaler"
+          - "ingress-targets-service"
+          - "service-targets-pod"
+          - "networkpolicy"
+          - "deployment-has-poddisruptionbudget"
+          - "deployment-has-host-podantiaffinity"
+          - "container-image-tag"
+          - "container-image-pull-policy"
+        
+        scoring_thresholds:
+          minimum_score: 7
+          warning_threshold: 5
+          critical_threshold: 3
+        
+        ignore_tests:
+          - "container-security-context-privileged"  # For specific use cases
+        
+        output_configuration:
+          format: "human"
+          verbosity: 2
+          
+          custom_outputs:
+            - "json"
+            - "yaml"
+            - "junit"
+
+  # Dependency Scanning
+  dependency_scanning:
+    sca_scanners:
+      primary: "snyk"
+      secondary: "safety"
+      
+    snyk_configuration:
+      version: "1.1240.0"
+      
+      scanning_scope:
+        - "vulnerabilities"
+        - "licenses"
+        - "code_quality"
+      
+      package_managers:
+        javascript:
+          - "npm"
+          - "yarn"
+          - "pnpm"
+        
+        python:
+          - "pip"
+          - "pipenv"
+          - "poetry"
+        
+        java:
+          - "maven"
+          - "gradle"
+        
+        go:
+          - "modules"
+        
+        docker:
+          - "dockerfile"
+          - "container_images"
+      
+      policy_configuration:
+        severity_threshold: "high"
+        fail_on_issues: true
+        
+        ignore_policies:
+          - ".snyk"
+          - "snyk-ignore-policies.json"
+        
+        license_policies:
+          allowed_licenses:
+            - "MIT"
+            - "Apache-2.0"
+            - "BSD-3-Clause"
+            - "BSD-2-Clause"
+            - "ISC"
+          
+          disallowed_licenses:
+            - "GPL-3.0"
+            - "AGPL-3.0"
+            - "SSPL-1.0"
+          
+          review_required_licenses:
+            - "LGPL-2.1"
+            - "MPL-2.0"
+            - "EPL-2.0"
+      
+      reporting:
+        formats: ["json", "sarif", "html"]
+        include_dev_dependencies: false
+        
+        custom_reporting:
+          vulnerability_trends: true
+          compliance_report: true
+          executive_summary: true
+    
+    safety_configuration:
+      version: "2.3.5"
+      
+      databases:
+        - "safety-db"
+        - "pyup"
+      
+      scan_configuration:
+        full_report: true
+        ignore_unpinned: false
+        continue_on_error: false
+        
+        ignore_policies:
+          - ".safety-policy.json"
+        
+        output_formats:
+          - "json"
+          - "bare"
+          - "text"
+
+  # Secrets Detection
+  secrets_scanning:
+    primary_scanner: "gitleaks"
+    secondary_scanner: "trufflehog"
+    
+    gitleaks_configuration:
+      version: "8.18.0"
+      
+      scan_types:
+        - "detect"    # Scan current state
+        - "protect"   # Pre-commit hook
+        - "dir"       # Directory scan
+      
+      rules_configuration:
+        config_file: ".gitleaks.toml"
+        
+        custom_rules:
+          hugai_api_keys:
+            description: "HUGAI API Keys"
+            regex: "hugai_[a-zA-Z0-9]{32}"
+            keywords: ["hugai_"]
+          
+          ai_model_tokens:
+            description: "AI Model Access Tokens"
+            regex: "(openai|anthropic|cohere)_[a-zA-Z0-9_-]{20,}"
+            keywords: ["openai_", "anthropic_", "cohere_"]
+          
+          database_urls:
+            description: "Database Connection URLs"
+            regex: "(postgresql|mysql|mongodb)://[^\\s]*"
+            keywords: ["postgresql://", "mysql://", "mongodb://"]
+        
+        allowlist:
+          description: "Allowed patterns and files"
+          regexes:
+            - "test_key_.*"
+            - "fake_.*"
+            - "example_.*"
+          
+          paths:
+            - "test/"
+            - "tests/"
+            - "*.test.js"
+            - "*.spec.py"
+            - "mock_data/"
+      
+      output_configuration:
+        format: "sarif"
+        report_format: "json"
+        verbose: true
+        redact: true
+    
+    trufflehog_configuration:
+      version: "3.63.0"
+      
+      scanning_configuration:
+        entropy_threshold: 4.0
+        
+        detectors:
+          - "aws"
+          - "github"
+          - "slack"
+          - "stripe"
+          - "openai"
+          - "anthropic"
+          - "gcp"
+          - "azure"
+        
+        verification:
+          enabled: true
+          timeout: "10s"
+        
+        concurrency: 8
+        
+        filters:
+          entropy_filter: true
+          regex_filter: true
+          
+        exclude_patterns:
+          - "node_modules/"
+          - "vendor/"
+          - "test/"
+          - "*.min.js"
+          - "*.log"
+
+  # Compliance Scanning
+  compliance_scanning:
+    frameworks:
+      - "gdpr"
+      - "hipaa"
+      - "pci_dss"
+      - "sox"
+      - "iso_27001"
+      - "nist_csf"
+    
+    gdpr_compliance:
+      scanner: "privacy_scanner"
+      
+      data_protection_checks:
+        - "personal_data_identification"
+        - "consent_management_validation"
+        - "data_retention_policy_compliance"
+        - "right_to_erasure_implementation"
+        - "data_portability_support"
+        - "breach_notification_procedures"
+      
+      privacy_by_design:
+        - "data_minimization"
+        - "purpose_limitation"
+        - "storage_limitation"
+        - "accuracy_principle"
+        - "integrity_confidentiality"
+    
+    pci_dss_compliance:
+      scanner: "pci_scanner"
+      
+      requirements_validation:
+        req_1: "firewall_configuration"
+        req_2: "default_security_parameters"
+        req_3: "cardholder_data_protection"
+        req_4: "encrypted_transmission"
+        req_6: "secure_systems_applications"
+        req_8: "access_control_measures"
+        req_10: "network_access_monitoring"
+        req_11: "security_testing_procedures"
+
+integration:
+  # CI/CD Integration
+  cicd_integration:
+    pipeline_stages:
+      pre_commit:
+        hooks:
+          - "gitleaks protect"
+          - "semgrep --config=auto --error"
+          - "safety check"
+      
+      build_stage:
+        security_scans:
+          - "sast_scan"
+          - "dependency_scan"
+          - "secrets_scan"
+          - "iac_scan"
+      
+      test_stage:
+        security_tests:
+          - "dast_baseline_scan"
+          - "container_image_scan"
+          - "compliance_scan"
+      
+      deploy_stage:
+        security_gates:
+          - "vulnerability_threshold_check"
+          - "compliance_validation"
+          - "security_approval_gate"
+    
+    quality_gates:
+      security_gate_criteria:
+        critical_vulnerabilities: 0
+        high_vulnerabilities: 0
+        medium_vulnerabilities: 10
+        license_violations: 0
+        secrets_detected: 0
+        compliance_failures: 0
+
+  # Incident Response Integration
+  security_incident_integration:
+    automated_response:
+      critical_vulnerability_detected:
+        actions:
+          - "block_deployment"
+          - "create_security_incident"
+          - "notify_security_team"
+          - "quarantine_affected_components"
+      
+      secrets_exposed:
+        actions:
+          - "revoke_compromised_credentials"
+          - "notify_security_team"
+          - "audit_access_logs"
+          - "update_detection_rules"
+
+validation:
+  # Security Scanning Validation
+  scanning_effectiveness:
+    vulnerability_detection_rate: ">95%"
+    false_positive_rate: "<10%"
+    scan_completion_time: "<30_minutes"
+    coverage_percentage: ">90%"
+  
+  # Compliance Validation
+  compliance_validation:
+    framework_coverage: "complete"
+    audit_trail_completeness: "100%"
+    policy_enforcement: "automated"
+    reporting_accuracy: ">98%"
+
+examples:
+  # Security Scan Configuration
+  comprehensive_scan_example:
+    scan_pipeline: |
+      security_scan:
+        parallel:
+          sast:
+            - semgrep --config=auto --json --output=sast-results.json
+          
+          dependency:
+            - snyk test --json > dependency-results.json
+          
+          secrets:
+            - gitleaks detect --source . --report-format sarif --report-path secrets-results.sarif
+          
+          container:
+            - trivy image --format json --output container-results.json $IMAGE_NAME
+        
+        sequential:
+          dast:
+            - zap-baseline.py -t $TARGET_URL -J dast-results.json
+          
+          compliance:
+            - checkov --framework terraform --output json --output-file compliance-results.json
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize security scanning
+  hugai security init --scanners semgrep,snyk,trivy --compliance gdpr,pci-dss
+  
+  # Run comprehensive security scan
+  hugai security scan --type all --target . --format sarif --output security-results.sarif
+  
+  # Scan container images
+  hugai security scan container --image hugai/agent:latest --severity high,critical
+  
+  # Perform DAST scan
+  hugai security scan dast --target https://app.hugai.dev --auth-token $AUTH_TOKEN
+  
+  # Check compliance
+  hugai security compliance --frameworks gdpr,hipaa --generate-report
+  
+  # Monitor security metrics
+  hugai security metrics --period weekly --format dashboard

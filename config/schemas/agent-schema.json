@@ -1,0 +1,308 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://hugai.dev/schemas/agent-schema.json",
+  "title": "HUGAI Agent Configuration Schema",
+  "description": "JSON Schema for validating HUGAI agent configuration files",
+  "type": "object",
+  "required": ["metadata", "configuration", "integration", "validation"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version", "description", "category", "author", "created", "updated"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Agent name in kebab-case"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200,
+          "description": "Brief agent description"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["core", "specialized", "utility", "governance"],
+          "description": "Agent category"
+        },
+        "author": {
+          "type": "string",
+          "description": "Configuration author"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date (YYYY-MM-DD)"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Last update date (YYYY-MM-DD)"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional tags for categorization"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "required": ["role", "capabilities", "dependencies", "parameters"],
+      "properties": {
+        "role": {
+          "type": "object",
+          "required": ["primary", "secondary"],
+          "properties": {
+            "primary": {
+              "type": "string",
+              "description": "Primary role description"
+            },
+            "secondary": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Secondary roles"
+            }
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Agent capabilities"
+        },
+        "dependencies": {
+          "type": "object",
+          "properties": {
+            "agents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required agent dependencies"
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required tool dependencies"
+            },
+            "services": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required service dependencies"
+            }
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "llm_config": {
+              "type": "object",
+              "properties": {
+                "model": {
+                  "type": "string",
+                  "description": "LLM model identifier"
+                },
+                "temperature": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 2,
+                  "description": "Model temperature"
+                },
+                "max_tokens": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Maximum tokens"
+                }
+              }
+            },
+            "execution": {
+              "type": "object",
+              "properties": {
+                "timeout": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Execution timeout in seconds"
+                },
+                "retry_attempts": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10,
+                  "description": "Number of retry attempts"
+                },
+                "parallel_execution": {
+                  "type": "boolean",
+                  "description": "Whether agent supports parallel execution"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "required": ["triggers", "inputs", "outputs"],
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["event", "condition"],
+            "properties": {
+              "event": {
+                "type": "string",
+                "description": "Trigger event"
+              },
+              "condition": {
+                "type": "string",
+                "description": "Trigger condition"
+              }
+            }
+          },
+          "description": "Agent trigger conditions"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "required"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Input name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["string", "object", "array", "boolean", "number"],
+                "description": "Input data type"
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Whether input is required"
+              },
+              "description": {
+                "type": "string",
+                "description": "Input description"
+              }
+            }
+          },
+          "description": "Agent input specifications"
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Output name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["string", "object", "array", "boolean", "number"],
+                "description": "Output data type"
+              },
+              "description": {
+                "type": "string",
+                "description": "Output description"
+              }
+            }
+          },
+          "description": "Agent output specifications"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["quality_gates", "metrics"],
+      "properties": {
+        "quality_gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "criteria"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Quality gate name"
+              },
+              "criteria": {
+                "type": "string",
+                "description": "Quality gate criteria"
+              }
+            }
+          },
+          "description": "Quality validation gates"
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "threshold"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Metric name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["performance", "quality", "reliability", "security"],
+                "description": "Metric type"
+              },
+              "threshold": {
+                "type": "number",
+                "description": "Metric threshold value"
+              }
+            }
+          },
+          "description": "Performance and quality metrics"
+        }
+      }
+    },
+    "cli_usage": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["command", "description"],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "CLI command"
+              },
+              "description": {
+                "type": "string",
+                "description": "Command description"
+              },
+              "example": {
+                "type": "string",
+                "description": "Command example"
+              }
+            }
+          },
+          "description": "CLI command examples"
+        }
+      }
+    }
+  }
+}

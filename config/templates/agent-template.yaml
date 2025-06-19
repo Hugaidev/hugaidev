@@ -1,0 +1,92 @@
+# HUGAI Agent Configuration Template
+# This template provides a standardized structure for creating agent configurations
+# Based on the agent-schema.json validation requirements
+
+# Include base metadata template
+{% include 'base-metadata.yaml' %}
+
+# Agent-specific configuration
+configuration:
+  # Agent role definition
+  role:
+    primary: "{{primary_role}}"
+    secondary: {{secondary_roles | default([]) | to_yaml}}
+
+  # Agent capabilities
+  capabilities: {{capabilities | to_yaml}}
+
+  # Dependencies with cross-references
+  dependencies:
+    agents: {{agent_dependencies | default([]) | to_yaml}}
+    tools: {{tool_dependencies | default([]) | to_yaml}}
+    services: {{service_dependencies | default([]) | to_yaml}}
+    
+    # Cross-reference documentation
+    agent_docs: 
+      {% for dep in agent_dependencies | default([]) %}
+      - config: "config/agents/{{dep}}.yaml"
+        docs: "docs/agents/{{dep}}.md"
+      {% endfor %}
+    
+    tool_docs:
+      {% for dep in tool_dependencies | default([]) %}
+      - config: "config/tools/{{dep}}.yaml"
+        docs: "docs/tools/{{dep}}.md"
+      {% endfor %}
+
+  # Agent parameters
+  parameters:
+    llm_config:
+      model: "{{llm_model | default('gpt-4')}}"
+      temperature: {{temperature | default(0.7)}}
+      max_tokens: {{max_tokens | default(2000)}}
+      {% if system_prompt %}
+      system_prompt: "{{system_prompt}}"
+      {% endif %}
+
+    execution:
+      timeout: {{timeout | default(300)}}
+      retry_attempts: {{retry_attempts | default(3)}}
+      parallel_execution: {{parallel_execution | default(false)}}
+      
+    {% if custom_parameters %}
+    custom: {{custom_parameters | to_yaml}}
+    {% endif %}
+
+# Include base integration template
+{% include 'base-integration.yaml' %}
+
+# Include base validation template  
+{% include 'base-validation.yaml' %}
+
+# Include base CLI usage template with agent-specific settings
+{% set component_type = 'agent' %}
+{% include 'base-cli-usage.yaml' %}
+
+# Agent-specific extensions
+agent_extensions:
+  # Prompt templates
+  prompts:
+    system: "{{system_prompt | default('You are a helpful AI assistant specialized in ' + primary_role + '.')}}"
+    {% for prompt in custom_prompts | default([]) %}
+    {{prompt.name}}: "{{prompt.template}}"
+    {% endfor %}
+
+  # Learning and adaptation
+  learning:
+    enabled: {{learning_enabled | default(false)}}
+    {% if learning_enabled %}
+    feedback_sources: {{feedback_sources | default(['human', 'metrics']) | to_yaml}}
+    adaptation_frequency: "{{adaptation_frequency | default('daily')}}"
+    {% endif %}
+
+  # Collaboration patterns
+  collaboration:
+    {% for pattern in collaboration_patterns | default([]) %}
+    - type: "{{pattern.type}}"
+      agents: {{pattern.agents | to_yaml}}
+      protocol: "{{pattern.protocol}}"
+      {% if pattern.conditions %}
+      conditions: {{pattern.conditions | to_yaml}}
+      {% endif %}
+    {% endfor %}

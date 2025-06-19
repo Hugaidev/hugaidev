@@ -1,0 +1,871 @@
+metadata:
+  name: test-automation-configuration
+  version: 1.0.0
+  description: "Comprehensive test automation framework for HUGAI applications covering unit, integration, E2E, and AI-specific testing"
+  category: infrastructure-tools
+  dependencies:
+    - test-frameworks
+    - test-data-management
+    - test-reporting
+    - ai-testing-tools
+  tags:
+    - test-automation
+    - quality-assurance
+    - ai-testing
+    - continuous-testing
+    - test-management
+
+configuration:
+  # Test Automation Philosophy
+  testing_philosophy:
+    purpose: "Provide comprehensive, automated testing capabilities that ensure HUGAI system reliability, quality, and AI model accuracy"
+    principles:
+      pyramid_testing: "Focus on unit tests, supported by integration and E2E tests"
+      ai_specific_testing: "Include specialized testing for AI models and human-AI interactions"
+      continuous_testing: "Integrate testing throughout the development lifecycle"
+      data_driven_testing: "Use realistic test data and scenarios"
+      feedback_loops: "Provide fast, actionable feedback to developers"
+
+  # Test Framework Configuration
+  test_frameworks:
+    unit_testing:
+      javascript_typescript:
+        framework: "jest"
+        version: "29.7.0"
+        
+        configuration:
+          preset: "ts-jest"
+          test_environment: "node"
+          roots: ["<rootDir>/src", "<rootDir>/test"]
+          test_match: ["**/__tests__/**/*.test.(js|ts)", "**/?(*.)+(spec|test).(js|ts)"]
+          
+          coverage:
+            collect_coverage_from:
+              - "src/**/*.{js,ts}"
+              - "!src/**/*.d.ts"
+              - "!src/**/*.test.{js,ts}"
+              - "!src/**/index.{js,ts}"
+            
+            coverage_thresholds:
+              global:
+                branches: 80
+                functions: 80
+                lines: 80
+                statements: 80
+              
+              "./src/agents/": 
+                branches: 85
+                functions: 90
+                lines: 85
+                statements: 85
+            
+            coverage_reporters: ["text", "lcov", "html", "json"]
+            coverage_directory: "coverage"
+          
+          setup_files_after_env: ["<rootDir>/test/setup.ts"]
+          
+          module_name_mapper:
+            "^@/(.*)$": "<rootDir>/src/$1"
+            "^@test/(.*)$": "<rootDir>/test/$1"
+          
+          transform:
+            "^.+\\.ts$": "ts-jest"
+          
+          globals:
+            "ts-jest":
+              ts_config: "tsconfig.test.json"
+        
+        testing_utilities:
+          mocking: "@hugai/test-mocks"
+          factories: "@hugai/test-factories"
+          assertions: "@hugai/test-assertions"
+          
+          mock_configurations:
+            ai_models:
+              mock_responses: true
+              response_delay: "100ms"
+              failure_simulation: true
+            
+            databases:
+              in_memory_db: true
+              transaction_rollback: true
+              
+            external_apis:
+              mock_server: "msw"
+              response_scenarios: "success,error,timeout"
+      
+      python:
+        framework: "pytest"
+        version: "7.4.3"
+        
+        configuration:
+          test_paths: ["tests/", "src/"]
+          python_files: ["test_*.py", "*_test.py"]
+          python_classes: ["Test*"]
+          python_functions: ["test_*"]
+          
+          markers:
+            unit: "Unit tests"
+            integration: "Integration tests"
+            ai_model: "AI model tests"
+            slow: "Slow tests"
+            external: "Tests requiring external services"
+          
+          coverage:
+            source: ["src/"]
+            omit: ["*/tests/*", "*/test_*", "*/__pycache__/*"]
+            
+            coverage_thresholds:
+              total: 80
+              individual_files: 70
+              
+              specific_modules:
+                "src/agents/": 85
+                "src/models/": 90
+                "src/core/": 85
+          
+          plugins:
+            - "pytest-cov"
+            - "pytest-xdist"      # Parallel execution
+            - "pytest-mock"       # Mocking utilities
+            - "pytest-asyncio"    # Async test support
+            - "pytest-benchmark"  # Performance testing
+            - "pytest-factoryboy" # Test data factories
+            - "pytest-html"       # HTML reports
+        
+        fixtures_configuration:
+          ai_model_fixtures:
+            scope: "session"
+            autouse: false
+            
+            mock_models:
+              gpt4_mock:
+                responses_file: "test_data/gpt4_responses.json"
+                latency_simulation: true
+                
+              claude_mock:
+                responses_file: "test_data/claude_responses.json"
+                error_simulation: true
+          
+          database_fixtures:
+            scope: "function"
+            autouse: true
+            
+            database_setup:
+              create_test_db: true
+              run_migrations: true
+              load_fixtures: true
+              cleanup_after_test: true
+      
+      java:
+        framework: "junit5"
+        version: "5.10.1"
+        
+        configuration:
+          test_source_directory: "src/test/java"
+          test_resources_directory: "src/test/resources"
+          
+          annotations:
+            - "@Test"
+            - "@ParameterizedTest"
+            - "@RepeatedTest"
+            - "@TestFactory"
+          
+          extensions:
+            - "MockitoExtension"
+            - "SpringBootTest"
+            - "TestContainersExtension"
+          
+          coverage:
+            tool: "jacoco"
+            minimum_coverage: 80
+            exclude_patterns:
+              - "**/dto/**"
+              - "**/entity/**"
+              - "**/config/**"
+          
+          test_categories:
+            unit_tests: "@Tag(\"unit\")"
+            integration_tests: "@Tag(\"integration\")"
+            ai_tests: "@Tag(\"ai\")"
+        
+        dependencies:
+          - "org.junit.jupiter:junit-jupiter"
+          - "org.mockito:mockito-core"
+          - "org.mockito:mockito-junit-jupiter"
+          - "org.springframework.boot:spring-boot-starter-test"
+          - "org.testcontainers:junit-jupiter"
+          - "com.github.tomakehurst:wiremock-jre8"
+      
+      go:
+        framework: "testing"
+        version: "go1.21"
+        
+        configuration:
+          test_files_pattern: "*_test.go"
+          benchmark_pattern: "Benchmark*"
+          
+          coverage:
+            minimum_coverage: 80
+            coverage_mode: "atomic"
+            coverage_output: "coverage.out"
+          
+          test_flags:
+            - "-race"     # Race condition detection
+            - "-v"        # Verbose output
+            - "-cover"    # Coverage analysis
+            - "-timeout=30m"
+          
+          build_tags:
+            - "unit"
+            - "integration"
+            - "ai_testing"
+        
+        testing_utilities:
+          assertion_library: "testify"
+          mocking_library: "gomock"
+          http_mocking: "httptest"
+          
+          testify_features:
+            - "assert"
+            - "require"
+            - "suite"
+            - "mock"
+
+  # Integration Testing
+  integration_testing:
+    database_testing:
+      strategy: "test_containers"
+      
+      test_containers_configuration:
+        postgresql:
+          image: "postgres:15"
+          environment:
+            POSTGRES_DB: "hugai_test"
+            POSTGRES_USER: "test_user"
+            POSTGRES_PASSWORD: "test_password"
+          
+          exposed_ports: [5432]
+          wait_strategy: "log"
+          wait_for_log: "database system is ready to accept connections"
+          startup_timeout: "60s"
+        
+        redis:
+          image: "redis:7-alpine"
+          exposed_ports: [6379]
+          wait_strategy: "port"
+          startup_timeout: "30s"
+        
+        elasticsearch:
+          image: "elasticsearch:8.10.0"
+          environment:
+            discovery_type: "single-node"
+            ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+            xpack_security_enabled: "false"
+          
+          exposed_ports: [9200]
+          wait_strategy: "http"
+          wait_for_http: "/cluster/health"
+          startup_timeout: "120s"
+      
+      test_data_management:
+        data_loading_strategy: "fixtures_and_factories"
+        
+        fixtures:
+          user_data: "test_data/users.json"
+          project_data: "test_data/projects.json"
+          agent_configurations: "test_data/agent_configs.yaml"
+        
+        factories:
+          user_factory:
+            library: "factory_boy"  # Python
+            traits: ["admin", "developer", "viewer"]
+            
+          project_factory:
+            library: "factory_boy"
+            relationships: ["users", "agents"]
+            
+          task_factory:
+            library: "factory_boy"
+            ai_generated_content: true
+    
+    api_testing:
+      framework: "supertest"  # Node.js / "rest-assured" for Java
+      
+      test_scenarios:
+        authentication_flows:
+          - "successful_login"
+          - "invalid_credentials"
+          - "token_expiration"
+          - "permission_validation"
+        
+        agent_operations:
+          - "agent_task_creation"
+          - "agent_task_execution"
+          - "agent_status_monitoring"
+          - "agent_error_handling"
+        
+        data_operations:
+          - "crud_operations"
+          - "data_validation"
+          - "concurrent_access"
+          - "transaction_handling"
+      
+      contract_testing:
+        provider_testing: true
+        consumer_testing: true
+        
+        pact_configuration:
+          pact_broker_url: "${PACT_BROKER_URL}"
+          pact_broker_token: "${PACT_BROKER_TOKEN}"
+          
+          consumer_tests:
+            - "hugai-web-app"
+            - "hugai-mobile-app"
+            - "hugai-cli"
+          
+          provider_tests:
+            - "hugai-api"
+            - "hugai-agent-service"
+            - "hugai-auth-service"
+    
+    service_integration:
+      microservices_testing:
+        strategy: "component_testing"
+        
+        component_test_configuration:
+          test_isolation: true
+          external_service_mocking: true
+          
+          service_dependencies:
+            mock_external_apis: true
+            use_test_databases: true
+            simulate_network_conditions: true
+          
+          test_scenarios:
+            - "service_startup_and_health"
+            - "inter_service_communication"
+            - "failure_handling_and_recovery"
+            - "load_balancing_and_scaling"
+
+  # End-to-End Testing
+  e2e_testing:
+    web_application_testing:
+      framework: "playwright"
+      version: "1.40.0"
+      
+      configuration:
+        browsers: ["chromium", "firefox", "webkit"]
+        headless: true
+        screenshot_on_failure: true
+        video_recording: "retain-on-failure"
+        
+        base_url: "${E2E_BASE_URL}"
+        timeout: 30000
+        expect_timeout: 5000
+        
+        projects:
+          - name: "desktop-chrome"
+            use: "chromium"
+            viewport: { width: 1280, height: 720 }
+          
+          - name: "mobile-chrome"
+            use: "chromium"
+            viewport: { width: 375, height: 667 }
+            device_scale_factor: 2
+          
+          - name: "desktop-firefox"
+            use: "firefox"
+            viewport: { width: 1280, height: 720 }
+        
+        test_directory: "e2e/"
+        output_directory: "e2e-results/"
+        
+        reporter: [
+          ["html", { outputFolder: "e2e-results/html-report" }],
+          ["json", { outputFile: "e2e-results/test-results.json" }],
+          ["junit", { outputFile: "e2e-results/junit.xml" }]
+        ]
+      
+      test_scenarios:
+        user_workflows:
+          user_registration_and_onboarding:
+            steps:
+              - "navigate_to_registration"
+              - "fill_registration_form"
+              - "verify_email_confirmation"
+              - "complete_onboarding_wizard"
+              - "verify_dashboard_access"
+            
+            assertions:
+              - "user_profile_created"
+              - "welcome_email_sent"
+              - "dashboard_personalized"
+          
+          project_creation_and_management:
+            steps:
+              - "create_new_project"
+              - "configure_project_settings"
+              - "add_team_members"
+              - "setup_hugai_agents"
+              - "run_first_analysis"
+            
+            assertions:
+              - "project_accessible_to_team"
+              - "agents_properly_configured"
+              - "analysis_results_displayed"
+          
+          ai_agent_interaction:
+            steps:
+              - "select_agent_type"
+              - "configure_agent_parameters"
+              - "submit_task_request"
+              - "monitor_task_progress"
+              - "review_agent_output"
+              - "approve_or_reject_results"
+            
+            assertions:
+              - "task_completed_successfully"
+              - "output_meets_quality_standards"
+              - "human_checkpoint_recorded"
+      
+      page_object_model:
+        base_page:
+          common_elements:
+            - "navigation_menu"
+            - "user_profile_dropdown"
+            - "notification_center"
+            - "help_button"
+          
+          common_actions:
+            - "wait_for_page_load"
+            - "verify_page_title"
+            - "take_screenshot"
+            - "log_console_errors"
+        
+        specific_pages:
+          login_page:
+            elements:
+              email_input: "[data-testid='email-input']"
+              password_input: "[data-testid='password-input']"
+              login_button: "[data-testid='login-button']"
+              error_message: "[data-testid='error-message']"
+            
+            actions:
+              - "login_with_credentials"
+              - "verify_login_error"
+              - "reset_password"
+          
+          dashboard_page:
+            elements:
+              project_cards: "[data-testid='project-card']"
+              create_project_button: "[data-testid='create-project']"
+              activity_feed: "[data-testid='activity-feed']"
+            
+            actions:
+              - "create_new_project"
+              - "select_project"
+              - "view_project_details"
+    
+    mobile_application_testing:
+      framework: "detox"  # React Native / "espresso" for Android / "xcuitest" for iOS
+      
+      configuration:
+        test_runner: "jest"
+        runner_config: "e2e/config.json"
+        
+        devices:
+          ios_simulator:
+            type: "ios.simulator"
+            device: "iPhone 14"
+            os: "iOS 17.0"
+          
+          android_emulator:
+            type: "android.emulator"
+            device: "Pixel_7_API_34"
+        
+        apps:
+          ios_debug:
+            type: "ios.app"
+            binary_path: "ios/build/Build/Products/Debug-iphonesimulator/HugaiApp.app"
+          
+          android_debug:
+            type: "android.apk"
+            binary_path: "android/app/build/outputs/apk/debug/app-debug.apk"
+      
+      test_scenarios:
+        - "app_launch_and_splash_screen"
+        - "user_authentication_flow"
+        - "navigation_between_screens"
+        - "offline_functionality"
+        - "push_notifications"
+        - "camera_integration"
+        - "file_upload_and_sharing"
+
+  # AI-Specific Testing
+  ai_testing:
+    model_testing:
+      unit_tests_for_ai_models:
+        test_categories:
+          model_accuracy:
+            description: "Test model prediction accuracy against known datasets"
+            test_methods:
+              - "test_prediction_accuracy_on_validation_set"
+              - "test_regression_metrics"
+              - "test_classification_metrics"
+            
+            success_criteria:
+              accuracy_threshold: 0.85
+              precision_threshold: 0.80
+              recall_threshold: 0.80
+              f1_score_threshold: 0.82
+          
+          model_robustness:
+            description: "Test model behavior with edge cases and adversarial inputs"
+            test_methods:
+              - "test_handling_of_empty_inputs"
+              - "test_handling_of_malformed_inputs"
+              - "test_adversarial_attack_resistance"
+              - "test_input_validation"
+            
+            success_criteria:
+              graceful_degradation: true
+              error_handling: "comprehensive"
+              security_validation: "passed"
+          
+          model_performance:
+            description: "Test model inference speed and resource usage"
+            test_methods:
+              - "test_inference_latency"
+              - "test_batch_processing_performance"
+              - "test_memory_usage"
+              - "test_concurrent_requests"
+            
+            success_criteria:
+              max_inference_time: "2s"
+              max_memory_usage: "4GB"
+              concurrent_request_support: 10
+      
+      integration_tests_for_ai_workflows:
+        human_ai_interaction_testing:
+          test_scenarios:
+            - "ai_suggestion_generation"
+            - "human_review_and_approval"
+            - "feedback_incorporation"
+            - "iterative_improvement"
+          
+          test_data:
+            realistic_scenarios: "test_data/ai_scenarios.json"
+            edge_cases: "test_data/edge_cases.json"
+            error_conditions: "test_data/error_scenarios.json"
+        
+        agent_orchestration_testing:
+          test_scenarios:
+            - "multi_agent_coordination"
+            - "task_delegation_and_routing"
+            - "agent_failure_and_recovery"
+            - "workload_balancing"
+          
+          success_criteria:
+            task_completion_rate: ">95%"
+            coordination_latency: "<5s"
+            failure_recovery_time: "<30s"
+    
+    prompt_testing:
+      prompt_validation:
+        test_categories:
+          prompt_injection_resistance:
+            description: "Test resistance to prompt injection attacks"
+            test_methods:
+              - "test_malicious_instruction_filtering"
+              - "test_context_boundary_enforcement"
+              - "test_output_sanitization"
+          
+          prompt_effectiveness:
+            description: "Test prompt quality and response relevance"
+            test_methods:
+              - "test_response_quality_metrics"
+              - "test_context_understanding"
+              - "test_instruction_following"
+          
+          prompt_consistency:
+            description: "Test consistent responses to similar prompts"
+            test_methods:
+              - "test_response_variability"
+              - "test_deterministic_outputs"
+              - "test_semantic_consistency"
+      
+      a_b_testing_for_prompts:
+        framework: "custom_ab_testing"
+        
+        test_configuration:
+          sample_size: 1000
+          significance_level: 0.05
+          power: 0.80
+          
+          metrics:
+            primary: "task_completion_rate"
+            secondary: ["response_quality", "user_satisfaction", "processing_time"]
+          
+          test_variants:
+            control: "current_prompt_template"
+            variant_a: "optimized_prompt_v1"
+            variant_b: "optimized_prompt_v2"
+
+  # Performance Testing
+  performance_testing:
+    load_testing:
+      framework: "k6"
+      
+      test_scenarios:
+        baseline_load:
+          virtual_users: 50
+          duration: "10m"
+          ramp_up_time: "2m"
+          
+          success_criteria:
+            response_time_p95: "<500ms"
+            error_rate: "<1%"
+            throughput: ">100_rps"
+        
+        stress_test:
+          virtual_users: 500
+          duration: "20m"
+          ramp_up_time: "5m"
+          
+          success_criteria:
+            response_time_p95: "<2s"
+            error_rate: "<5%"
+            system_stability: "maintained"
+        
+        spike_test:
+          base_users: 50
+          spike_users: 1000
+          spike_duration: "5m"
+          
+          success_criteria:
+            recovery_time: "<2m"
+            error_rate_during_spike: "<10%"
+            system_availability: ">99%"
+      
+      ai_specific_performance:
+        model_inference_load:
+          concurrent_requests: 100
+          request_duration: "30m"
+          
+          test_scenarios:
+            - "single_model_inference"
+            - "batch_model_inference"
+            - "multi_model_orchestration"
+          
+          success_criteria:
+            inference_time_p95: "<10s"
+            model_availability: ">99.5%"
+            resource_utilization: "<80%"
+
+  # Test Data Management
+  test_data_management:
+    synthetic_data_generation:
+      strategy: "ai_powered_generation"
+      
+      data_types:
+        user_data:
+          generator: "faker_with_ai_enhancement"
+          privacy_compliant: true
+          realistic_patterns: true
+          
+          generation_rules:
+            - "maintain_referential_integrity"
+            - "follow_business_rules"
+            - "include_edge_cases"
+            - "anonymize_sensitive_data"
+        
+        code_samples:
+          generator: "github_copilot_style"
+          languages: ["javascript", "python", "java", "go"]
+          complexity_levels: ["simple", "medium", "complex"]
+          
+          quality_validation:
+            syntax_checking: true
+            style_compliance: true
+            security_scanning: true
+        
+        ai_training_data:
+          generator: "domain_specific_ai"
+          quality_validation: true
+          bias_checking: true
+          
+          data_categories:
+            - "requirements_analysis_examples"
+            - "code_review_scenarios"
+            - "architecture_decisions"
+            - "testing_strategies"
+    
+    test_environment_management:
+      environment_provisioning:
+        strategy: "containerized_environments"
+        
+        environment_types:
+          unit_test_env:
+            provisioning_time: "<30s"
+            isolation: "process_level"
+            cleanup: "automatic"
+          
+          integration_test_env:
+            provisioning_time: "<5m"
+            isolation: "container_level"
+            cleanup: "automatic"
+            external_service_mocking: true
+          
+          e2e_test_env:
+            provisioning_time: "<15m"
+            isolation: "full_environment"
+            cleanup: "scheduled"
+            production_like: true
+
+  # Test Reporting and Analytics
+  test_reporting:
+    unified_reporting:
+      dashboard_integration:
+        grafana_dashboards:
+          test_execution_overview:
+            metrics:
+              - "test_pass_rate_by_category"
+              - "test_execution_time_trends"
+              - "flaky_test_identification"
+              - "coverage_trends_by_component"
+          
+          ai_testing_metrics:
+            metrics:
+              - "model_accuracy_trends"
+              - "ai_test_coverage"
+              - "prompt_effectiveness_scores"
+              - "human_ai_interaction_success_rates"
+      
+      notification_integration:
+        slack_notifications:
+          test_failures: "#dev-alerts"
+          coverage_drops: "#qa-alerts"
+          performance_regressions: "#perf-alerts"
+        
+        email_reports:
+          daily_test_summary: ["qa-team@company.com"]
+          weekly_trends: ["engineering-managers@company.com"]
+    
+    test_analytics:
+      flaky_test_detection:
+        algorithm: "statistical_analysis"
+        confidence_threshold: 0.95
+        
+        remediation_actions:
+          - "automatic_retry_with_analysis"
+          - "quarantine_unstable_tests"
+          - "developer_notification"
+          - "root_cause_investigation"
+      
+      test_optimization:
+        test_selection: "impact_based"
+        parallel_execution: "intelligent_scheduling"
+        resource_optimization: "dynamic_allocation"
+
+integration:
+  # CI/CD Integration
+  pipeline_integration:
+    test_stages:
+      commit_stage:
+        tests: ["unit", "fast_integration"]
+        timeout: "10m"
+        parallel_execution: true
+        
+      acceptance_stage:
+        tests: ["e2e", "performance", "security"]
+        timeout: "45m"
+        environment: "staging"
+        
+      production_validation:
+        tests: ["smoke", "health_checks"]
+        timeout: "5m"
+        environment: "production"
+    
+    quality_gates:
+      test_coverage_gate:
+        minimum_coverage: 80
+        coverage_delta: -2  # Max 2% decrease allowed
+        
+      test_reliability_gate:
+        max_flaky_tests: 5
+        max_failed_tests: 0
+        
+      performance_gate:
+        max_regression: "10%"
+        baseline_comparison: "last_successful_build"
+
+validation:
+  # Test Framework Validation
+  framework_effectiveness:
+    test_execution_speed: "optimized"
+    test_reliability: ">99%"
+    maintenance_overhead: "minimal"
+    developer_experience: "positive"
+  
+  # Quality Assurance Validation
+  qa_validation:
+    defect_detection_rate: ">90%"
+    false_positive_rate: "<5%"
+    test_automation_coverage: ">80%"
+    regression_prevention: "effective"
+
+examples:
+  # Jest Test Configuration
+  jest_test_example:
+    test_file: |
+      import { AgentOrchestrator } from '@/agents/orchestrator';
+      import { MockAIModel } from '@test/mocks/ai-model';
+      
+      describe('AgentOrchestrator', () => {
+        let orchestrator: AgentOrchestrator;
+        let mockAIModel: MockAIModel;
+        
+        beforeEach(() => {
+          mockAIModel = new MockAIModel();
+          orchestrator = new AgentOrchestrator(mockAIModel);
+        });
+        
+        it('should execute task with human checkpoint', async () => {
+          const task = { type: 'code_review', priority: 'high' };
+          
+          mockAIModel.mockResponse({
+            suggestions: ['Add error handling', 'Improve documentation'],
+            confidence: 0.85
+          });
+          
+          const result = await orchestrator.executeTask(task);
+          
+          expect(result.status).toBe('pending_human_approval');
+          expect(result.aiSuggestions).toHaveLength(2);
+          expect(result.requiresHumanReview).toBe(true);
+        });
+      });
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize test automation
+  hugai test init --frameworks jest,pytest,playwright --coverage-threshold 80
+  
+  # Run all tests
+  hugai test run --all --coverage --parallel --report
+  
+  # Run specific test categories
+  hugai test run --category unit,integration --watch
+  
+  # Run AI-specific tests
+  hugai test ai --models gpt4,claude --scenarios prompt-injection,accuracy
+  
+  # Run performance tests
+  hugai test performance --load-profile baseline --duration 10m
+  
+  # Generate test reports
+  hugai test report --format html,junit --output test-results/
+  
+  # Analyze test trends
+  hugai test analytics --period weekly --metrics coverage,reliability,performance

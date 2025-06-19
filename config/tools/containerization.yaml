@@ -1,0 +1,754 @@
+metadata:
+  name: containerization-configuration
+  version: 1.0.0
+  description: "Container management and orchestration configuration for HUGAI development workflows"
+  category: infrastructure-tools
+  dependencies:
+    - docker-registry
+    - kubernetes-cluster
+    - security-scanning
+    - monitoring-tools
+  tags:
+    - containerization
+    - orchestration
+    - docker
+    - kubernetes
+    - microservices
+
+configuration:
+  # Containerization Philosophy
+  containerization_philosophy:
+    purpose: "Provide consistent, scalable, and secure container-based deployment for HUGAI agents and applications"
+    principles:
+      immutability: "Build immutable container images with versioned dependencies"
+      security_first: "Implement security scanning and hardening by default"
+      resource_efficiency: "Optimize resource usage through intelligent scaling and resource management"
+      observability: "Built-in monitoring, logging, and tracing capabilities"
+      portability: "Ensure containers run consistently across environments"
+
+  # Docker Configuration
+  docker_configuration:
+    registry_settings:
+      primary_registry:
+        url: "registry.hugai.dev"
+        authentication:
+          username: "${DOCKER_REGISTRY_USERNAME}"
+          password: "${DOCKER_REGISTRY_PASSWORD}"
+        ssl_verification: true
+        timeout: 30
+      
+      mirror_registries:
+        - url: "mirror.hugai.dev"
+          priority: 1
+          fallback: true
+        - url: "backup-registry.hugai.dev"
+          priority: 2
+          fallback: true
+      
+      public_registries:
+        docker_hub:
+          url: "docker.io"
+          rate_limiting: true
+          pull_limit: 100 # per 6 hours
+        
+        github_registry:
+          url: "ghcr.io"
+          authentication_required: true
+    
+    base_image_strategy:
+      security_scanning: true
+      vulnerability_threshold: "MEDIUM"
+      auto_updates: true
+      approved_base_images:
+        minimal_runtime:
+          - "gcr.io/distroless/base-debian12"
+          - "gcr.io/distroless/static-debian12"
+          - "scratch"
+        
+        language_specific:
+          node:
+            - "node:18-alpine"
+            - "node:20-alpine"
+            security_updates: "automatic"
+            scan_frequency: "daily"
+          
+          python:
+            - "python:3.11-slim"
+            - "python:3.12-slim"
+            security_updates: "automatic"
+            scan_frequency: "daily"
+          
+          java:
+            - "openjdk:17-jre-slim"
+            - "openjdk:21-jre-slim"
+            security_updates: "automatic"
+            scan_frequency: "daily"
+          
+          go:
+            - "golang:1.21-alpine"
+            - "gcr.io/distroless/static-debian12"
+            build_strategy: "multi_stage"
+        
+        ai_ml_workloads:
+          - "nvidia/cuda:12.0-runtime-ubuntu22.04"
+          - "tensorflow/tensorflow:2.13.0-gpu"
+          - "pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime"
+    
+    build_configuration:
+      buildkit:
+        enabled: true
+        version: "latest"
+        features:
+          - "multi_platform_builds"
+          - "build_cache"
+          - "secrets_management"
+          - "ssh_forwarding"
+      
+      multi_stage_builds:
+        enabled: true
+        stages:
+          build_stage:
+            purpose: "compile_and_build"
+            base_image: "build_tools_image"
+            optimization: "speed"
+          
+          runtime_stage:
+            purpose: "minimal_runtime"
+            base_image: "distroless_or_minimal"
+            optimization: "size_and_security"
+      
+      build_optimization:
+        layer_caching: true
+        cache_from: ["registry.hugai.dev/cache/${CI_PROJECT_NAME}:latest"]
+        cache_to: ["registry.hugai.dev/cache/${CI_PROJECT_NAME}:latest"]
+        squash_layers: false # Keep false for better caching
+        
+        size_optimization:
+          remove_package_managers: true
+          clean_apt_cache: true
+          remove_unnecessary_files: true
+          use_minimal_base_images: true
+      
+      security_hardening:
+        run_as_non_root: true
+        non_root_user: "appuser"
+        uid: 10001
+        gid: 10001
+        
+        filesystem_permissions:
+          read_only_root_filesystem: true
+          tmpfs_mounts: ["/tmp", "/var/tmp"]
+          volume_mounts: ["/app/data", "/app/logs"]
+        
+        capability_dropping:
+          drop_all: true
+          add_only_required: ["NET_BIND_SERVICE"]
+        
+        security_scanning:
+          scan_on_build: true
+          scanners: ["trivy", "grype", "clair"]
+          fail_on_critical: true
+          fail_on_high: false
+          allowlist_file: ".security-allowlist.yaml"
+
+  # Container Image Templates
+  image_templates:
+    hugai_agent_base:
+      dockerfile_template: |
+        # Multi-stage build for HUGAI agents
+        FROM node:18-alpine AS builder
+        
+        # Set up build environment
+        WORKDIR /build
+        COPY package*.json ./
+        RUN npm ci --only=production --no-audit
+        
+        # Copy source code
+        COPY src/ ./src/
+        COPY config/ ./config/
+        
+        # Build application
+        RUN npm run build
+        
+        # Runtime stage
+        FROM gcr.io/distroless/nodejs18-debian12
+        
+        # Create non-root user
+        USER 10001:10001
+        
+        # Copy built application
+        COPY --from=builder --chown=10001:10001 /build/dist /app/
+        COPY --from=builder --chown=10001:10001 /build/node_modules /app/node_modules/
+        
+        # Set working directory
+        WORKDIR /app
+        
+        # Expose port
+        EXPOSE 8080
+        
+        # Health check
+        HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+          CMD ["node", "health-check.js"]
+        
+        # Start application
+        ENTRYPOINT ["node", "index.js"]
+      
+      build_args:
+        NODE_ENV: "production"
+        APP_VERSION: "${CI_COMMIT_SHA}"
+        BUILD_DATE: "${BUILD_DATE}"
+      
+      labels:
+        maintainer: "hugai-team@company.com"
+        version: "${CI_COMMIT_TAG}"
+        description: "HUGAI Agent Runtime"
+        source: "${CI_PROJECT_URL}"
+    
+    hugai_web_app:
+      dockerfile_template: |
+        # Multi-stage build for web applications
+        FROM node:18-alpine AS builder
+        
+        # Install build dependencies
+        RUN apk add --no-cache git
+        
+        WORKDIR /build
+        
+        # Install dependencies
+        COPY package*.json ./
+        RUN npm ci --include=dev --no-audit
+        
+        # Copy source and build
+        COPY . .
+        RUN npm run build
+        
+        # Production stage
+        FROM nginx:1.25-alpine
+        
+        # Copy nginx configuration
+        COPY nginx.conf /etc/nginx/nginx.conf
+        
+        # Copy built assets
+        COPY --from=builder /build/dist /usr/share/nginx/html
+        
+        # Create non-root user for nginx
+        RUN addgroup -g 101 -S nginx && \
+            adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx nginx
+        
+        # Set ownership
+        RUN chown -R nginx:nginx /usr/share/nginx/html
+        
+        # Expose port
+        EXPOSE 8080
+        
+        # Health check
+        HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+          CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+        
+        # Switch to non-root user
+        USER nginx
+        
+        CMD ["nginx", "-g", "daemon off;"]
+
+  # Kubernetes Orchestration
+  kubernetes_orchestration:
+    cluster_configuration:
+      cluster_name: "hugai-production"
+      kubernetes_version: "1.28"
+      cloud_provider: "gcp" # gcp | aws | azure | on_premise
+      
+      node_pools:
+        system_pool:
+          node_count: 3
+          machine_type: "e2-standard-4"
+          disk_size: "100GB"
+          disk_type: "pd-ssd"
+          auto_scaling:
+            enabled: true
+            min_nodes: 3
+            max_nodes: 5
+          labels:
+            pool_type: "system"
+            workload_type: "infrastructure"
+        
+        agent_pool:
+          node_count: 5
+          machine_type: "e2-standard-8"
+          disk_size: "200GB"
+          disk_type: "pd-ssd"
+          auto_scaling:
+            enabled: true
+            min_nodes: 3
+            max_nodes: 20
+          labels:
+            pool_type: "agents"
+            workload_type: "ai_workload"
+          taints:
+            - key: "workload"
+              value: "ai-agents"
+              effect: "NoSchedule"
+        
+        gpu_pool:
+          node_count: 2
+          machine_type: "n1-standard-4"
+          accelerator:
+            type: "nvidia-tesla-t4"
+            count: 1
+          auto_scaling:
+            enabled: true
+            min_nodes: 0
+            max_nodes: 10
+          labels:
+            pool_type: "gpu"
+            workload_type: "ml_training"
+          taints:
+            - key: "nvidia.com/gpu"
+              value: "true"
+              effect: "NoSchedule"
+      
+      network_configuration:
+        network_policy: true
+        pod_security_policy: true
+        rbac: true
+        network_plugin: "calico"
+        service_mesh: "istio"
+        ingress_controller: "nginx"
+    
+    namespace_strategy:
+      namespace_per_environment: true
+      namespace_per_team: false
+      namespace_per_application: false
+      
+      namespaces:
+        hugai-system:
+          purpose: "core_hugai_infrastructure"
+          resource_quotas:
+            requests.cpu: "10"
+            requests.memory: "20Gi"
+            limits.cpu: "20"
+            limits.memory: "40Gi"
+            persistentvolumeclaims: "10"
+          
+          network_policies:
+            default_deny: true
+            allowed_ingress: ["hugai-gateway"]
+            allowed_egress: ["external-apis", "monitoring"]
+        
+        hugai-agents:
+          purpose: "ai_agent_workloads"
+          resource_quotas:
+            requests.cpu: "50"
+            requests.memory: "100Gi"
+            limits.cpu: "100"
+            limits.memory: "200Gi"
+            count/pods: "100"
+          
+          network_policies:
+            default_deny: true
+            allowed_ingress: ["hugai-gateway", "hugai-system"]
+            allowed_egress: ["external-apis", "databases", "monitoring"]
+        
+        hugai-web:
+          purpose: "web_applications_and_apis"
+          resource_quotas:
+            requests.cpu: "20"
+            requests.memory: "40Gi"
+            limits.cpu: "40"
+            limits.memory: "80Gi"
+            count/services.loadbalancers: "5"
+    
+    deployment_configurations:
+      agent_deployment_template:
+        api_version: "apps/v1"
+        kind: "Deployment"
+        metadata:
+          name: "${AGENT_NAME}"
+          namespace: "hugai-agents"
+          labels:
+            app: "${AGENT_NAME}"
+            component: "hugai-agent"
+            version: "${IMAGE_TAG}"
+        
+        spec:
+          replicas: 3
+          strategy:
+            type: "RollingUpdate"
+            rolling_update:
+              max_unavailable: 1
+              max_surge: 1
+          
+          selector:
+            match_labels:
+              app: "${AGENT_NAME}"
+          
+          template:
+            metadata:
+              labels:
+                app: "${AGENT_NAME}"
+                component: "hugai-agent"
+                version: "${IMAGE_TAG}"
+              annotations:
+                prometheus.io/scrape: "true"
+                prometheus.io/port: "9090"
+                prometheus.io/path: "/metrics"
+            
+            spec:
+              service_account_name: "${AGENT_NAME}-sa"
+              security_context:
+                run_as_non_root: true
+                run_as_user: 10001
+                run_as_group: 10001
+                fs_group: 10001
+              
+              node_selector:
+                workload_type: "ai_workload"
+              
+              tolerations:
+                - key: "workload"
+                  operator: "Equal"
+                  value: "ai-agents"
+                  effect: "NoSchedule"
+              
+              containers:
+                - name: "${AGENT_NAME}"
+                  image: "registry.hugai.dev/${AGENT_NAME}:${IMAGE_TAG}"
+                  image_pull_policy: "IfNotPresent"
+                  
+                  ports:
+                    - container_port: 8080
+                      name: "http"
+                    - container_port: 9090
+                      name: "metrics"
+                  
+                  env:
+                    - name: "AGENT_NAME"
+                      value: "${AGENT_NAME}"
+                    - name: "ENVIRONMENT"
+                      value: "${ENVIRONMENT}"
+                    - name: "LOG_LEVEL"
+                      value: "INFO"
+                  
+                  env_from:
+                    - secret_ref:
+                        name: "${AGENT_NAME}-secrets"
+                    - config_map_ref:
+                        name: "${AGENT_NAME}-config"
+                  
+                  resources:
+                    requests:
+                      cpu: "500m"
+                      memory: "1Gi"
+                    limits:
+                      cpu: "2"
+                      memory: "4Gi"
+                  
+                  security_context:
+                    allow_privilege_escalation: false
+                    read_only_root_filesystem: true
+                    capabilities:
+                      drop: ["ALL"]
+                  
+                  liveness_probe:
+                    http_get:
+                      path: "/health"
+                      port: 8080
+                    initial_delay_seconds: 30
+                    period_seconds: 30
+                    timeout_seconds: 5
+                    failure_threshold: 3
+                  
+                  readiness_probe:
+                    http_get:
+                      path: "/ready"
+                      port: 8080
+                    initial_delay_seconds: 5
+                    period_seconds: 10
+                    timeout_seconds: 3
+                    failure_threshold: 3
+                  
+                  volume_mounts:
+                    - name: "tmp"
+                      mount_path: "/tmp"
+                    - name: "app-data"
+                      mount_path: "/app/data"
+              
+              volumes:
+                - name: "tmp"
+                  empty_dir: {}
+                - name: "app-data"
+                  persistent_volume_claim:
+                    claim_name: "${AGENT_NAME}-data"
+      
+      horizontal_pod_autoscaler:
+        api_version: "autoscaling/v2"
+        kind: "HorizontalPodAutoscaler"
+        metadata:
+          name: "${AGENT_NAME}-hpa"
+          namespace: "hugai-agents"
+        
+        spec:
+          scale_target_ref:
+            api_version: "apps/v1"
+            kind: "Deployment"
+            name: "${AGENT_NAME}"
+          
+          min_replicas: 2
+          max_replicas: 10
+          
+          metrics:
+            - type: "Resource"
+              resource:
+                name: "cpu"
+                target:
+                  type: "Utilization"
+                  average_utilization: 70
+            
+            - type: "Resource"
+              resource:
+                name: "memory"
+                target:
+                  type: "Utilization"
+                  average_utilization: 80
+          
+          behavior:
+            scale_up:
+              stabilization_window_seconds: 60
+              policies:
+                - type: "Percent"
+                  value: 100
+                  period_seconds: 15
+            scale_down:
+              stabilization_window_seconds: 300
+              policies:
+                - type: "Percent"
+                  value: 10
+                  period_seconds: 60
+
+  # Service Mesh Configuration
+  service_mesh:
+    provider: "istio"
+    version: "1.19"
+    
+    installation_profile: "default"
+    components:
+      pilot:
+        enabled: true
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "2048Mi"
+      
+      proxy:
+        enabled: true
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "2000m"
+            memory: "1024Mi"
+      
+      gateways:
+        istio_ingress_gateway:
+          enabled: true
+          service_type: "LoadBalancer"
+          ports:
+            - port: 80
+              target_port: 8080
+              name: "http"
+            - port: 443
+              target_port: 8443
+              name: "https"
+    
+    traffic_management:
+      virtual_services: true
+      destination_rules: true
+      gateways: true
+      service_entries: true
+      
+      load_balancing: "ROUND_ROBIN"
+      connection_pooling:
+        tcp:
+          max_connections: 100
+        http:
+          http1_max_pending_requests: 50
+          h2_max_requests: 100
+      
+      circuit_breaker:
+        consecutive_errors: 5
+        interval: "30s"
+        base_ejection_time: "30s"
+        max_ejection_percent: 50
+      
+      retry_policy:
+        attempts: 3
+        per_try_timeout: "30s"
+        retry_on: "5xx,reset,connect-failure,refused-stream"
+    
+    security:
+      mutual_tls:
+        mode: "STRICT"
+        auto_mtls: true
+      
+      authorization_policies: true
+      authentication_policies: true
+      
+      peer_authentication:
+        default_mode: "STRICT"
+        port_level_mtls: true
+      
+      request_authentication:
+        jwt_rules: true
+        oauth2_integration: true
+    
+    observability:
+      telemetry_v2: true
+      distributed_tracing:
+        provider: "jaeger"
+        sampling_rate: 1.0
+      
+      metrics:
+        prometheus_integration: true
+        custom_metrics: true
+      
+      access_logs:
+        enabled: true
+        format: "json"
+        providers: ["envoy", "otel"]
+
+integration:
+  # CI/CD Integration
+  cicd_integration:
+    image_building:
+      build_on_commit: true
+      build_on_tag: true
+      parallel_builds: true
+      
+      build_triggers:
+        - "code_changes"
+        - "dockerfile_changes"
+        - "dependency_updates"
+        - "base_image_updates"
+      
+      build_optimization:
+        layer_caching: true
+        multi_stage_optimization: true
+        dependency_caching: true
+        parallel_layer_builds: true
+    
+    deployment_automation:
+      auto_deploy_environments: ["development", "staging"]
+      approval_required_environments: ["production"]
+      
+      deployment_strategies:
+        development: "direct_replace"
+        staging: "rolling_update"
+        production: "blue_green"
+      
+      rollback_automation:
+        health_check_failures: true
+        performance_degradation: true
+        error_rate_spike: true
+        manual_trigger: true
+
+  # Monitoring Integration
+  monitoring_integration:
+    container_metrics:
+      cadvisor: true
+      node_exporter: true
+      kube_state_metrics: true
+      
+      custom_metrics:
+        application_metrics: true
+        business_metrics: true
+        performance_metrics: true
+    
+    log_aggregation:
+      fluent_bit: true
+      elasticsearch_backend: true
+      log_retention: "90_days"
+      
+      log_parsing:
+        json_logs: true
+        structured_logging: true
+        error_extraction: true
+    
+    alerting:
+      prometheus_alertmanager: true
+      alert_rules:
+        high_cpu_usage: ">80%"
+        high_memory_usage: ">85%"
+        pod_crash_looping: true
+        deployment_failures: true
+        pvc_near_full: ">90%"
+
+validation:
+  # Container Security Validation
+  security_validation:
+    vulnerability_scanning: "required"
+    image_signing: "required"
+    security_policies: "enforced"
+    runtime_security: "monitored"
+  
+  # Performance Validation
+  performance_validation:
+    resource_efficiency: ">80%"
+    startup_time: "<30_seconds"
+    scaling_responsiveness: "<2_minutes"
+    resource_utilization: "optimized"
+  
+  # Reliability Validation
+  reliability_validation:
+    availability_target: ">99.9%"
+    recovery_time: "<5_minutes"
+    data_persistence: "guaranteed"
+    disaster_recovery: "tested"
+
+examples:
+  # Example Agent Deployment
+  example_deployment:
+    agent_name: "requirements-analyzer"
+    configuration: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: requirements-analyzer
+        namespace: hugai-agents
+      spec:
+        replicas: 3
+        selector:
+          matchLabels:
+            app: requirements-analyzer
+        template:
+          spec:
+            containers:
+            - name: requirements-analyzer
+              image: registry.hugai.dev/requirements-analyzer:v1.0.0
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  cpu: 2
+                  memory: 4Gi
+
+# CLI Usage Examples
+cli_usage: |
+  # Build and push container image
+  hugai container build --dockerfile Dockerfile.agent --tag requirements-analyzer:v1.0.0
+  hugai container push requirements-analyzer:v1.0.0
+  
+  # Deploy to Kubernetes
+  hugai container deploy --agent requirements-analyzer --environment production
+  
+  # Scale deployment
+  hugai container scale requirements-analyzer --replicas 5
+  
+  # Monitor container health
+  hugai container status --agent requirements-analyzer --watch
+  
+  # View container logs
+  hugai container logs requirements-analyzer --follow --tail 100
+  
+  # Execute into container
+  hugai container exec requirements-analyzer --shell /bin/sh

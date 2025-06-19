@@ -1,0 +1,686 @@
+metadata:
+  name: deployment-tools-configuration
+  version: 1.0.0
+  description: "Comprehensive deployment automation and infrastructure management for HUGAI applications"
+  category: infrastructure-tools
+  dependencies:
+    - containerization
+    - infrastructure-as-code
+    - monitoring-tools
+    - security-scanning
+  tags:
+    - deployment-automation
+    - infrastructure-management
+    - continuous-deployment
+    - rollback-capabilities
+    - environment-management
+
+configuration:
+  # Deployment Philosophy
+  deployment_philosophy:
+    purpose: "Provide reliable, scalable, and secure deployment automation for HUGAI applications and infrastructure"
+    principles:
+      infrastructure_as_code: "All infrastructure defined and versioned as code"
+      immutable_infrastructure: "Deploy new infrastructure rather than modifying existing"
+      zero_downtime_deployments: "Ensure service availability during deployments"
+      automated_rollbacks: "Automatic rollback on deployment failures or issues"
+      environment_parity: "Consistent environments from development to production"
+      security_by_default: "Security controls integrated into deployment process"
+
+  # Infrastructure as Code
+  infrastructure_as_code:
+    primary_tool: "terraform"
+    version: "1.6.0"
+    
+    terraform_configuration:
+      backend:
+        type: "s3"
+        bucket: "hugai-terraform-state"
+        key: "infrastructure/terraform.tfstate"
+        region: "us-west-2"
+        encrypt: true
+        dynamodb_table: "hugai-terraform-locks"
+        
+      providers:
+        aws:
+          version: "~> 5.0"
+          region: "us-west-2"
+          default_tags:
+            Environment: "${var.environment}"
+            Project: "hugai"
+            ManagedBy: "terraform"
+            Owner: "${var.team_name}"
+        
+        kubernetes:
+          version: "~> 2.23"
+          host: "${data.aws_eks_cluster.cluster.endpoint}"
+          cluster_ca_certificate: "${base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)}"
+        
+        helm:
+          version: "~> 2.11"
+          kubernetes:
+            host: "${data.aws_eks_cluster.cluster.endpoint}"
+      
+      modules:
+        vpc_module:
+          source: "terraform-aws-modules/vpc/aws"
+          version: "~> 5.0"
+          
+          configuration:
+            name: "hugai-vpc-${var.environment}"
+            cidr: "10.0.0.0/16"
+            azs: ["us-west-2a", "us-west-2b", "us-west-2c"]
+            private_subnets: ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+            public_subnets: ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+            enable_nat_gateway: true
+            enable_vpn_gateway: false
+            enable_dns_hostnames: true
+            enable_dns_support: true
+        
+        eks_module:
+          source: "terraform-aws-modules/eks/aws"
+          version: "~> 19.0"
+          
+          configuration:
+            cluster_name: "hugai-${var.environment}"
+            cluster_version: "1.28"
+            vpc_id: "${module.vpc.vpc_id}"
+            subnet_ids: "${module.vpc.private_subnets}"
+            
+            node_groups:
+              system:
+                instance_types: ["t3.medium"]
+                min_size: 2
+                max_size: 4
+                desired_size: 2
+                labels:
+                  role: "system"
+                taints:
+                  - key: "system"
+                    value: "true"
+                    effect: "NO_SCHEDULE"
+              
+              agents:
+                instance_types: ["c5.xlarge"]
+                min_size: 3
+                max_size: 20
+                desired_size: 5
+                labels:
+                  role: "agents"
+                  workload: "ai"
+              
+              gpu:
+                instance_types: ["p3.2xlarge"]
+                min_size: 0
+                max_size: 5
+                desired_size: 0
+                labels:
+                  role: "gpu"
+                  workload: "ml-training"
+                taints:
+                  - key: "nvidia.com/gpu"
+                    value: "true"
+                    effect: "NO_SCHEDULE"
+        
+        rds_module:
+          source: "terraform-aws-modules/rds/aws"
+          version: "~> 6.0"
+          
+          configuration:
+            identifier: "hugai-${var.environment}"
+            engine: "postgres"
+            engine_version: "15.4"
+            instance_class: "db.r6g.large"
+            allocated_storage: 100
+            max_allocated_storage: 1000
+            
+            db_name: "hugai"
+            username: "${var.db_username}"
+            password: "${var.db_password}"
+            
+            vpc_security_group_ids: ["${aws_security_group.rds.id}"]
+            db_subnet_group_name: "${aws_db_subnet_group.main.name}"
+            
+            backup_retention_period: 7
+            backup_window: "03:00-04:00"
+            maintenance_window: "sun:04:00-sun:05:00"
+            
+            encryption_enabled: true
+            performance_insights_enabled: true
+            monitoring_interval: 60
+            
+            deletion_protection: true
+            skip_final_snapshot: false
+            final_snapshot_identifier: "hugai-${var.environment}-final-${formatdate('YYYY-MM-DD-hhmm', timestamp())}"
+    
+    validation_tools:
+      terraform_plan_validation: true
+      security_scanning: true
+      cost_estimation: true
+      
+      validation_pipeline:
+        - tool: "terraform validate"
+          description: "Validate Terraform syntax and configuration"
+        
+        - tool: "tflint"
+          description: "Lint Terraform code for best practices"
+          config_file: ".tflint.hcl"
+        
+        - tool: "checkov"
+          description: "Security and compliance scanning"
+          frameworks: ["terraform"]
+        
+        - tool: "infracost"
+          description: "Cost estimation for infrastructure changes"
+          api_key: "${INFRACOST_API_KEY}"
+        
+        - tool: "terraform plan"
+          description: "Generate and review execution plan"
+          out_file: "tfplan"
+
+  # Deployment Strategies
+  deployment_strategies:
+    blue_green_deployment:
+      description: "Zero-downtime deployment with instant rollback capability"
+      
+      configuration:
+        traffic_routing: "load_balancer_based"
+        health_check_timeout: "300s"
+        traffic_switch_delay: "30s"
+        rollback_trigger_timeout: "600s"
+        
+        prerequisites:
+          - "green_environment_health_check_passed"
+          - "integration_tests_passed"
+          - "security_scans_passed"
+          - "performance_baseline_met"
+        
+        process_steps:
+          - step: "deploy_to_green_environment"
+            timeout: "20m"
+            rollback_on_failure: true
+          
+          - step: "run_smoke_tests"
+            timeout: "5m"
+            rollback_on_failure: true
+          
+          - step: "gradual_traffic_shift"
+            traffic_percentages: [10, 25, 50, 75, 100]
+            step_duration: "2m"
+            rollback_on_error_spike: true
+          
+          - step: "monitor_and_validate"
+            duration: "10m"
+            auto_rollback_conditions:
+              - "error_rate > 2%"
+              - "response_time_p95 > 1000ms"
+              - "health_check_failures > 5%"
+        
+        rollback_strategy:
+          automatic_triggers:
+            - "health_check_failure_threshold_exceeded"
+            - "error_rate_spike_detected"
+            - "performance_degradation_detected"
+            - "manual_rollback_initiated"
+          
+          rollback_process:
+            - "immediate_traffic_switch_to_blue"
+            - "green_environment_isolation"
+            - "incident_notification"
+            - "rollback_verification"
+    
+    canary_deployment:
+      description: "Gradual rollout with traffic-based validation"
+      
+      configuration:
+        initial_traffic_percentage: 5
+        increment_percentage: 10
+        increment_interval: "10m"
+        max_increment_failures: 2
+        
+        success_criteria:
+          error_rate_threshold: "< 1%"
+          response_time_p95_threshold: "< 500ms"
+          success_rate_threshold: "> 99%"
+          custom_metrics_threshold: "defined_per_service"
+        
+        canary_analysis:
+          analysis_interval: "5m"
+          minimum_request_count: 100
+          statistical_significance: 0.95
+          
+          metrics_analysis:
+            - metric: "success_rate"
+              threshold: 0.99
+              comparison: "current_vs_baseline"
+            
+            - metric: "response_time_p95"
+              threshold: 500
+              comparison: "current_vs_baseline"
+            
+            - metric: "error_rate"
+              threshold: 0.01
+              comparison: "current_vs_baseline"
+        
+        promotion_criteria:
+          all_increments_successful: true
+          no_critical_alerts: true
+          performance_within_sla: true
+          manual_approval_received: false # Set to true for critical services
+        
+        rollback_conditions:
+          failure_threshold_exceeded: true
+          critical_error_detected: true
+          manual_intervention_required: true
+    
+    rolling_deployment:
+      description: "Sequential instance updates with health verification"
+      
+      configuration:
+        batch_size: 2
+        batch_percentage: 25
+        batch_delay: "60s"
+        max_unavailable: "25%"
+        max_surge: "25%"
+        
+        health_check_configuration:
+          grace_period: "30s"
+          check_interval: "10s"
+          failure_threshold: 3
+          success_threshold: 1
+          timeout: "5s"
+        
+        update_strategy:
+          - "scale_up_new_instances"
+          - "wait_for_health_checks"
+          - "drain_old_instances"
+          - "terminate_old_instances"
+          - "verify_cluster_health"
+        
+        rollback_strategy:
+          automatic_rollback: true
+          rollback_triggers:
+            - "health_check_failures > 50%"
+            - "deployment_timeout_exceeded"
+            - "cluster_instability_detected"
+
+  # Environment Management
+  environment_management:
+    environment_definitions:
+      development:
+        purpose: "Feature development and testing"
+        infrastructure_size: "minimal"
+        auto_scaling: false
+        monitoring_level: "basic"
+        data_retention: "7_days"
+        
+        configuration:
+          instance_types: ["t3.small", "t3.medium"]
+          min_instances: 1
+          max_instances: 3
+          storage_type: "gp3"
+          backup_frequency: "none"
+          ssl_certificates: "self_signed"
+        
+        deployment_automation:
+          trigger: "push_to_develop_branch"
+          approval_required: false
+          testing_required: "unit_tests_only"
+          rollback_automation: true
+      
+      staging:
+        purpose: "Production-like testing and validation"
+        infrastructure_size: "medium"
+        auto_scaling: true
+        monitoring_level: "detailed"
+        data_retention: "30_days"
+        
+        configuration:
+          instance_types: ["t3.medium", "t3.large"]
+          min_instances: 2
+          max_instances: 10
+          storage_type: "gp3"
+          backup_frequency: "daily"
+          ssl_certificates: "lets_encrypt"
+        
+        deployment_automation:
+          trigger: "manual_or_scheduled"
+          approval_required: true
+          testing_required: "full_test_suite"
+          rollback_automation: true
+      
+      production:
+        purpose: "Live user-facing environment"
+        infrastructure_size: "large"
+        auto_scaling: true
+        monitoring_level: "comprehensive"
+        data_retention: "7_years"
+        
+        configuration:
+          instance_types: ["c5.large", "c5.xlarge"]
+          min_instances: 5
+          max_instances: 50
+          storage_type: "io2"
+          backup_frequency: "continuous"
+          ssl_certificates: "commercial_ca"
+        
+        deployment_automation:
+          trigger: "manual_only"
+          approval_required: true
+          approvers: ["release_manager", "security_officer"]
+          testing_required: "full_suite_plus_smoke_tests"
+          rollback_automation: true
+          change_window: "maintenance_window_only"
+    
+    environment_provisioning:
+      automation_tool: "terraform"
+      provisioning_time: "< 30_minutes"
+      cost_optimization: true
+      
+      provisioning_pipeline:
+        - step: "validate_terraform_configuration"
+          timeout: "5m"
+        
+        - step: "plan_infrastructure_changes"
+          timeout: "10m"
+          approval_required: true
+        
+        - step: "apply_infrastructure_changes"
+          timeout: "20m"
+          parallelization: true
+        
+        - step: "verify_infrastructure_health"
+          timeout: "10m"
+          health_checks: "comprehensive"
+        
+        - step: "configure_monitoring_and_alerting"
+          timeout: "5m"
+          monitoring_stack: "prometheus_grafana"
+    
+    environment_lifecycle:
+      automated_cleanup: true
+      retention_policies:
+        feature_branches: "7_days_after_merge"
+        pull_request_previews: "3_days_after_close"
+        staging_snapshots: "30_days"
+        production_backups: "7_years"
+      
+      cost_management:
+        auto_shutdown: true
+        shutdown_schedule:
+          development: "weekends_and_nights"
+          staging: "nights_only"
+          production: "never"
+        
+        resource_rightsizing: true
+        spot_instance_usage: "development_and_staging"
+
+  # Application Deployment
+  application_deployment:
+    containerized_applications:
+      orchestrator: "kubernetes"
+      deployment_tool: "helm"
+      
+      helm_configuration:
+        chart_repository: "https://charts.hugai.dev"
+        chart_version_strategy: "semantic_versioning"
+        values_templating: "environment_specific"
+        
+        default_values:
+          image:
+            registry: "registry.hugai.dev"
+            pullPolicy: "IfNotPresent"
+            tag: "${IMAGE_TAG}"
+          
+          service:
+            type: "ClusterIP"
+            port: 8080
+            targetPort: 8080
+          
+          ingress:
+            enabled: true
+            className: "nginx"
+            annotations:
+              cert_manager_io_cluster_issuer: "letsencrypt-prod"
+              nginx_ingress_kubernetes_io_rate_limit: "100"
+          
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          
+          autoscaling:
+            enabled: true
+            minReplicas: 2
+            maxReplicas: 10
+            targetCPUUtilizationPercentage: 70
+          
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            fsGroup: 10001
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+      
+      deployment_pipeline:
+        - stage: "build_and_test"
+          steps:
+            - "build_container_image"
+            - "run_security_scans"
+            - "run_unit_tests"
+            - "push_to_registry"
+        
+        - stage: "deploy_to_staging"
+          steps:
+            - "deploy_via_helm"
+            - "run_integration_tests"
+            - "run_performance_tests"
+            - "validate_deployment"
+        
+        - stage: "production_deployment"
+          approval_required: true
+          steps:
+            - "create_deployment_plan"
+            - "backup_current_state"
+            - "execute_deployment_strategy"
+            - "verify_deployment_success"
+            - "update_service_registry"
+    
+    serverless_applications:
+      platform: "aws_lambda"
+      deployment_tool: "serverless_framework"
+      
+      serverless_configuration:
+        provider: "aws"
+        runtime: "nodejs18.x"
+        region: "us-west-2"
+        stage: "${opt:stage, 'dev'}"
+        
+        environment_variables:
+          NODE_ENV: "${self:provider.stage}"
+          LOG_LEVEL: "info"
+          HUGAI_API_URL: "${env:HUGAI_API_URL}"
+        
+        iam_role_statements:
+          - effect: "Allow"
+            action: ["dynamodb:Query", "dynamodb:Scan", "dynamodb:GetItem"]
+            resource: "arn:aws:dynamodb:${self:provider.region}:*:table/hugai-*"
+        
+        package:
+          individually: true
+          exclude:
+            - ".git/**"
+            - "test/**"
+            - "docs/**"
+        
+        functions:
+          hugai_agent:
+            handler: "src/handlers/agent.handler"
+            timeout: 300
+            memory_size: 1024
+            reserved_concurrency: 50
+            
+            events:
+              - http:
+                  path: "/agent/{proxy+}"
+                  method: "ANY"
+                  cors: true
+            
+            environment:
+              AGENT_TYPE: "${env:AGENT_TYPE}"
+
+  # Database Migrations
+  database_migrations:
+    migration_tool: "flyway"
+    migration_strategy: "forward_only"
+    
+    migration_configuration:
+      locations: ["filesystem:db/migration"]
+      sql_migration_prefix: "V"
+      sql_migration_separator: "__"
+      sql_migration_suffixes: [".sql"]
+      
+      baseline_on_migrate: true
+      validate_on_migrate: true
+      clean_disabled: true
+      
+      placeholders:
+        environment: "${ENVIRONMENT}"
+        app_user: "${DB_APP_USER}"
+        schema_name: "${DB_SCHEMA_NAME}"
+    
+    migration_pipeline:
+      - step: "validate_migration_scripts"
+        tools: ["sql_lint", "migration_validator"]
+        
+      - step: "backup_database"
+        strategy: "point_in_time_snapshot"
+        retention: "30_days"
+        
+      - step: "execute_migrations"
+        timeout: "30m"
+        rollback_on_failure: true
+        
+      - step: "verify_migration_success"
+        validation_queries: true
+        data_integrity_checks: true
+        
+      - step: "update_application_configuration"
+        restart_required: false
+        health_check_after_update: true
+
+integration:
+  # CI/CD Integration
+  cicd_integration:
+    github_actions:
+      workflow_template: |
+        name: HUGAI Deployment Pipeline
+        on:
+          push:
+            branches: [main, develop]
+          release:
+            types: [published]
+        
+        jobs:
+          deploy:
+            runs-on: ubuntu-latest
+            steps:
+              - uses: actions/checkout@v4
+              
+              - name: Configure AWS credentials
+                uses: aws-actions/configure-aws-credentials@v2
+                with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: us-west-2
+              
+              - name: Deploy with HUGAI
+                run: |
+                  hugai deploy --environment ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    
+    monitoring_integration:
+      deployment_tracking: true
+      performance_monitoring: true
+      error_tracking: true
+      
+      post_deployment_monitoring:
+        duration: "30m"
+        metrics:
+          - "response_time_p95"
+          - "error_rate"
+          - "throughput"
+          - "cpu_utilization"
+          - "memory_utilization"
+        
+        alert_thresholds:
+          error_rate: "> 2%"
+          response_time_p95: "> 1000ms"
+          cpu_utilization: "> 80%"
+          memory_utilization: "> 85%"
+
+validation:
+  # Deployment Validation
+  deployment_validation:
+    pre_deployment_checks:
+      - "infrastructure_health_check"
+      - "security_scan_passed"
+      - "performance_baseline_met"
+      - "backup_verified"
+    
+    post_deployment_validation:
+      - "application_health_check"
+      - "integration_test_suite"
+      - "performance_regression_test"
+      - "security_verification"
+  
+  # Infrastructure Validation
+  infrastructure_validation:
+    compliance_checks: "automated"
+    security_posture: "continuously_monitored"
+    cost_optimization: "regularly_reviewed"
+    performance_benchmarks: "baseline_maintained"
+
+examples:
+  # Production Deployment Example
+  production_deployment_example:
+    strategy: "blue_green"
+    configuration: |
+      deployment:
+        strategy: blue_green
+        environment: production
+        approval_required: true
+        approvers: [release_manager, security_officer]
+        
+        health_checks:
+          endpoint: /health
+          timeout: 30s
+          interval: 10s
+          
+        rollback_conditions:
+          error_rate: "> 1%"
+          response_time_p95: "> 800ms"
+
+# CLI Usage Examples
+cli_usage: |
+  # Deploy application to staging
+  hugai deploy --environment staging --strategy rolling --wait-for-completion
+  
+  # Deploy with infrastructure updates
+  hugai deploy --environment production --strategy blue-green --update-infrastructure
+  
+  # Rollback deployment
+  hugai deploy rollback --environment production --to-version v1.2.3
+  
+  # Plan infrastructure changes
+  hugai deploy plan --environment staging --show-costs
+  
+  # Monitor deployment status
+  hugai deploy status --environment production --watch
+  
+  # Validate deployment configuration
+  hugai deploy validate --config deployment.yaml --environment production

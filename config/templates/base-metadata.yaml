@@ -1,0 +1,25 @@
+# Base Metadata Template
+# This template defines common metadata fields used across all HUGAI configurations
+# Use this template to ensure consistency and reduce duplication
+
+metadata:
+  name: "{{name}}"                    # REQUIRED: kebab-case name
+  version: "{{version | default('1.0.0')}}"  # REQUIRED: semantic version
+  description: "{{description}}"      # REQUIRED: brief description (10-200 chars)
+  category: "{{category}}"           # REQUIRED: varies by type
+  author: "{{author | default('HUGAI Team')}}"  # REQUIRED: configuration author
+  created: "{{created | default(current_date)}}"  # REQUIRED: creation date (YYYY-MM-DD)
+  updated: "{{updated | default(current_date)}}"  # REQUIRED: last update date (YYYY-MM-DD)
+  tags: {{tags | default([]) | to_yaml}}      # OPTIONAL: tags for categorization
+  
+  # Documentation cross-references
+  documentation:
+    primary_doc: "{{documentation_path | default('')}}"  # Primary documentation file
+    related_docs: {{related_docs | default([]) | to_yaml}}  # Related documentation
+    config_dependencies: {{config_dependencies | default([]) | to_yaml}}  # Dependent configs
+    
+  # Maintenance information  
+  maintainer: "{{maintainer | default(author)}}"    # OPTIONAL: current maintainer
+  status: "{{status | default('active')}}"          # active, deprecated, experimental
+  review_date: "{{review_date | default('')}}"      # Next review date
+  changelog_url: "{{changelog_url | default('')}}"  # Link to changelog

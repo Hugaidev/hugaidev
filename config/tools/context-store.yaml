@@ -1,0 +1,708 @@
+metadata:
+  name: context-store-configuration
+  version: 1.0.0
+  description: "Context store and knowledge management system for HUGAI agent memory and decision tracking"
+  category: infrastructure-tools
+  dependencies:
+    - knowledge-graph-database
+    - vector-database
+    - relational-database
+    - cache-layer
+  tags:
+    - context-management
+    - knowledge-store
+    - agent-memory
+    - decision-tracking
+    - data-persistence
+
+configuration:
+  # Context Store Philosophy
+  context_philosophy:
+    purpose: "Provide comprehensive context management and knowledge persistence for HUGAI agents and workflows"
+    principles:
+      multi_modal_storage: "Support structured, unstructured, and graph-based data storage"
+      temporal_awareness: "Maintain historical context and decision evolution"
+      agent_memory: "Enable agents to learn from past interactions and decisions"
+      knowledge_graph: "Build relationships between entities, decisions, and artifacts"
+      privacy_preservation: "Ensure sensitive information is protected and compliant"
+
+  # Storage Architecture
+  storage_architecture:
+    metadata_store:
+      type: "postgresql"
+      version: "15"
+      configuration:
+        connection_string: "${POSTGRES_CONNECTION_STRING}"
+        ssl_mode: "require"
+        pool_settings:
+          max_connections: 20
+          min_connections: 5
+          idle_timeout: "300s"
+          max_lifetime: "1h"
+        
+        performance_tuning:
+          shared_buffers: "256MB"
+          effective_cache_size: "1GB"
+          work_mem: "4MB"
+          maintenance_work_mem: "64MB"
+          checkpoint_completion_target: 0.7
+          wal_buffers: "16MB"
+        
+        backup_configuration:
+          automated_backups: true
+          backup_frequency: "daily"
+          retention_period: "30_days"
+          point_in_time_recovery: true
+          backup_location: "s3://hugai-backups/postgres/"
+      
+      schema_design:
+        entities:
+          projects:
+            columns:
+              - "id UUID PRIMARY KEY"
+              - "name VARCHAR(255) NOT NULL"
+              - "description TEXT"
+              - "metadata JSONB"
+              - "created_at TIMESTAMP WITH TIME ZONE"
+              - "updated_at TIMESTAMP WITH TIME ZONE"
+            indexes:
+              - "CREATE INDEX idx_projects_name ON projects(name)"
+              - "CREATE INDEX idx_projects_metadata ON projects USING GIN(metadata)"
+          
+          agents:
+            columns:
+              - "id UUID PRIMARY KEY"
+              - "name VARCHAR(255) NOT NULL"
+              - "type VARCHAR(100) NOT NULL"
+              - "configuration JSONB"
+              - "status VARCHAR(50)"
+              - "last_active TIMESTAMP WITH TIME ZONE"
+              - "metrics JSONB"
+            indexes:
+              - "CREATE INDEX idx_agents_type ON agents(type)"
+              - "CREATE INDEX idx_agents_status ON agents(status)"
+          
+          sessions:
+            columns:
+              - "id UUID PRIMARY KEY"
+              - "project_id UUID REFERENCES projects(id)"
+              - "agent_id UUID REFERENCES agents(id)"
+              - "session_data JSONB"
+              - "start_time TIMESTAMP WITH TIME ZONE"
+              - "end_time TIMESTAMP WITH TIME ZONE"
+              - "outcome VARCHAR(100)"
+            indexes:
+              - "CREATE INDEX idx_sessions_project ON sessions(project_id)"
+              - "CREATE INDEX idx_sessions_agent ON sessions(agent_id)"
+              - "CREATE INDEX idx_sessions_timerange ON sessions(start_time, end_time)"
+          
+          decisions:
+            columns:
+              - "id UUID PRIMARY KEY"
+              - "session_id UUID REFERENCES sessions(id)"
+              - "decision_type VARCHAR(100)"
+              - "context JSONB"
+              - "reasoning TEXT"
+              - "outcome JSONB"
+              - "confidence_score DECIMAL(3,2)"
+              - "human_validated BOOLEAN DEFAULT FALSE"
+              - "timestamp TIMESTAMP WITH TIME ZONE"
+            indexes:
+              - "CREATE INDEX idx_decisions_session ON decisions(session_id)"
+              - "CREATE INDEX idx_decisions_type ON decisions(decision_type)"
+              - "CREATE INDEX idx_decisions_confidence ON decisions(confidence_score)"
+    
+    artifact_store:
+      type: "s3_compatible"
+      configuration:
+        endpoint: "${S3_ENDPOINT}"
+        access_key: "${S3_ACCESS_KEY}"
+        secret_key: "${S3_SECRET_KEY}"
+        bucket_name: "hugai-artifacts"
+        region: "us-west-2"
+        
+        encryption:
+          server_side_encryption: "AES256"
+          kms_key_id: "${KMS_KEY_ID}"
+          encryption_at_rest: true
+        
+        lifecycle_policies:
+          intelligent_tiering: true
+          transition_rules:
+            - from: "STANDARD"
+              to: "STANDARD_IA"
+              days: 30
+            - from: "STANDARD_IA"
+              to: "GLACIER"
+              days: 90
+            - from: "GLACIER"
+              to: "DEEP_ARCHIVE"
+              days: 365
+        
+        versioning: true
+        cross_region_replication: true
+        backup_region: "us-east-1"
+      
+      artifact_types:
+        code_artifacts:
+          path_prefix: "code/"
+          compression: "gzip"
+          retention: "5_years"
+          indexing: true
+        
+        documentation_artifacts:
+          path_prefix: "docs/"
+          compression: "gzip"
+          retention: "3_years"
+          full_text_search: true
+        
+        model_artifacts:
+          path_prefix: "models/"
+          compression: "none"
+          retention: "2_years"
+          versioning: "semantic"
+        
+        decision_artifacts:
+          path_prefix: "decisions/"
+          compression: "gzip"
+          retention: "7_years"
+          encryption: "required"
+    
+    knowledge_graph:
+      database: "neo4j"
+      version: "5.0"
+      configuration:
+        connection_uri: "${NEO4J_CONNECTION_URI}"
+        username: "${NEO4J_USERNAME}"
+        password: "${NEO4J_PASSWORD}"
+        database_name: "hugai_knowledge"
+        
+        memory_settings:
+          heap_initial_size: "1G"
+          heap_max_size: "2G"
+          page_cache_size: "512M"
+        
+        security:
+          auth_enabled: true
+          encryption: true
+          ssl_policy: "required"
+        
+        clustering:
+          mode: "single_instance" # or "cluster"
+          backup_strategy: "online_backup"
+          backup_frequency: "daily"
+      
+      graph_schema:
+        node_types:
+          Entity:
+            properties:
+              - "id: STRING (UNIQUE)"
+              - "type: STRING"
+              - "name: STRING"
+              - "description: TEXT"
+              - "metadata: MAP"
+              - "created_at: DATETIME"
+              - "updated_at: DATETIME"
+          
+          CodeFile:
+            inherits: "Entity"
+            properties:
+              - "path: STRING"
+              - "language: STRING"
+              - "size: INTEGER"
+              - "complexity_score: FLOAT"
+              - "test_coverage: FLOAT"
+              - "last_modified: DATETIME"
+              - "git_hash: STRING"
+          
+          Function:
+            inherits: "Entity"
+            properties:
+              - "signature: STRING"
+              - "parameters: LIST"
+              - "return_type: STRING"
+              - "cyclomatic_complexity: INTEGER"
+              - "lines_of_code: INTEGER"
+          
+          Requirement:
+            inherits: "Entity"
+            properties:
+              - "requirement_id: STRING"
+              - "priority: STRING"
+              - "status: STRING"
+              - "acceptance_criteria: LIST"
+              - "business_value: STRING"
+          
+          Decision:
+            inherits: "Entity"
+            properties:
+              - "decision_type: STRING"
+              - "reasoning: TEXT"
+              - "confidence_score: FLOAT"
+              - "human_validated: BOOLEAN"
+              - "impact_assessment: TEXT"
+          
+          Agent:
+            inherits: "Entity"
+            properties:
+              - "agent_type: STRING"
+              - "version: STRING"
+              - "capabilities: LIST"
+              - "performance_metrics: MAP"
+        
+        relationship_types:
+          DEPENDS_ON:
+            properties:
+              - "dependency_type: STRING"
+              - "strength: FLOAT"
+              - "created_at: DATETIME"
+          
+          IMPLEMENTS:
+            properties:
+              - "implementation_method: STRING"
+              - "completeness: FLOAT"
+              - "validated: BOOLEAN"
+          
+          GENERATES:
+            properties:
+              - "generation_method: STRING"
+              - "confidence: FLOAT"
+              - "timestamp: DATETIME"
+          
+          REVIEWS:
+            properties:
+              - "review_type: STRING"
+              - "outcome: STRING"
+              - "feedback: TEXT"
+              - "timestamp: DATETIME"
+          
+          RELATES_TO:
+            properties:
+              - "relationship_type: STRING"
+              - "similarity_score: FLOAT"
+              - "context: STRING"
+    
+    cache_layer:
+      type: "redis"
+      version: "7.0"
+      configuration:
+        connection_string: "${REDIS_CONNECTION_STRING}"
+        password: "${REDIS_PASSWORD}"
+        ssl_enabled: true
+        
+        memory_settings:
+          maxmemory: "2gb"
+          maxmemory_policy: "allkeys-lru"
+          
+        persistence:
+          save_policy: "900 1 300 10 60 10000"
+          aof_enabled: true
+          aof_fsync: "everysec"
+        
+        clustering:
+          enabled: true
+          nodes: 3
+          replicas_per_node: 1
+        
+        backup_configuration:
+          backup_frequency: "hourly"
+          retention_period: "7_days"
+          backup_location: "s3://hugai-backups/redis/"
+      
+      cache_strategies:
+        session_cache:
+          ttl: 3600 # 1 hour
+          key_pattern: "session:{session_id}"
+          compression: true
+        
+        agent_state_cache:
+          ttl: 1800 # 30 minutes
+          key_pattern: "agent_state:{agent_id}"
+          persistence: true
+        
+        decision_cache:
+          ttl: 7200 # 2 hours
+          key_pattern: "decision:{decision_id}"
+          invalidation: "manual"
+        
+        knowledge_cache:
+          ttl: 21600 # 6 hours
+          key_pattern: "knowledge:{entity_type}:{entity_id}"
+          compression: true
+        
+        search_results_cache:
+          ttl: 900 # 15 minutes
+          key_pattern: "search:{query_hash}"
+          max_size: "100mb"
+
+  # Agent Memory Management
+  agent_memory:
+    episodic_memory:
+      description: "Store specific episodes and interactions"
+      storage_duration: "30_days"
+      compression_strategy: "lz4"
+      indexing_strategy: "temporal_and_contextual"
+      
+      memory_types:
+        interaction_memory:
+          storage: "postgresql"
+          table: "agent_interactions"
+          retention: "30_days"
+          compression: true
+          
+        task_memory:
+          storage: "postgresql"
+          table: "agent_tasks"
+          retention: "90_days"
+          indexed_fields: ["task_type", "outcome", "timestamp"]
+        
+        error_memory:
+          storage: "postgresql"
+          table: "agent_errors"
+          retention: "180_days"
+          analysis: "automated_pattern_detection"
+    
+    semantic_memory:
+      description: "Store generalized knowledge and patterns"
+      embedding_model: "text-embedding-3-large"
+      vector_database: "pinecone"
+      similarity_threshold: 0.8
+      update_strategy: "incremental_learning"
+      
+      knowledge_categories:
+        code_patterns:
+          embedding_dimension: 1536
+          update_frequency: "real_time"
+          similarity_clustering: true
+          
+        decision_patterns:
+          embedding_dimension: 1536
+          update_frequency: "daily"
+          pattern_analysis: "automated"
+        
+        user_preferences:
+          embedding_dimension: 1536
+          update_frequency: "real_time"
+          personalization: true
+    
+    working_memory:
+      description: "Temporary context for current operations"
+      capacity: "16000_tokens"
+      eviction_policy: "lru_with_importance_weighting"
+      persistence: false
+      
+      components:
+        current_context:
+          max_size: "8000_tokens"
+          priority: "high"
+          eviction_strategy: "preserve_most_recent"
+        
+        background_knowledge:
+          max_size: "6000_tokens"
+          priority: "medium"
+          eviction_strategy: "relevance_based"
+        
+        temporary_results:
+          max_size: "2000_tokens"
+          priority: "low"
+          eviction_strategy: "time_based"
+
+  # Data Lifecycle Management
+  data_lifecycle:
+    retention_policies:
+      audit_logs:
+        retention_period: "7_years"
+        storage_tier: "cold_storage_after_1_year"
+        compression: "high"
+        encryption: "required"
+      
+      code_artifacts:
+        retention_period: "5_years"
+        storage_tier: "warm_storage_after_6_months"
+        versioning: "semantic"
+        deduplication: true
+      
+      agent_decisions:
+        retention_period: "2_years"
+        storage_tier: "standard"
+        analysis: "continuous"
+        privacy_scrubbing: "automated"
+      
+      temporary_context:
+        retention_period: "30_days"
+        storage_tier: "hot_storage"
+        cleanup: "automated"
+        compression: "light"
+      
+      user_data:
+        retention_period: "per_gdpr_requirements"
+        storage_tier: "encrypted_storage"
+        right_to_erasure: "supported"
+        consent_tracking: "required"
+    
+    archival_strategy:
+      hot_storage:
+        duration: "3_months"
+        access_pattern: "frequent"
+        performance: "high"
+        cost: "high"
+      
+      warm_storage:
+        duration: "1_year"
+        access_pattern: "occasional"
+        performance: "medium"
+        cost: "medium"
+      
+      cold_storage:
+        duration: "indefinite"
+        access_pattern: "rare"
+        performance: "low"
+        cost: "low"
+        retrieval_time: "minutes_to_hours"
+    
+    privacy_controls:
+      data_classification:
+        enabled: true
+        levels: ["public", "internal", "confidential", "restricted"]
+        auto_classification: true
+        ml_model: "data_classifier_v2"
+      
+      pii_detection:
+        enabled: true
+        scanning: "real_time"
+        anonymization: "automatic"
+        compliance: ["gdpr", "ccpa", "hipaa"]
+      
+      access_logging:
+        enabled: true
+        log_all_access: true
+        retention: "7_years"
+        real_time_monitoring: true
+      
+      encryption_at_rest:
+        enabled: true
+        algorithm: "AES-256"
+        key_rotation: "quarterly"
+        key_management: "hsm"
+
+  # Knowledge Graph Operations
+  knowledge_graph_operations:
+    entity_linking:
+      automatic_linking: true
+      confidence_threshold: 0.85
+      link_types: ["semantic", "structural", "temporal"]
+      
+      linking_algorithms:
+        semantic_similarity:
+          model: "sentence_transformers"
+          threshold: 0.8
+          batch_processing: true
+        
+        structural_analysis:
+          graph_algorithms: ["pagerank", "community_detection"]
+          update_frequency: "daily"
+        
+        temporal_correlation:
+          time_window: "30_days"
+          correlation_threshold: 0.7
+    
+    graph_analytics:
+      centrality_analysis:
+        algorithms: ["betweenness", "closeness", "eigenvector"]
+        update_frequency: "weekly"
+        use_cases: ["importance_ranking", "influence_detection"]
+      
+      community_detection:
+        algorithm: "louvain"
+        resolution: 1.0
+        update_frequency: "daily"
+        use_cases: ["module_identification", "team_boundaries"]
+      
+      path_analysis:
+        shortest_paths: true
+        all_paths: false
+        max_depth: 6
+        use_cases: ["dependency_tracing", "impact_analysis"]
+    
+    graph_queries:
+      common_patterns:
+        find_related_entities: |
+          MATCH (e1:Entity)-[r*1..3]-(e2:Entity)
+          WHERE e1.id = $entity_id
+          RETURN e2, type(r), length(r) as distance
+          ORDER BY distance, e2.updated_at DESC
+          LIMIT 50
+        
+        trace_decision_lineage: |
+          MATCH path = (req:Requirement)-[:IMPLEMENTS*]->(code:CodeFile)
+          -[:GENERATES]->(decision:Decision)
+          WHERE req.id = $requirement_id
+          RETURN path, length(path) as depth
+          ORDER BY depth
+        
+        find_similar_patterns: |
+          MATCH (e1:Entity)-[r1]-(common:Entity)-[r2]-(e2:Entity)
+          WHERE e1.id = $entity_id
+          AND type(r1) = type(r2)
+          AND e1 <> e2
+          RETURN e2, count(common) as similarity_score
+          ORDER BY similarity_score DESC
+          LIMIT 20
+
+integration:
+  # API Integration
+  api_integration:
+    rest_api:
+      base_url: "/api/v1/context"
+      authentication: "bearer_token"
+      rate_limiting: "1000_requests_per_minute"
+      
+      endpoints:
+        context_storage:
+          - "POST /context/store"
+          - "GET /context/{id}"
+          - "PUT /context/{id}"
+          - "DELETE /context/{id}"
+        
+        knowledge_graph:
+          - "POST /graph/entities"
+          - "GET /graph/entities/{id}/relationships"
+          - "POST /graph/query"
+        
+        agent_memory:
+          - "POST /memory/episodic"
+          - "GET /memory/semantic/search"
+          - "PUT /memory/working/{session_id}"
+    
+    graphql_api:
+      endpoint: "/graphql"
+      schema_introspection: true
+      query_complexity_limit: 1000
+      
+      operations:
+        context_queries: |
+          type Query {
+            getContext(id: ID!): Context
+            searchKnowledge(query: String!, filters: KnowledgeFilters): [KnowledgeNode]
+            getAgentMemory(agentId: ID!, type: MemoryType): AgentMemory
+          }
+          
+          type Mutation {
+            storeContext(input: ContextInput!): Context
+            updateKnowledgeGraph(input: GraphUpdateInput!): KnowledgeGraph
+            recordDecision(input: DecisionInput!): Decision
+          }
+    
+    streaming_api:
+      protocol: "websocket"
+      endpoint: "/ws/context"
+      real_time_updates: true
+      
+      event_types:
+        - "context_created"
+        - "context_updated"
+        - "knowledge_graph_updated"
+        - "agent_memory_updated"
+
+  # Agent Integration
+  agent_integration:
+    memory_interface:
+      episodic_memory_api:
+        store_interaction: "POST /memory/episodic/interaction"
+        retrieve_similar: "GET /memory/episodic/similar"
+        update_importance: "PUT /memory/episodic/{id}/importance"
+      
+      semantic_memory_api:
+        store_knowledge: "POST /memory/semantic/knowledge"
+        search_similar: "GET /memory/semantic/search"
+        update_embeddings: "PUT /memory/semantic/embeddings"
+      
+      working_memory_api:
+        set_context: "PUT /memory/working/{session_id}/context"
+        get_context: "GET /memory/working/{session_id}/context"
+        clear_context: "DELETE /memory/working/{session_id}"
+    
+    context_injection:
+      automatic_injection: true
+      context_relevance_threshold: 0.7
+      max_context_size: "8000_tokens"
+      
+      injection_strategies:
+        task_based: "inject_relevant_past_tasks"
+        similarity_based: "inject_similar_contexts"
+        temporal_based: "inject_recent_contexts"
+        importance_based: "inject_high_importance_contexts"
+
+validation:
+  # Data Integrity Validation
+  data_integrity:
+    consistency_checks: "automated"
+    referential_integrity: "enforced"
+    data_validation: "schema_based"
+    corruption_detection: "checksums_and_hashing"
+  
+  # Performance Validation
+  performance_validation:
+    query_performance: "<100ms_p95"
+    storage_efficiency: ">80%_compression_ratio"
+    cache_hit_ratio: ">90%"
+    memory_utilization: "<80%_peak_usage"
+  
+  # Security Validation
+  security_validation:
+    access_control: "rbac_enforced"
+    data_encryption: "end_to_end"
+    audit_logging: "comprehensive"
+    privacy_compliance: "gdpr_hipaa_compliant"
+
+examples:
+  # Context Storage Example
+  context_storage_example:
+    agent_session: |
+      {
+        "session_id": "uuid-1234",
+        "agent_id": "requirements-analyzer",
+        "project_id": "ecommerce-platform",
+        "context": {
+          "current_task": "analyze_user_authentication_requirements",
+          "previous_decisions": [
+            {
+              "decision_id": "auth-001",
+              "type": "architecture_choice",
+              "outcome": "oauth2_with_jwt"
+            }
+          ],
+          "relevant_artifacts": [
+            "s3://hugai-artifacts/code/auth-module.js",
+            "s3://hugai-artifacts/docs/security-requirements.md"
+          ]
+        }
+      }
+  
+  # Knowledge Graph Query Example
+  knowledge_graph_query: |
+    MATCH (req:Requirement {id: "REQ-001"})
+    -[:IMPLEMENTS]->(code:CodeFile)
+    -[:TESTS]->(test:TestCase)
+    RETURN req.description, code.path, test.coverage
+    ORDER BY test.coverage DESC
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize context store
+  hugai context init --database-url postgresql://localhost/hugai --graph-url neo4j://localhost
+  
+  # Store agent context
+  hugai context store --agent requirements-analyzer --session session-123 --context context.json
+  
+  # Query knowledge graph
+  hugai context query --type cypher --query "MATCH (n:Requirement) RETURN n LIMIT 10"
+  
+  # Search agent memory
+  hugai context memory search --agent-id agent-001 --query "authentication patterns"
+  
+  # Export context data
+  hugai context export --format json --output context-backup.json --date-range 30d
+  
+  # Monitor context store health
+  hugai context status --detailed --metrics

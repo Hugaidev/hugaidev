@@ -1,0 +1,58 @@
+# Base Integration Template
+# This template defines common integration patterns used across HUGAI configurations
+# Customize the triggers, inputs, and outputs based on specific requirements
+
+integration:
+  # Event triggers that activate this component
+  triggers:
+    - event: "{{primary_trigger_event}}"
+      condition: "{{primary_trigger_condition}}"
+    {% for trigger in additional_triggers | default([]) %}
+    - event: "{{trigger.event}}"
+      condition: "{{trigger.condition}}"
+    {% endfor %}
+
+  # Input specifications
+  inputs:
+    {% for input in inputs | default([]) %}
+    - name: "{{input.name}}"
+      type: "{{input.type}}"
+      required: {{input.required | default(true)}}
+      description: "{{input.description | default('')}}"
+      {% if input.validation %}
+      validation:
+        {% for rule in input.validation %}
+        - rule: "{{rule.rule}}"
+          message: "{{rule.message}}"
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+
+  # Output specifications  
+  outputs:
+    {% for output in outputs | default([]) %}
+    - name: "{{output.name}}"
+      type: "{{output.type}}"
+      description: "{{output.description | default('')}}"
+      {% if output.format %}
+      format: "{{output.format}}"
+      {% endif %}
+    {% endfor %}
+
+  # Dependencies on other components
+  dependencies:
+    {% if agent_dependencies %}
+    agents: {{agent_dependencies | to_yaml}}
+    {% endif %}
+    {% if tool_dependencies %}
+    tools: {{tool_dependencies | to_yaml}}
+    {% endif %}
+    {% if service_dependencies %}
+    services: {{service_dependencies | to_yaml}}
+    {% endif %}
+
+  # Communication protocols
+  protocols:
+    {% for protocol in protocols | default(['http', 'https']) %}
+    - "{{protocol}}"
+    {% endfor %}

@@ -1,0 +1,296 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://hugai.dev/schemas/lifecycle-schema.json",
+  "title": "HUGAI Lifecycle Configuration Schema",
+  "description": "JSON Schema for validating HUGAI lifecycle phase configuration files",
+  "type": "object",
+  "required": ["metadata", "configuration", "integration", "validation"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version", "description", "phase", "author", "created", "updated"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Phase name in kebab-case"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200,
+          "description": "Brief phase description"
+        },
+        "phase": {
+          "type": "string",
+          "enum": ["planning", "design", "implementation", "testing", "deployment", "maintenance", "governance"],
+          "description": "Lifecycle phase"
+        },
+        "author": {
+          "type": "string",
+          "description": "Configuration author"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date (YYYY-MM-DD)"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Last update date (YYYY-MM-DD)"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "required": ["objectives", "deliverables", "agents", "tools"],
+      "properties": {
+        "objectives": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Phase objectives"
+        },
+        "deliverables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "description"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Deliverable name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["document", "code", "configuration", "artifact"],
+                "description": "Deliverable type"
+              },
+              "description": {
+                "type": "string",
+                "description": "Deliverable description"
+              },
+              "required": {
+                "type": "boolean",
+                "default": true,
+                "description": "Whether deliverable is required"
+              }
+            }
+          },
+          "description": "Phase deliverables"
+        },
+        "agents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "role"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Agent name"
+              },
+              "role": {
+                "type": "string",
+                "enum": ["primary", "secondary", "optional"],
+                "description": "Agent role in phase"
+              },
+              "responsibilities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Agent responsibilities"
+              }
+            }
+          },
+          "description": "Agents involved in phase"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "purpose"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Tool name"
+              },
+              "purpose": {
+                "type": "string",
+                "description": "Tool purpose in phase"
+              },
+              "required": {
+                "type": "boolean",
+                "default": true,
+                "description": "Whether tool is required"
+              }
+            }
+          },
+          "description": "Tools used in phase"
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "required": ["dependencies", "workflows"],
+      "properties": {
+        "dependencies": {
+          "type": "object",
+          "properties": {
+            "predecessor_phases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required predecessor phases"
+            },
+            "successor_phases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Successor phases"
+            },
+            "parallel_phases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Phases that can run in parallel"
+            }
+          }
+        },
+        "workflows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "steps"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Workflow name"
+              },
+              "steps": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "agent", "action"],
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Step name"
+                    },
+                    "agent": {
+                      "type": "string",
+                      "description": "Responsible agent"
+                    },
+                    "action": {
+                      "type": "string",
+                      "description": "Step action"
+                    },
+                    "parallel": {
+                      "type": "boolean",
+                      "default": false,
+                      "description": "Whether step can run in parallel"
+                    }
+                  }
+                },
+                "description": "Workflow steps"
+              }
+            }
+          },
+          "description": "Phase workflows"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["checkpoints", "quality_gates"],
+      "properties": {
+        "checkpoints": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "criteria"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Checkpoint name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["human", "automated", "hybrid"],
+                "description": "Checkpoint type"
+              },
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Validation criteria"
+              }
+            }
+          },
+          "description": "Phase validation checkpoints"
+        },
+        "quality_gates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "threshold", "metric"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Quality gate name"
+              },
+              "threshold": {
+                "type": "number",
+                "description": "Pass threshold"
+              },
+              "metric": {
+                "type": "string",
+                "description": "Metric being measured"
+              }
+            }
+          },
+          "description": "Automated quality gates"
+        }
+      }
+    },
+    "cli_usage": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["command", "description"],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "CLI command"
+              },
+              "description": {
+                "type": "string",
+                "description": "Command description"
+              },
+              "example": {
+                "type": "string",
+                "description": "Command example"
+              }
+            }
+          },
+          "description": "CLI command examples"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,835 @@
+metadata:
+  name: version-control-configuration
+  version: 1.0.0
+  description: "Comprehensive version control system configuration for HUGAI development workflows with Git-based collaboration"
+  category: infrastructure-tools
+  dependencies:
+    - git-hosting-platform
+    - branch-protection-rules
+    - code-review-tools
+    - merge-strategies
+  tags:
+    - version-control
+    - git-workflow
+    - collaboration
+    - code-review
+    - branch-management
+
+configuration:
+  # Version Control Philosophy
+  version_control_philosophy:
+    purpose: "Provide robust, scalable version control that supports HUGAI's human-governed development methodology"
+    principles:
+      human_oversight: "Ensure human review and approval for all significant changes"
+      ai_assistance: "Leverage AI for code review assistance while maintaining human control"
+      collaboration_first: "Optimize for team collaboration and knowledge sharing"
+      quality_gates: "Integrate quality checks into the version control workflow"
+      audit_trail: "Maintain complete audit trail of all changes and decisions"
+
+  # Git Configuration
+  git_configuration:
+    core_settings:
+      default_branch: "main"
+      merge_strategy: "merge"
+      rebase_strategy: "false"  # Preserve merge commits for audit trail
+      
+      global_config:
+        user_name: "${GIT_USER_NAME}"
+        user_email: "${GIT_USER_EMAIL}"
+        core_editor: "code --wait"
+        core_autocrlf: "input"
+        core_safecrlf: "true"
+        
+        init_default_branch: "main"
+        pull_rebase: "false"
+        push_default: "simple"
+        
+        merge_tool: "vscode"
+        diff_tool: "vscode"
+        
+        commit_template: ".gitmessage"
+    
+    hooks_configuration:
+      pre_commit_hooks:
+        enabled: true
+        framework: "pre-commit"
+        
+        hooks:
+          - repo: "https://github.com/pre-commit/pre-commit-hooks"
+            rev: "v4.4.0"
+            hooks:
+              - id: "trailing-whitespace"
+              - id: "end-of-file-fixer"
+              - id: "check-yaml"
+              - id: "check-json"
+              - id: "check-merge-conflict"
+              - id: "check-added-large-files"
+                args: ["--maxkb=1000"]
+              - id: "mixed-line-ending"
+          
+          - repo: "https://github.com/gitleaks/gitleaks"
+            rev: "v8.18.0"
+            hooks:
+              - id: "gitleaks"
+                name: "Detect secrets"
+                description: "Detect secrets in code"
+                entry: "gitleaks detect --source . --verbose"
+                language: "system"
+          
+          - repo: "local"
+            hooks:
+              - id: "hugai-code-review"
+                name: "HUGAI AI Code Review"
+                entry: "hugai review --pre-commit"
+                language: "system"
+                types: ["text"]
+                stages: ["commit"]
+              
+              - id: "hugai-security-scan"
+                name: "HUGAI Security Scan"
+                entry: "hugai security scan --pre-commit"
+                language: "system"
+                types: ["text"]
+                stages: ["commit"]
+      
+      commit_msg_hooks:
+        enabled: true
+        
+        hooks:
+          - id: "conventional-commits"
+            name: "Conventional Commits"
+            entry: "hugai commit validate"
+            language: "system"
+            stages: ["commit-msg"]
+          
+          - id: "ticket-reference"
+            name: "Ticket Reference"
+            entry: "hugai commit check-ticket"
+            language: "system"
+            stages: ["commit-msg"]
+      
+      pre_push_hooks:
+        enabled: true
+        
+        hooks:
+          - id: "test-suite"
+            name: "Run Test Suite"
+            entry: "hugai test run --fast"
+            language: "system"
+            stages: ["push"]
+          
+          - id: "branch-protection"
+            name: "Branch Protection Check"
+            entry: "hugai branch validate --target"
+            language: "system"
+            stages: ["push"]
+
+  # Branching Strategy
+  branching_strategy:
+    model: "github_flow_with_hugai_gates"
+    
+    branch_types:
+      main_branch:
+        name: "main"
+        protection_rules:
+          required_status_checks:
+            strict: true
+            contexts:
+              - "ci/hugai-validation"
+              - "ci/security-scan"
+              - "ci/test-suite"
+              - "ci/code-quality"
+          
+          enforce_admins: false
+          required_pull_request_reviews:
+            required_approving_review_count: 2
+            dismiss_stale_reviews: true
+            require_code_owner_reviews: true
+            require_last_push_approval: true
+          
+          restrictions:
+            push_restrictions: ["hugai-admins", "release-managers"]
+            merge_restrictions: ["hugai-admins", "tech-leads"]
+          
+          allow_force_pushes: false
+          allow_deletions: false
+      
+      development_branches:
+        pattern: "feature/*"
+        naming_convention: "feature/TICKET-123-short-description"
+        
+        creation_rules:
+          source_branch: "main"
+          require_ticket_reference: true
+          require_description: true
+        
+        protection_rules:
+          required_status_checks:
+            contexts:
+              - "ci/hugai-validation"
+              - "ci/test-suite"
+          
+          delete_after_merge: true
+          auto_merge_enabled: false
+      
+      hotfix_branches:
+        pattern: "hotfix/*"
+        naming_convention: "hotfix/TICKET-123-critical-fix"
+        
+        creation_rules:
+          source_branch: "main"
+          require_approval: true
+          expedited_review: true
+        
+        protection_rules:
+          required_status_checks:
+            contexts:
+              - "ci/hugai-validation"
+              - "ci/security-scan"
+              - "ci/smoke-tests"
+          
+          required_pull_request_reviews:
+            required_approving_review_count: 1
+            require_code_owner_reviews: true
+      
+      release_branches:
+        pattern: "release/*"
+        naming_convention: "release/v1.2.3"
+        
+        creation_rules:
+          source_branch: "main"
+          require_release_notes: true
+          require_changelog_update: true
+        
+        protection_rules:
+          required_status_checks:
+            contexts:
+              - "ci/hugai-validation"
+              - "ci/full-test-suite"
+              - "ci/security-scan"
+              - "ci/performance-tests"
+          
+          required_pull_request_reviews:
+            required_approving_review_count: 2
+            require_code_owner_reviews: true
+
+  # Pull Request Workflow
+  pull_request_workflow:
+    templates:
+      feature_pr_template:
+        title_format: "[TICKET-123] Brief description of changes"
+        
+        template_content: |
+          ## Summary
+          Brief description of what this PR accomplishes.
+          
+          ## Related Ticket
+          - Fixes #[ticket-number]
+          - Related to #[related-ticket]
+          
+          ## Type of Change
+          - [ ] Bug fix (non-breaking change which fixes an issue)
+          - [ ] New feature (non-breaking change which adds functionality)
+          - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+          - [ ] Documentation update
+          - [ ] Performance improvement
+          - [ ] Code refactoring
+          
+          ## AI Assistance Used
+          - [ ] AI code generation
+          - [ ] AI code review
+          - [ ] AI testing assistance
+          - [ ] AI documentation generation
+          
+          ## Testing
+          - [ ] Unit tests pass
+          - [ ] Integration tests pass
+          - [ ] E2E tests pass (if applicable)
+          - [ ] Manual testing completed
+          - [ ] Performance impact assessed
+          
+          ## Human Review Requirements
+          - [ ] Security review (if security-related changes)
+          - [ ] Architecture review (if architectural changes)
+          - [ ] Performance review (if performance-critical changes)
+          - [ ] UX review (if user-facing changes)
+          
+          ## Checklist
+          - [ ] Code follows project style guidelines
+          - [ ] Self-review of code completed
+          - [ ] Code is commented appropriately
+          - [ ] Documentation updated (if needed)
+          - [ ] No new warnings or errors introduced
+          - [ ] Backward compatibility maintained (if applicable)
+          
+          ## Screenshots/Demo
+          (If applicable, add screenshots or demo links)
+          
+          ## Additional Notes
+          Any additional context or considerations for reviewers.
+      
+      hotfix_pr_template:
+        title_format: "[HOTFIX] Critical issue description"
+        
+        template_content: |
+          ## 🚨 HOTFIX ALERT 🚨
+          
+          ## Critical Issue Description
+          Describe the critical issue this hotfix addresses.
+          
+          ## Root Cause Analysis
+          Brief explanation of what caused the issue.
+          
+          ## Solution Summary
+          High-level description of the fix.
+          
+          ## Risk Assessment
+          - Impact if deployed: [Low/Medium/High]
+          - Impact if not deployed: [Low/Medium/High]
+          - Risk of regression: [Low/Medium/High]
+          
+          ## Testing
+          - [ ] Fix verified in production-like environment
+          - [ ] Regression tests completed
+          - [ ] Smoke tests pass
+          - [ ] Rollback plan tested
+          
+          ## Approval Chain
+          - [ ] Technical Lead approval
+          - [ ] Security approval (if applicable)
+          - [ ] Product Owner approval
+          - [ ] Release Manager approval
+          
+          ## Deployment Plan
+          Describe the deployment strategy and timing.
+          
+          ## Rollback Plan
+          Describe the rollback strategy if issues arise.
+    
+    automated_checks:
+      pr_validation:
+        title_validation:
+          pattern: "^\\[(TICKET-\\d+|HOTFIX)\\].*"
+          error_message: "PR title must start with [TICKET-123] or [HOTFIX]"
+        
+        description_validation:
+          min_length: 50
+          required_sections: ["Summary", "Testing", "Checklist"]
+        
+        file_validation:
+          max_files_changed: 50
+          max_lines_changed: 2000
+          blocked_file_patterns:
+            - "*.min.js"
+            - "package-lock.json"
+            - "yarn.lock"
+      
+      ai_assisted_review:
+        enabled: true
+        
+        ai_review_scope:
+          - "code_quality_analysis"
+          - "security_vulnerability_detection"
+          - "performance_impact_assessment"
+          - "documentation_completeness"
+          - "test_coverage_analysis"
+        
+        ai_review_configuration:
+          model: "claude-3-5-sonnet"
+          confidence_threshold: 0.8
+          
+          review_prompts:
+            code_quality: |
+              Review this code for quality, maintainability, and adherence to best practices.
+              Focus on:
+              1. Code structure and organization
+              2. Naming conventions
+              3. Error handling
+              4. Performance implications
+              5. Maintainability concerns
+            
+            security: |
+              Analyze this code for security vulnerabilities and concerns.
+              Check for:
+              1. Input validation issues
+              2. Authentication/authorization flaws
+              3. Data exposure risks
+              4. Injection vulnerabilities
+              5. Cryptographic issues
+          
+          human_override: true
+          human_review_required_for:
+            - "security_concerns_detected"
+            - "breaking_changes_identified"
+            - "performance_regressions_suspected"
+            - "ai_confidence_below_threshold"
+    
+    review_assignment:
+      automatic_assignment: true
+      
+      assignment_rules:
+        code_owners:
+          enabled: true
+          file: ".github/CODEOWNERS"
+          
+          ownership_patterns:
+            - "src/agents/* @hugai-team/ai-engineers"
+            - "src/security/* @hugai-team/security-team"
+            - "src/ui/* @hugai-team/frontend-team"
+            - "infrastructure/* @hugai-team/devops-team"
+            - "docs/* @hugai-team/technical-writers"
+        
+        round_robin_assignment:
+          enabled: true
+          pools:
+            senior_engineers: ["alice", "bob", "charlie"]
+            security_reviewers: ["david", "eve"]
+            performance_experts: ["frank", "grace"]
+          
+          assignment_strategy: "least_recently_assigned"
+        
+        expertise_based_assignment:
+          enabled: true
+          
+          expertise_mapping:
+            ai_models: ["alice", "bob"]
+            security: ["david", "eve"]
+            performance: ["frank", "grace"]
+            ui_ux: ["helen", "ivan"]
+            infrastructure: ["jack", "karen"]
+
+  # Code Review Process
+  code_review_process:
+    review_guidelines:
+      review_criteria:
+        functionality:
+          - "Code accomplishes intended purpose"
+          - "Edge cases are handled appropriately"
+          - "Error conditions are handled gracefully"
+          - "Input validation is comprehensive"
+        
+        design:
+          - "Code follows established patterns"
+          - "Abstractions are appropriate"
+          - "Coupling is minimized"
+          - "Cohesion is maximized"
+        
+        readability:
+          - "Code is self-documenting"
+          - "Comments explain why, not what"
+          - "Naming is clear and consistent"
+          - "Code structure is logical"
+        
+        performance:
+          - "No obvious performance issues"
+          - "Algorithms are efficient"
+          - "Resource usage is reasonable"
+          - "Caching is used appropriately"
+        
+        security:
+          - "Input is validated and sanitized"
+          - "Authentication is proper"
+          - "Authorization is enforced"
+          - "Sensitive data is protected"
+        
+        testing:
+          - "Adequate test coverage"
+          - "Tests are meaningful"
+          - "Edge cases are tested"
+          - "Mocks are used appropriately"
+    
+    review_workflow:
+      review_stages:
+        automated_review:
+          duration: "5-10 minutes"
+          
+          checks:
+            - "ai_powered_code_analysis"
+            - "static_analysis_tools"
+            - "security_vulnerability_scan"
+            - "test_coverage_analysis"
+            - "documentation_completeness"
+          
+          blocking_issues:
+            - "critical_security_vulnerabilities"
+            - "test_coverage_below_threshold"
+            - "breaking_api_changes"
+            - "performance_regressions"
+        
+        human_review:
+          duration: "varies by complexity"
+          
+          review_types:
+            standard_review:
+              required_reviewers: 2
+              expertise_requirements: ["domain_knowledge"]
+              approval_threshold: "all_reviewers"
+            
+            security_review:
+              required_reviewers: 1
+              expertise_requirements: ["security_expertise"]
+              approval_threshold: "security_team_approval"
+            
+            architecture_review:
+              required_reviewers: 1
+              expertise_requirements: ["architecture_expertise"]
+              approval_threshold: "architecture_team_approval"
+        
+        final_approval:
+          requirements:
+            - "all_automated_checks_passed"
+            - "required_human_approvals_received"
+            - "no_unresolved_review_comments"
+            - "up_to_date_with_target_branch"
+          
+          auto_merge_conditions:
+            - "all_requirements_met"
+            - "auto_merge_enabled_by_author"
+            - "no_merge_conflicts"
+            - "target_branch_protection_satisfied"
+
+  # Merge Strategies
+  merge_strategies:
+    default_strategy: "merge_commit"
+    
+    strategy_configuration:
+      merge_commit:
+        description: "Creates merge commit preserving branch history"
+        use_cases: ["feature_branches", "release_branches"]
+        
+        configuration:
+          generate_merge_message: true
+          include_pr_number: true
+          include_co_authors: true
+          
+          merge_message_template: |
+            Merge pull request #{pr_number} from {source_branch}
+            
+            {pr_title}
+            
+            {pr_description_summary}
+            
+            Co-authored-by: {co_authors}
+      
+      squash_and_merge:
+        description: "Squashes commits into single commit"
+        use_cases: ["small_features", "bug_fixes"]
+        
+        configuration:
+          include_pr_number: true
+          preserve_commit_messages: true
+          
+          commit_message_template: |
+            {pr_title} (#{pr_number})
+            
+            {commit_messages_summary}
+      
+      rebase_and_merge:
+        description: "Rebases commits without merge commit"
+        use_cases: ["linear_history_preference"]
+        
+        configuration:
+          require_linear_history: true
+          preserve_commit_messages: true
+    
+    branch_specific_strategies:
+      main_branch:
+        allowed_strategies: ["merge_commit"]
+        require_status_checks: true
+        require_up_to_date: true
+      
+      feature_branches:
+        allowed_strategies: ["merge_commit", "squash_and_merge"]
+        default_strategy: "merge_commit"
+      
+      hotfix_branches:
+        allowed_strategies: ["merge_commit"]
+        expedited_process: true
+
+  # Tagging and Release Management
+  tagging_strategy:
+    versioning_scheme: "semantic_versioning"
+    
+    semantic_versioning:
+      format: "v{major}.{minor}.{patch}"
+      pre_release_format: "v{major}.{minor}.{patch}-{pre_release}.{build}"
+      
+      version_bump_rules:
+        major:
+          triggers:
+            - "breaking_changes"
+            - "major_feature_releases"
+            - "architecture_overhauls"
+        
+        minor:
+          triggers:
+            - "new_features"
+            - "feature_enhancements"
+            - "non_breaking_api_additions"
+        
+        patch:
+          triggers:
+            - "bug_fixes"
+            - "security_patches"
+            - "documentation_updates"
+    
+    release_process:
+      automated_tagging: true
+      
+      release_workflow:
+        pre_release_validation:
+          - "all_tests_pass"
+          - "security_scan_clean"
+          - "performance_benchmarks_met"
+          - "documentation_updated"
+        
+        release_creation:
+          generate_changelog: true
+          include_contributor_list: true
+          create_github_release: true
+          
+          changelog_sections:
+            - "breaking_changes"
+            - "new_features"
+            - "improvements"
+            - "bug_fixes"
+            - "security_updates"
+            - "documentation"
+        
+        post_release_actions:
+          - "deploy_to_staging"
+          - "run_smoke_tests"
+          - "notify_stakeholders"
+          - "update_documentation_sites"
+
+  # Repository Management
+  repository_management:
+    repository_structure:
+      monorepo_configuration:
+        enabled: true
+        
+        workspace_organization:
+          - "packages/agents/"
+          - "packages/ui/"
+          - "packages/api/"
+          - "packages/shared/"
+          - "tools/"
+          - "docs/"
+          - "examples/"
+        
+        dependency_management:
+          tool: "lerna" # or "nx" or "rush"
+          workspace_protocol: true
+          hoist_dependencies: true
+        
+        build_coordination:
+          affected_detection: true
+          parallel_builds: true
+          dependency_graph_optimization: true
+    
+    repository_settings:
+      general_settings:
+        allow_merge_commits: true
+        allow_squash_merging: true
+        allow_rebase_merging: false
+        
+        automatically_delete_head_branches: true
+        allow_auto_merge: true
+        
+        default_branch_name: "main"
+        
+        vulnerability_alerts: true
+        dependency_graph: true
+        dependabot_alerts: true
+        dependabot_security_updates: true
+      
+      branch_protection:
+        enforce_branch_protection: true
+        
+        protected_branches:
+          - "main"
+          - "release/*"
+          - "hotfix/*"
+        
+        protection_rules:
+          dismiss_stale_reviews: true
+          require_code_owner_reviews: true
+          restrict_pushes: true
+          restrict_review_dismissals: true
+
+integration:
+  # Platform Integration
+  platform_integration:
+    github_integration:
+      github_apps:
+        hugai_bot:
+          permissions:
+            contents: "read"
+            pull_requests: "write"
+            issues: "write"
+            checks: "write"
+            actions: "read"
+          
+          features:
+            - "automated_code_review"
+            - "pull_request_validation"
+            - "issue_triaging"
+            - "release_automation"
+        
+        security_scanner:
+          permissions:
+            contents: "read"
+            security_events: "write"
+            checks: "write"
+          
+          features:
+            - "vulnerability_scanning"
+            - "dependency_analysis"
+            - "secret_detection"
+      
+      github_actions_integration:
+        workflow_triggers:
+          - "push"
+          - "pull_request"
+          - "release"
+          - "schedule"
+        
+        workflow_templates:
+          - "hugai-ci.yml"
+          - "hugai-security.yml"
+          - "hugai-release.yml"
+    
+    issue_tracking_integration:
+      jira_integration:
+        enabled: true
+        
+        configuration:
+          server_url: "${JIRA_SERVER_URL}"
+          username: "${JIRA_USERNAME}"
+          api_token: "${JIRA_API_TOKEN}"
+          
+          project_key: "HUGAI"
+          
+          issue_linking:
+            commit_pattern: "\\b(HUGAI-\\d+)\\b"
+            pr_pattern: "\\[(HUGAI-\\d+)\\]"
+            
+            auto_transition:
+              on_pr_created: "In Review"
+              on_pr_merged: "Done"
+              on_branch_created: "In Progress"
+        
+        smart_commits:
+          enabled: true
+          
+          commit_commands:
+            - "time"
+            - "comment"
+            - "transition"
+        
+        automation_rules:
+          - "auto_assign_based_on_component"
+          - "auto_label_based_on_file_changes"
+          - "auto_estimate_based_on_complexity"
+
+  # Notification Integration
+  notification_integration:
+    slack_integration:
+      channels:
+        general_updates: "#hugai-dev"
+        security_alerts: "#hugai-security"
+        release_notifications: "#hugai-releases"
+        
+      notification_triggers:
+        pull_request_events:
+          - "opened"
+          - "ready_for_review"
+          - "approved"
+          - "merged"
+          - "closed"
+        
+        security_events:
+          - "vulnerability_detected"
+          - "secret_exposed"
+          - "security_scan_failed"
+        
+        release_events:
+          - "release_created"
+          - "release_published"
+          - "hotfix_deployed"
+    
+    email_integration:
+      notification_groups:
+        development_team: ["dev-team@company.com"]
+        security_team: ["security-team@company.com"]
+        release_managers: ["release-managers@company.com"]
+      
+      digest_schedules:
+        daily_digest: "9:00 AM"
+        weekly_summary: "Monday 9:00 AM"
+        monthly_report: "1st of month 9:00 AM"
+
+validation:
+  # Version Control Validation
+  workflow_effectiveness:
+    code_review_quality: "measurable_improvement"
+    merge_conflict_rate: "<5%"
+    rollback_frequency: "<2%"
+    developer_satisfaction: ">4.0/5"
+  
+  # Compliance Validation
+  compliance_validation:
+    audit_trail_completeness: "100%"
+    access_control_enforcement: "verified"
+    change_approval_process: "documented_and_followed"
+    security_scanning_coverage: ">95%"
+
+examples:
+  # Git Workflow Example
+  feature_development_workflow:
+    workflow_steps: |
+      # 1. Create feature branch
+      git checkout -b feature/HUGAI-123-implement-new-agent
+      
+      # 2. Make changes with AI assistance
+      hugai generate code --task "implement requirements analyzer agent"
+      
+      # 3. Review AI-generated code
+      hugai review --files src/agents/requirements-analyzer.ts
+      
+      # 4. Run tests
+      hugai test run --coverage
+      
+      # 5. Commit with conventional commits
+      git add .
+      git commit -m "feat(agents): implement requirements analyzer agent
+      
+      - Add AI-powered requirements analysis
+      - Include human validation checkpoints
+      - Add comprehensive test coverage
+      
+      Fixes HUGAI-123"
+      
+      # 6. Push and create PR
+      git push origin feature/HUGAI-123-implement-new-agent
+      hugai pr create --template feature
+
+# CLI Usage Examples
+cli_usage: |
+  # Initialize version control for HUGAI project
+  hugai vcs init --platform github --workflow hugai-flow --protection-rules standard
+  
+  # Create feature branch with ticket integration
+  hugai branch create feature/HUGAI-123-new-feature --ticket HUGAI-123
+  
+  # Run AI-assisted code review
+  hugai review --ai-enhanced --files src/ --human-required
+  
+  # Create pull request with template
+  hugai pr create --template feature --reviewers @hugai-team/core
+  
+  # Merge with validation
+  hugai merge --strategy merge-commit --validate-all
+  
+  # Create release with automation
+  hugai release create --version 1.2.3 --changelog --deploy staging

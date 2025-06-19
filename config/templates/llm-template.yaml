@@ -1,0 +1,212 @@
+# HUGAI LLM Configuration Template
+# This template provides a standardized structure for creating LLM model configurations
+# Based on the llm-schema.json validation requirements
+
+# Include base metadata template
+{% include 'base-metadata.yaml' %}
+
+# LLM-specific configuration
+configuration:
+  # Provider definitions
+  providers:
+    {% for provider in providers %}
+    - name: "{{provider.name}}"
+      type: "{{provider.type}}"
+      endpoint: "{{provider.endpoint}}"
+      authentication:
+        method: "{{provider.authentication.method}}"
+        {% if provider.authentication.key_env_var %}
+        key_env_var: "{{provider.authentication.key_env_var}}"
+        {% endif %}
+      {% if provider.rate_limits %}
+      rate_limits:
+        requests_per_minute: {{provider.rate_limits.requests_per_minute}}
+        tokens_per_minute: {{provider.rate_limits.tokens_per_minute}}
+      {% endif %}
+      {% if provider.region %}
+      region: "{{provider.region}}"
+      {% endif %}
+    {% endfor %}
+
+  # Model definitions
+  models:
+    {% for model in models %}
+    - id: "{{model.id}}"
+      name: "{{model.name | default(model.id)}}"
+      provider: "{{model.provider}}"
+      capabilities:
+        max_tokens: {{model.capabilities.max_tokens}}
+        context_window: {{model.capabilities.context_window}}
+        supports_functions: {{model.capabilities.supports_functions | default(false)}}
+        supports_vision: {{model.capabilities.supports_vision | default(false)}}
+        supports_code: {{model.capabilities.supports_code | default(false)}}
+      cost:
+        input_cost: {{model.cost.input_cost}}
+        output_cost: {{model.cost.output_cost}}
+        currency: "{{model.cost.currency | default('USD')}}"
+      parameters:
+        temperature: {{model.parameters.temperature | default(0.7)}}
+        top_p: {{model.parameters.top_p | default(1)}}
+        frequency_penalty: {{model.parameters.frequency_penalty | default(0)}}
+        presence_penalty: {{model.parameters.presence_penalty | default(0)}}
+      {% if model.specializations %}
+      specializations: {{model.specializations | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+  # Intelligent routing configuration
+  routing:
+    strategy: "{{routing_strategy | default('capability_based')}}"
+    rules:
+      {% for rule in routing_rules %}
+      - name: "{{rule.name | default('Rule ' + loop.index)}}"
+        condition:
+          {% if rule.condition.task_type %}
+          task_type: "{{rule.condition.task_type}}"
+          {% endif %}
+          {% if rule.condition.input_length %}
+          input_length:
+            min: {{rule.condition.input_length.min | default(0)}}
+            max: {{rule.condition.input_length.max}}
+          {% endif %}
+          {% if rule.condition.cost_threshold %}
+          cost_threshold: {{rule.condition.cost_threshold}}
+          {% endif %}
+        target_model: "{{rule.target_model}}"
+        {% if rule.fallback_models %}
+        fallback_models: {{rule.fallback_models | to_yaml}}
+        {% endif %}
+      {% endfor %}
+
+  # Cost optimization
+  cost_optimization:
+    budget:
+      {% if daily_limit %}
+      daily_limit: {{daily_limit}}
+      {% endif %}
+      {% if monthly_limit %}
+      monthly_limit: {{monthly_limit}}
+      {% endif %}
+      alert_thresholds: {{alert_thresholds | default([0.7, 0.9]) | to_yaml}}
+    
+    strategies: {{cost_strategies | default(['cache_responses', 'use_cheaper_models']) | to_yaml}}
+
+# LLM integration with agents and tools
+integration:
+  # Agent-specific model preferences
+  agents:
+    {% for agent in agent_integrations | default([]) %}
+    - agent_name: "{{agent.name}}"
+      preferred_models: {{agent.preferred_models | to_yaml}}
+      {% if agent.task_routing %}
+      task_specific_routing: {{agent.task_routing | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+  # Tool integrations
+  tools:
+    {% for tool in tool_integrations | default([]) %}
+    - tool_name: "{{tool.name}}"
+      integration_type: "{{tool.integration_type}}"
+      {% if tool.configuration %}
+      configuration: {{tool.configuration | to_yaml}}
+      {% endif %}
+    {% endfor %}
+
+# LLM validation and monitoring
+validation:
+  # Monitoring configuration
+  monitoring:
+    logging:
+      level: "{{log_level | default('info')}}"
+      include_requests: {{log_requests | default(true)}}
+      include_responses: {{log_responses | default(false)}}
+    
+    metrics:
+      {% for metric in monitoring_metrics | default([]) %}
+      - name: "{{metric.name}}"
+        type: "{{metric.type}}"
+        description: "{{metric.description | default('')}}"
+      {% endfor %}
+
+  # Quality metrics and thresholds
+  quality_metrics:
+    {% for metric in quality_metrics | default([]) %}
+    - name: "{{metric.name}}"
+      threshold: {{metric.threshold}}
+      {% if metric.unit %}
+      unit: "{{metric.unit}}"
+      {% endif %}
+    {% endfor %}
+
+# Include base CLI usage template with LLM-specific settings
+{% set component_type = 'llm' %}
+{% set custom_commands = [
+  {
+    'name': 'route',
+    'description': 'Test model routing for a given input',
+    'example': 'hugai llm route ' + name + ' --input "Write a Python function" --show-reasoning'
+  },
+  {
+    'name': 'benchmark',
+    'description': 'Benchmark model performance',
+    'example': 'hugai llm benchmark ' + name + ' --tasks code,reasoning --duration 1h'
+  },
+  {
+    'name': 'cost',
+    'description': 'Show cost analysis and optimization suggestions',
+    'example': 'hugai llm cost ' + name + ' --period last-week --breakdown by-model'
+  }
+] %}
+{% include 'base-cli-usage.yaml' %}
+
+# LLM-specific extensions
+llm_extensions:
+  # Advanced routing
+  advanced_routing:
+    {% if load_balancing %}
+    load_balancing:
+      strategy: "{{load_balancing.strategy | default('round_robin')}}"
+      health_check_interval: {{load_balancing.health_check_interval | default(60)}}
+    {% endif %}
+    
+    {% if circuit_breaker %}
+    circuit_breaker:
+      failure_threshold: {{circuit_breaker.failure_threshold | default(5)}}
+      recovery_timeout: {{circuit_breaker.recovery_timeout | default(60)}}
+    {% endif %}
+
+  # Caching configuration
+  caching:
+    enabled: {{caching_enabled | default(true)}}
+    {% if caching_enabled %}
+    ttl: {{cache_ttl | default(3600)}}
+    max_size: {{cache_max_size | default('1GB')}}
+    {% if cache_strategies %}
+    strategies: {{cache_strategies | to_yaml}}
+    {% endif %}
+    {% endif %}
+
+  # Fine-tuning support
+  fine_tuning:
+    enabled: {{fine_tuning_enabled | default(false)}}
+    {% if fine_tuning_enabled %}
+    training_data_format: "{{training_data_format | default('jsonl')}}"
+    evaluation_metrics: {{evaluation_metrics | default(['accuracy', 'f1_score']) | to_yaml}}
+    {% endif %}
+
+  # Security and compliance
+  security:
+    {% if data_encryption %}
+    data_encryption: {{data_encryption | to_yaml}}
+    {% endif %}
+    
+    {% if pii_detection %}
+    pii_detection:
+      enabled: {{pii_detection.enabled | default(true)}}
+      action: "{{pii_detection.action | default('redact')}}"
+    {% endif %}
+    
+    {% if compliance_requirements %}
+    compliance: {{compliance_requirements | to_yaml}}
+    {% endif %}

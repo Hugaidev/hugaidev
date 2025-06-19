@@ -1,0 +1,479 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://hugai.dev/schemas/llm-schema.json",
+  "title": "HUGAI LLM Configuration Schema",
+  "description": "JSON Schema for validating HUGAI LLM model configuration files",
+  "type": "object",
+  "required": ["metadata", "configuration", "integration", "validation"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version", "description", "author", "created", "updated"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "LLM configuration name in kebab-case"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200,
+          "description": "Brief LLM configuration description"
+        },
+        "author": {
+          "type": "string",
+          "description": "Configuration author"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date (YYYY-MM-DD)"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Last update date (YYYY-MM-DD)"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "required": ["providers", "models", "routing", "cost_optimization"],
+      "properties": {
+        "providers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "endpoint"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Provider name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["openai", "anthropic", "azure", "huggingface", "local", "custom"],
+                "description": "Provider type"
+              },
+              "endpoint": {
+                "type": "string",
+                "format": "uri",
+                "description": "Provider API endpoint"
+              },
+              "authentication": {
+                "type": "object",
+                "required": ["method"],
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "enum": ["api_key", "oauth", "bearer_token", "none"],
+                    "description": "Authentication method"
+                  },
+                  "key_env_var": {
+                    "type": "string",
+                    "description": "Environment variable for API key"
+                  }
+                }
+              },
+              "rate_limits": {
+                "type": "object",
+                "properties": {
+                  "requests_per_minute": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Requests per minute limit"
+                  },
+                  "tokens_per_minute": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Tokens per minute limit"
+                  }
+                }
+              }
+            }
+          },
+          "minItems": 1,
+          "description": "LLM providers configuration"
+        },
+        "models": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "provider", "capabilities", "cost"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Model identifier"
+              },
+              "name": {
+                "type": "string",
+                "description": "Model display name"
+              },
+              "provider": {
+                "type": "string",
+                "description": "Provider name"
+              },
+              "capabilities": {
+                "type": "object",
+                "required": ["max_tokens", "context_window"],
+                "properties": {
+                  "max_tokens": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Maximum output tokens"
+                  },
+                  "context_window": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "description": "Context window size"
+                  },
+                  "supports_functions": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Function calling support"
+                  },
+                  "supports_vision": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Vision capabilities"
+                  },
+                  "supports_code": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Code generation capabilities"
+                  }
+                }
+              },
+              "cost": {
+                "type": "object",
+                "required": ["input_cost", "output_cost"],
+                "properties": {
+                  "input_cost": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Cost per 1K input tokens"
+                  },
+                  "output_cost": {
+                    "type": "number",
+                    "minimum": 0,
+                    "description": "Cost per 1K output tokens"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "default": "USD",
+                    "description": "Currency code"
+                  }
+                }
+              },
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "temperature": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2,
+                    "default": 0.7,
+                    "description": "Default temperature"
+                  },
+                  "top_p": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 1,
+                    "description": "Top-p sampling"
+                  },
+                  "frequency_penalty": {
+                    "type": "number",
+                    "minimum": -2,
+                    "maximum": 2,
+                    "default": 0,
+                    "description": "Frequency penalty"
+                  },
+                  "presence_penalty": {
+                    "type": "number",
+                    "minimum": -2,
+                    "maximum": 2,
+                    "default": 0,
+                    "description": "Presence penalty"
+                  }
+                }
+              }
+            }
+          },
+          "minItems": 1,
+          "description": "Available models configuration"
+        },
+        "routing": {
+          "type": "object",
+          "required": ["strategy", "rules"],
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": ["cost_optimized", "performance_first", "capability_based", "round_robin", "custom"],
+              "description": "Routing strategy"
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["condition", "target_model"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Rule name"
+                  },
+                  "condition": {
+                    "type": "object",
+                    "properties": {
+                      "task_type": {
+                        "type": "string",
+                        "enum": ["code", "analysis", "creative", "reasoning", "translation"],
+                        "description": "Task type condition"
+                      },
+                      "input_length": {
+                        "type": "object",
+                        "properties": {
+                          "min": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "max": {
+                            "type": "integer",
+                            "minimum": 0
+                          }
+                        }
+                      },
+                      "cost_threshold": {
+                        "type": "number",
+                        "minimum": 0,
+                        "description": "Maximum cost per request"
+                      }
+                    }
+                  },
+                  "target_model": {
+                    "type": "string",
+                    "description": "Model to route to"
+                  },
+                  "fallback_models": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Fallback models if primary fails"
+                  }
+                }
+              },
+              "description": "Routing rules"
+            }
+          }
+        },
+        "cost_optimization": {
+          "type": "object",
+          "required": ["budget", "strategies"],
+          "properties": {
+            "budget": {
+              "type": "object",
+              "properties": {
+                "daily_limit": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Daily spending limit"
+                },
+                "monthly_limit": {
+                  "type": "number",
+                  "minimum": 0,
+                  "description": "Monthly spending limit"
+                },
+                "alert_thresholds": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "description": "Alert thresholds as percentage of limit"
+                }
+              }
+            },
+            "strategies": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["cache_responses", "compress_prompts", "batch_requests", "use_cheaper_models", "smart_fallback"]
+              },
+              "description": "Cost optimization strategies"
+            }
+          }
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "required": ["agents", "tools"],
+      "properties": {
+        "agents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["agent_name", "preferred_models"],
+            "properties": {
+              "agent_name": {
+                "type": "string",
+                "description": "Agent name"
+              },
+              "preferred_models": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Preferred models for this agent"
+              },
+              "task_specific_routing": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "description": "Task-specific model routing"
+              }
+            }
+          },
+          "description": "Agent-specific model preferences"
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["tool_name", "integration_type"],
+            "properties": {
+              "tool_name": {
+                "type": "string",
+                "description": "Tool name"
+              },
+              "integration_type": {
+                "type": "string",
+                "enum": ["direct", "webhook", "api", "plugin"],
+                "description": "Integration method"
+              },
+              "configuration": {
+                "type": "object",
+                "description": "Tool-specific configuration"
+              }
+            }
+          },
+          "description": "Tool integrations"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["monitoring", "quality_metrics"],
+      "properties": {
+        "monitoring": {
+          "type": "object",
+          "properties": {
+            "logging": {
+              "type": "object",
+              "properties": {
+                "level": {
+                  "type": "string",
+                  "enum": ["debug", "info", "warn", "error"],
+                  "default": "info",
+                  "description": "Logging level"
+                },
+                "include_requests": {
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Log API requests"
+                },
+                "include_responses": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Log API responses"
+                }
+              }
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "type"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Metric name"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["counter", "gauge", "histogram", "summary"],
+                    "description": "Metric type"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Metric description"
+                  }
+                }
+              },
+              "description": "Monitoring metrics"
+            }
+          }
+        },
+        "quality_metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "threshold"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "enum": ["response_time", "error_rate", "token_efficiency", "cost_per_request"],
+                "description": "Quality metric name"
+              },
+              "threshold": {
+                "type": "number",
+                "description": "Quality threshold"
+              },
+              "unit": {
+                "type": "string",
+                "description": "Metric unit"
+              }
+            }
+          },
+          "description": "Quality metrics and thresholds"
+        }
+      }
+    },
+    "cli_usage": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["command", "description"],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "CLI command"
+              },
+              "description": {
+                "type": "string",
+                "description": "Command description"
+              },
+              "example": {
+                "type": "string",
+                "description": "Command example"
+              }
+            }
+          },
+          "description": "CLI command examples"
+        }
+      }
+    }
+  }
+}

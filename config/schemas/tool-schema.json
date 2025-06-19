@@ -1,0 +1,267 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://hugai.dev/schemas/tool-schema.json",
+  "title": "HUGAI Tool Configuration Schema",
+  "description": "JSON Schema for validating HUGAI tool configuration files",
+  "type": "object",
+  "required": ["metadata", "configuration", "integration", "validation"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version", "description", "category", "author", "created", "updated"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Tool name in kebab-case"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Semantic version"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 10,
+          "maxLength": 200,
+          "description": "Brief tool description"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["development", "testing", "deployment", "monitoring", "security", "collaboration"],
+          "description": "Tool category"
+        },
+        "author": {
+          "type": "string",
+          "description": "Configuration author"
+        },
+        "created": {
+          "type": "string",
+          "format": "date",
+          "description": "Creation date (YYYY-MM-DD)"
+        },
+        "updated": {
+          "type": "string",
+          "format": "date",
+          "description": "Last update date (YYYY-MM-DD)"
+        }
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "required": ["purpose", "capabilities", "requirements", "settings"],
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "description": "Tool's primary purpose"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "Tool capabilities"
+        },
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "system": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "System requirements"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Tool dependencies"
+            },
+            "permissions": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Required permissions"
+            }
+          }
+        },
+        "settings": {
+          "type": "object",
+          "properties": {
+            "default_config": {
+              "type": "object",
+              "description": "Default configuration settings"
+            },
+            "environment_variables": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "required"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Environment variable name"
+                  },
+                  "required": {
+                    "type": "boolean",
+                    "description": "Whether variable is required"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Variable description"
+                  },
+                  "default": {
+                    "type": "string",
+                    "description": "Default value"
+                  }
+                }
+              },
+              "description": "Required environment variables"
+            }
+          }
+        }
+      }
+    },
+    "integration": {
+      "type": "object",
+      "required": ["interfaces", "protocols"],
+      "properties": {
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "endpoint"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["api", "cli", "webhook", "gui", "library"],
+                "description": "Interface type"
+              },
+              "endpoint": {
+                "type": "string",
+                "description": "Interface endpoint or command"
+              },
+              "authentication": {
+                "type": "object",
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "enum": ["none", "api_key", "oauth", "basic", "token"],
+                    "description": "Authentication method"
+                  },
+                  "required": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether authentication is required"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Tool interfaces"
+        },
+        "protocols": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["http", "https", "grpc", "websocket", "tcp", "udp"],
+            "description": "Supported protocols"
+          },
+          "description": "Communication protocols"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["health_checks", "performance_metrics"],
+      "properties": {
+        "health_checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "endpoint", "interval"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Health check name"
+              },
+              "endpoint": {
+                "type": "string",
+                "description": "Health check endpoint"
+              },
+              "interval": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Check interval in seconds"
+              },
+              "timeout": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Check timeout in seconds"
+              }
+            }
+          },
+          "description": "Tool health checks"
+        },
+        "performance_metrics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "type", "threshold"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Metric name"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["latency", "throughput", "error_rate", "availability"],
+                "description": "Metric type"
+              },
+              "threshold": {
+                "type": "number",
+                "description": "Performance threshold"
+              },
+              "unit": {
+                "type": "string",
+                "description": "Metric unit"
+              }
+            }
+          },
+          "description": "Performance monitoring metrics"
+        }
+      }
+    },
+    "cli_usage": {
+      "type": "object",
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["command", "description"],
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "CLI command"
+              },
+              "description": {
+                "type": "string",
+                "description": "Command description"
+              },
+              "example": {
+                "type": "string",
+                "description": "Command example"
+              }
+            }
+          },
+          "description": "CLI command examples"
+        }
+      }
+    }
+  }
+}
