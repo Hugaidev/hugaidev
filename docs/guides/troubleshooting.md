@@ -907,10 +907,10 @@ escalation_matrix:
 
 ### Useful Resources
 
-- **Documentation**: [HUGAI Documentation Portal](docs.hugai.dev)
-- **Community Forum**: [HUGAI Community](community.hugai.dev)
-- **Status Page**: [HUGAI System Status](status.hugai.dev)
-- **Training Materials**: [HUGAI Training](training.hugai.dev)
+- **Documentation**: [HUGAI Documentation Portal](https://docs.hugai.dev)
+- **Community Forum**: [HUGAI Community](https://community.hugai.dev)
+- **Status Page**: [HUGAI System Status](https://status.hugai.dev)
+- **Training Materials**: [HUGAI Training](https://training.hugai.dev)
 
 ---
 
