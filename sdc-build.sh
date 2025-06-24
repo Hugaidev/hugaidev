@@ -7,7 +7,8 @@ source .venv/bin/activate
 echo "📚 Installing dependencies from requirements.txt..."
 pip install -r requirements.txt
 
-echo "🔧 Building HUG AI DEV documentation..."
+echo "🎨 Setting up Cairo library path for SVG support..."
+export DYLD_LIBRARY_PATH="/opt/homebrew/lib:$DYLD_LIBRARY_PATH"
 
 # English version (root)
 mkdocs build -f mkdocs.yml -d site
