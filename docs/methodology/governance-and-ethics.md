@@ -16,15 +16,6 @@ Governance and ethics form the backbone of the **HUG AI** methodology, ensuring 
 
 This section introduces the governance structures, ethical guidelines, and practical controls that embed responsible AI practices throughout the development lifecycle.
 
----
-title: Governance & Ethics
-description: Principles and practices for ethical AI governance, bias mitigation, traceability, and validation.
----
-
-# Governance & Ethics
-
-> Ethical AI demands rigorous governance frameworks, proactive bias mitigation, and end-to-end traceability.
-
 ## Bias in AI Models
 
 !!! warning "Model Bias Risks"
